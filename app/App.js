@@ -15,7 +15,7 @@ import BrowserIntercept from './pages/BrowserIntercept';
 export default class App extends Component {
   constructor() {
     super();
-    document.body.setAttribute('theme', 'default');
+    document.body.setAttribute('theme', 'one-light');
   }
 
   render() {
@@ -23,19 +23,19 @@ export default class App extends Component {
       <div id="content-wrapper" className="wrapper">
         <div id="sidebar" className="theme--sidebar">
           <div className="sidebar-icon theme--sidebar__header">
-            <i className="fas fa-camera"></i>
+            <i className="fas fa-window-restore"></i>
+          </div>
+
+          <div className="sidebar-icon active theme--sidebar__header">
+            <i className="fas fa-spider"></i>
           </div>
 
           <div className="sidebar-icon theme--sidebar__header">
-            <i className="material-icons md-36 md-light">view_headline</i>
+            <i className="fas fa-crosshairs"></i>
           </div>
 
           <div className="sidebar-icon theme--sidebar__header">
-            <i className="material-icons md-36 md-light">call_split</i>
-          </div>
-
-          <div className="sidebar-icon theme--sidebar__header">
-            <i className="material-icons md-36 md-light">call_made</i>
+            <i className="fas fa-rss"></i>
           </div>
         </div>
 

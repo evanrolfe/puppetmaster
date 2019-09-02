@@ -15,7 +15,6 @@
 #sidebar {
   width: 50px;
   background-color: var(--color-bg);
-  border-right: 1px solid #444A55;
   border-right: 1px solid @hl-md;
 }
 
@@ -26,11 +25,18 @@
 
 .sidebar-icon {
   background-color: var(--color-bg);
-  border-bottom: 1px solid #444A55;
+  //border-bottom: 1px solid @hl-md;
   align-items: center;
   justify-content: center;
   display: flex;
   height: 50px;
+  font-size: 30px;
+  color: var(--color-font);
+  opacity: 0.6;
+}
+
+.sidebar-icon.active, .sidebar-icon:hover {
+  opacity: 1.0;
 }
 
 #tabs-bar {
