@@ -10,9 +10,9 @@ export default class BrowserTabs extends Component<Props> {
   render() {
     return (
       <div>
-        <Link to="/browser/sessions">Sessions</Link> |
-        <Link to="/browser/Network">Network</Link> |
-        <Link to="/browser/intercept">Intercept</Link> |
+        <Link to="/browser/sessions" className="theme--link">Sessions</Link> |
+        <Link to="/browser/Network" className="theme--link">Network</Link> |
+        <Link to="/browser/intercept" className="theme--link">Intercept</Link> |
       </div>
     );
   }

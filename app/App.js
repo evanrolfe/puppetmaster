@@ -12,37 +12,25 @@ import BrowserIntercept from './pages/BrowserIntercept';
 
 // const history = createHashHistory();
 
-// import * as themeUtils from './utils/theme-utils';
-
 export default class App extends Component {
   constructor() {
     super();
-    document.body.setAttribute('theme', 'one-light');
+    document.body.setAttribute('theme', 'material');
   }
-/*
-  async generateTheme() {
-    for(let i=0; i< themes.length; i++) {
-      const theme = themes[i];
-      const css = await themeUtils.generateThemeCSS(theme);
 
-      console.log(`${theme.name}.less`)
-      console.log(css);
-    }
-  }
-*/
   render() {
     return (
-      <div id="content">
-        <div id="sidebar">X</div>
+      <div id="content-wrapper" className="wrapper">
+        <div id="sidebar" className="theme--sidebar">X</div>
 
         <HashRouter>
           <div id="mainbar">
-            <div id="tabs-bar">
+            <div id="tabs-bar" className="theme--pane__header">
               <Route exact path="/" component={BrowserTabs} />
               <Route path="/browser" component={BrowserTabs} />
             </div>
 
-            <div>
+            <div id="content" className="theme--pane">
               <Route exact path="/" component={BrowserSessions} />
               <Route
                 exact

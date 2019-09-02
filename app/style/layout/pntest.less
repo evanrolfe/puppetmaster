@@ -2,7 +2,42 @@
 @import '../constants/dimensions';
 @import '../constants/fonts';
 
-.hello {
-  color: var(--color-success);
-  font-size: 36px;
+#content-wrapper {
+  background-color: var(--color-bg);
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+}
+
+#sidebar {
+  width: 50px;
+  background-color: var(--color-bg);
+  border-right: 1px solid #444A55;
+}
+
+#mainbar {
+  width: 100%;
+  background-color: var(--color-bg);
+}
+
+.sidebar-icon {
+  border-bottom: 1px solid #444A55;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 50px;
+}
+
+#tabs-bar {
+  height: 40px;
+  width: 100%;
+  background-color: var(--color-bg);
+}
+
+#content {
+  background-color: var(--color-bg);
+  height: 100%;
 }
