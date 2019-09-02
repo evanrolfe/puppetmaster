@@ -12,7 +12,24 @@ import BrowserIntercept from './pages/BrowserIntercept';
 
 // const history = createHashHistory();
 
+// import * as themeUtils from './utils/theme-utils';
+
 export default class App extends Component {
+  constructor() {
+    super();
+    document.body.setAttribute('theme', 'one-light');
+  }
+/*
+  async generateTheme() {
+    for(let i=0; i< themes.length; i++) {
+      const theme = themes[i];
+      const css = await themeUtils.generateThemeCSS(theme);
+
+      console.log(`${theme.name}.less`)
+      console.log(css);
+    }
+  }
+*/
   render() {
     return (
       <div id="content">
