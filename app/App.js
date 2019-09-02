@@ -12,7 +12,7 @@ import BrowserIntercept from './pages/BrowserIntercept';
 
 // const history = createHashHistory();
 
-export default class Root extends Component {
+export default class App extends Component {
   render() {
     return (
       <div id="content">

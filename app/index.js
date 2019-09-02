@@ -1,23 +1,23 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
-import Root from './Root';
+import App from './App';
 import './style/index.less';
 
 render(
   <AppContainer>
-    <Root />
+    <App />
   </AppContainer>,
   document.getElementById('root')
 );
 
 if (module.hot) {
-  module.hot.accept('./Root', () => {
+  module.hot.accept('./App', () => {
     // eslint-disable-next-line global-require
-    const NextRoot = require('./Root').default;
+    const NextApp = require('./App').default;
     render(
       <AppContainer>
-        <NextRoot />
+        <NextApp />
       </AppContainer>,
       document.getElementById('root')
     );
