@@ -15,13 +15,29 @@ import BrowserIntercept from './pages/BrowserIntercept';
 export default class App extends Component {
   constructor() {
     super();
-    document.body.setAttribute('theme', 'material');
+    document.body.setAttribute('theme', 'default');
   }
 
   render() {
     return (
       <div id="content-wrapper" className="wrapper">
-        <div id="sidebar" className="theme--sidebar">X</div>
+        <div id="sidebar" className="theme--sidebar">
+          <div className="sidebar-icon theme--sidebar__header">
+            <i className="fas fa-camera"></i>
+          </div>
+
+          <div className="sidebar-icon theme--sidebar__header">
+            <i className="material-icons md-36 md-light">view_headline</i>
+          </div>
+
+          <div className="sidebar-icon theme--sidebar__header">
+            <i className="material-icons md-36 md-light">call_split</i>
+          </div>
+
+          <div className="sidebar-icon theme--sidebar__header">
+            <i className="material-icons md-36 md-light">call_made</i>
+          </div>
+        </div>
 
         <HashRouter>
           <div id="mainbar">

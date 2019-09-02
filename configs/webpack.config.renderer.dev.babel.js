@@ -159,7 +159,7 @@ export default merge.smart(baseConfig, {
       },
       // WOFF Font
       {
-        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.woff$/,
         use: {
           loader: 'url-loader',
           options: {
@@ -170,7 +170,7 @@ export default merge.smart(baseConfig, {
       },
       // WOFF2 Font
       {
-        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.woff2$/,
         use: {
           loader: 'url-loader',
           options: {
@@ -181,7 +181,7 @@ export default merge.smart(baseConfig, {
       },
       // TTF Font
       {
-        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.ttf$/,
         use: {
           loader: 'url-loader',
           options: {
@@ -192,12 +192,12 @@ export default merge.smart(baseConfig, {
       },
       // EOT Font
       {
-        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        use: 'file-loader'
+        test: /\.eot$/,
+        use: 'url-loader'
       },
       // SVG Font
       {
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.svg$/,
         use: {
           loader: 'url-loader',
           options: {
