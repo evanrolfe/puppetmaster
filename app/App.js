@@ -23,6 +23,11 @@ export default class App extends Component {
   render() {
     const history = createHashHistory();
 
+    const BrowserTitle = () => <span className="title">Browser</span>;
+    const CrawlerTitle = () => <span className="title">Crawler</span>;
+    const AttacksTitle = () => <span className="title">Attacks</span>;
+    const ScansTitle = () => <span className="title">Scans</span>;
+
     return (
       <HashRouter history={history}>
         <div id="content-wrapper" className="wrapper">
@@ -32,10 +37,15 @@ export default class App extends Component {
             <section className="theme--pane pane">
               <header className="pane__header theme--pane__header">
                 <div className="header-bar">
-                  <span className="title">Browser</span>
+                  <Route exact path="/" component={BrowserTitle} />
+                  <Route path="/browser" component={BrowserTitle} />
+                  <Route path="/crawler" component={CrawlerTitle} />
+                  <Route path="/attacks" component={AttacksTitle} />
+                  <Route path="/scans" component={ScansTitle} />
                 </div>
               </header>
 
+              <Route exact path="/" component={BrowserTabs} />
               <Route path="/browser" component={BrowserTabs} />
 
               <section className="pane__body theme--pane">
