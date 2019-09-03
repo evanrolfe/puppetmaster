@@ -5,10 +5,14 @@ import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 
 import BrowserTabs from './components/BrowserTabs';
+import SideBar from './components/SideBar';
 
 import BrowserSessions from './pages/BrowserSessions';
 import BrowserNetwork from './pages/BrowserNetwork';
 import BrowserIntercept from './pages/BrowserIntercept';
+import Crawler from './pages/Crawler';
+import Attacks from './pages/Attacks';
+import Scans from './pages/Scans';
 
 export default class App extends Component {
   constructor() {
@@ -20,38 +24,10 @@ export default class App extends Component {
     const history = createHashHistory();
 
     return (
-      <div id="content-wrapper" className="wrapper">
-        <div id="sidebar" className="theme--sidebar">
-          <div
-            className="sidebar-icon theme--sidebar__header"
-            title="Browser (CTRL+1)"
-          >
-            <i className="fas fa-window-restore" />
-          </div>
+      <HashRouter history={history}>
+        <div id="content-wrapper" className="wrapper">
+          <Route path="/" component={SideBar} />
 
-          <div
-            className="sidebar-icon active theme--sidebar__header"
-            title="Crawler (CTRL+2)"
-          >
-            <i className="fas fa-spider" />
-          </div>
-
-          <div
-            className="sidebar-icon theme--sidebar__header"
-            title="Attacks (CTRL+3)"
-          >
-            <i className="fas fa-crosshairs" />
-          </div>
-
-          <div
-            className="sidebar-icon theme--sidebar__header"
-            title="Scans (CTRL+4)"
-          >
-            <i className="fas fa-rss" />
-          </div>
-        </div>
-
-        <HashRouter history={history}>
           <div id="mainbar">
             <section className="theme--pane pane">
               <header className="pane__header theme--pane__header">
@@ -60,7 +36,7 @@ export default class App extends Component {
                 </div>
               </header>
 
-              <Route path="/" component={BrowserTabs} />
+              <Route path="/browser" component={BrowserTabs} />
 
               <section className="pane__body theme--pane">
                 <Route exact path="/" component={BrowserNetwork} />
@@ -79,11 +55,17 @@ export default class App extends Component {
                   path="/browser/sessions"
                   component={BrowserSessions}
                 />
+
+                <Route exact path="/crawler" component={Crawler} />
+
+                <Route exact path="/attacks" component={Attacks} />
+
+                <Route exact path="/scans" component={Scans} />
               </section>
             </section>
           </div>
-        </HashRouter>
-      </div>
+        </div>
+      </HashRouter>
     );
   }
 }

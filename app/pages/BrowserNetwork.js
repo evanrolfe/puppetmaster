@@ -13,6 +13,8 @@ export default class BrowserNetwork extends Component<Props> {
         Browser Network!
         <br />
         <Link to="/browser/intercept">Go to Intercept</Link>
+        <br />
+        <Link to="/crawler">Go to Crawler</Link>
       </div>
     );
   }

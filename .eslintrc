@@ -60,7 +60,9 @@
       { "extensions": [".js", ".jsx"] }
     ],
     "react/prefer-stateless-function": "off",
-    "react/destructuring-assignment": "off"
+    "react/destructuring-assignment": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "jsx-a11y/click-events-have-key-events": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
