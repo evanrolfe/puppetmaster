@@ -28,9 +28,10 @@ export default class SideBar extends Component {
       tabIndex = 1;
     } else if (pathname.includes('/attacks')) {
       tabIndex = 2;
-    }
-    if (pathname.includes('/scans')) {
+    } else if (pathname.includes('/scans')) {
       tabIndex = 3;
+    } else {
+      tabIndex = 0;
     }
 
     const newState = Object.assign({}, this.state);
