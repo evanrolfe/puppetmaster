@@ -3,9 +3,7 @@
 @import '../constants/fonts';
 
 .pane {
-  display: grid;
-  grid-template-rows: @height-nav minmax(0, 1fr);
-  grid-template-columns: 100%;
+  height: 100%;
 
   .pane__header {
     background: var(--color-bg);
@@ -29,12 +27,18 @@
     }
   }
 
-  .pane__body {
-    border-left: 1px solid @hl-md;
+  .pane__tabs {
+    //border-left: 1px solid @hl-md;
     box-sizing: border-box;
-    height: 100%;
     background: var(--color-bg);
     color: var(--color-font);
+  }
+
+  .pane__body {
+    background: var(--color-bg);
+    color: var(--color-font);
+    height: 100%;
+    padding: 10px;
   }
 
   .pane__body--placeholder {
