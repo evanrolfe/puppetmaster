@@ -1,11 +1,24 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { showModal } from '../components/modals/index';
+
+import AlertModal from '../modals/AlertModal';
 
 type Props = {};
 
 export default class BrowserNetwork extends Component<Props> {
   props: Props;
+
+  constructor(props) {
+    super(props);
+
+    this.showModal = this.showModal.bind(this);
+  }
+
+  showModal() {
+    showModal(AlertModal, { title: 'Alert', message: 'Hello World' });
+  }
 
   render() {
     return (
@@ -15,6 +28,10 @@ export default class BrowserNetwork extends Component<Props> {
         <Link to="/browser/intercept">Go to Intercept</Link>
         <br />
         <Link to="/crawler">Go to Crawler</Link>
+        <br />
+        <a role="button" onClick={() => this.showModal()}>
+          View Modal
+        </a>
       </div>
     );
   }

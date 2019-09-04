@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import { createHashHistory } from 'history';
 import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
+import { registerModal } from './components/modals/index';
+
+import AlertModal from './modals/AlertModal';
 
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
@@ -30,6 +33,10 @@ export default class App extends Component {
 
     return (
       <HashRouter history={history}>
+        <div key="modals" className="modals">
+          <AlertModal ref={registerModal} />
+        </div>
+
         <div id="content-wrapper" className="wrapper">
           <Route path="/" component={SideBar} />
 

@@ -16,10 +16,9 @@
     "comma-dangle": "off",
     "flowtype/boolean-style": ["error", "boolean"],
     "flowtype/define-flow-type": "warn",
-    "flowtype/delimiter-dangle": ["error", "never"],
+    "flowtype/delimiter-dangle": "off",
     "flowtype/generic-spacing": ["error", "never"],
     "flowtype/no-primitive-constructor-types": "error",
-    "flowtype/no-weak-types": "warn",
     "flowtype/object-type-delimiter": ["error", "comma"],
     "flowtype/require-parameter-type": "off",
     "flowtype/require-return-type": "off",
@@ -59,10 +58,25 @@
       "error",
       { "extensions": [".js", ".jsx"] }
     ],
+    // Added by Evan:
     "react/prefer-stateless-function": "off",
     "react/destructuring-assignment": "off",
     "jsx-a11y/interactive-supports-focus": "off",
-    "jsx-a11y/click-events-have-key-events": "off"
+    "jsx-a11y/click-events-have-key-events": "off",
+    "react/require-default-props": "off",
+    "no-underscore-dangle": "off",
+    "react/no-find-dom-node": "off", // TODO: Use this.node instead of findDOMNode
+    "flowtype/no-weak-types": "off",
+    "no-restricted-syntax": "off",
+    "class-methods-use-this": "off",
+    "react/button-has-type": "off",
+    "object-shorthand": "off",
+    "no-plusplus": "off",
+    "react/forbid-prop-types": "off",
+    "no-prototype-builtins": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "no-param-reassign": "off",
+    "no-continue": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
