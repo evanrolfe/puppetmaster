@@ -56,7 +56,8 @@
     height: @line-height-sm;
     border: 1px solid transparent;
     border-bottom: 1px solid @border-color;
-    border-top: 0 !important;
+    //border-top: 0 !important;
+    box-sizing: border-box;
     white-space: nowrap;
     display: flex;
     position: relative;
@@ -120,7 +121,9 @@
     }
 
     &.react-tabs__tab--selected {
-      border: 1px solid @border-color;
+      border-top: 3px solid var(--color-surprise);
+      border-right: 1px solid @border-color;
+      border-left: 1px solid @border-color;
       border-bottom-color: transparent;
 
       * {
