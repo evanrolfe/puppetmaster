@@ -11,6 +11,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   grid-template-columns: 100%;
   align-content: stretch;
+  box-sizing: border-box;
 
   .react-tabs__tab-list {
     display: flex;
@@ -46,7 +47,6 @@
 
     &::after {
       width: 100%;
-      height: @line-height-sm;
       content: '';
       border-bottom: 1px solid @border-color;
     }
@@ -61,6 +61,7 @@
     white-space: nowrap;
     display: flex;
     position: relative;
+    //margin-top: 1px;
 
     &:not(.react-tabs__tab--selected)::after {
       content: ' ';
