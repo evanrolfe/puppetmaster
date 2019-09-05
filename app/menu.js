@@ -186,6 +186,12 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
+            label: '&Preferences',
+            click: () => {
+              this.mainWindow.send('toggle-preferences');
+            }
+          },
+          {
             label: '&Open',
             accelerator: 'Ctrl+O'
           },

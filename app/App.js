@@ -1,9 +1,10 @@
 // @flow
+import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { createHashHistory } from 'history';
 import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
-import { registerModal } from './components/modals/index';
+import { registerModal, showModal } from './components/modals/index';
 
 import AlertModal from './modals/AlertModal';
 import PreferencesModal from './modals/PreferencesModal';
@@ -22,6 +23,10 @@ export default class App extends Component {
   constructor() {
     super();
     document.body.setAttribute('theme', 'default');
+
+    ipcRenderer.on('toggle-preferences', () => {
+      showModal(PreferencesModal);
+    });
   }
 
   render() {
