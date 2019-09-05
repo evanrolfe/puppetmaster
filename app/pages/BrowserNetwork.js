@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { showModal } from '../components/modals/index';
 
-import AlertModal from '../modals/AlertModal';
-import PreferencesModal from '../modals/PreferencesModal';
+import AlertModal from '../components/modals/AlertModal';
+import PreferencesModal from '../components/modals/PreferencesModal';
 
 type Props = {};
 

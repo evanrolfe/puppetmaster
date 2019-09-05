@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Modal from '../components/modals/Modal';
-import ModalBody from '../components/modals/ModalBody';
-import ModalHeader from '../components/modals/ModalHeader';
-import ModalFooter from '../components/modals/ModalFooter';
+import Modal from './Modal';
+import ModalBody from './ModalBody';
+import ModalHeader from './ModalHeader';
+import ModalFooter from './ModalFooter';
 
 class AlertModal extends Component {
   constructor(props) {

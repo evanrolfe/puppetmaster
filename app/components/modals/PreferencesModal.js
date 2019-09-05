@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import Modal from '../components/modals/Modal';
-import ModalBody from '../components/modals/ModalBody';
-import ModalHeader from '../components/modals/ModalHeader';
+import Modal from './Modal';
+import ModalBody from './ModalBody';
+import ModalHeader from './ModalHeader';
 
-import AboutSettingsTab from '../components/settings/AboutSettingsTab';
-import GeneralSettingsTab from '../components/settings/GeneralSettingsTab';
-import ThemeSettingsTab from '../components/settings/ThemeSettingsTab';
+import AboutSettingsTab from '../settings/AboutSettingsTab';
+import GeneralSettingsTab from '../settings/GeneralSettingsTab';
+import ThemeSettingsTab from '../settings/ThemeSettingsTab';
 
 export const TAB_INDEX_EXPORT = 1;
 export const TAB_INDEX_SHORTCUTS = 3;

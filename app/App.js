@@ -6,8 +6,8 @@ import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 import { registerModal, showModal } from './components/modals/index';
 
-import AlertModal from './modals/AlertModal';
-import PreferencesModal from './modals/PreferencesModal';
+import AlertModal from './components/modals/AlertModal';
+import PreferencesModal from './components/modals/PreferencesModal';
 
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
