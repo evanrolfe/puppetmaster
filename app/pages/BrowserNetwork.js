@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { showModal } from '../components/modals/index';
 
 import AlertModal from '../modals/AlertModal';
+import PreferencesModal from '../modals/PreferencesModal';
 
 type Props = {};
 
@@ -20,6 +21,10 @@ export default class BrowserNetwork extends Component<Props> {
     showModal(AlertModal, { title: 'Alert', message: 'Hello World' });
   }
 
+  showPreferences() {
+    showModal(PreferencesModal, {});
+  }
+
   render() {
     return (
       <div className="hello">
@@ -31,6 +36,10 @@ export default class BrowserNetwork extends Component<Props> {
         <br />
         <a role="button" onClick={() => this.showModal()}>
           View Modal
+        </a>
+        <br />
+        <a role="button" onClick={() => this.showPreferences()}>
+          Preferences
         </a>
       </div>
     );

@@ -6,6 +6,7 @@ import { HashRouter } from 'react-router-dom';
 import { registerModal } from './components/modals/index';
 
 import AlertModal from './modals/AlertModal';
+import PreferencesModal from './modals/PreferencesModal';
 
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
@@ -35,6 +36,7 @@ export default class App extends Component {
       <HashRouter history={history}>
         <div key="modals" className="modals">
           <AlertModal ref={registerModal} />
+          <PreferencesModal ref={registerModal} />
         </div>
 
         <div id="content-wrapper" className="wrapper">
