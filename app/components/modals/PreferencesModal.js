@@ -58,7 +58,10 @@ class PreferencesModal extends Component {
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel scrollable">
-              <ThemeSettingsTab />
+              <ThemeSettingsTab
+                activeTheme={this.props.activeTheme}
+                handleChangeTheme={this.props.handleChangeTheme}
+              />
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel pad scrollable">

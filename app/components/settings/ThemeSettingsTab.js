@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 const THEMES_PER_ROW = 5;
 
@@ -14,7 +15,7 @@ export default class ThemeSettingsTab extends Component {
     const themeName = theme;
     const themeDisplayName = theme;
 
-    const isActive = false;
+    const isActive = themeName === this.props.activeTheme;
 
     return (
       <div
@@ -23,7 +24,11 @@ export default class ThemeSettingsTab extends Component {
         style={{ maxWidth: `${100 / THEMES_PER_ROW}%` }}
       >
         <h2 className="txt-lg">{themeDisplayName}</h2>
-        <button value={themeName} className={isActive ? 'active' : ''}>
+        <button
+          onClick={() => this.props.handleChangeTheme(themeName)}
+          value={themeName}
+          className={isActive ? 'active' : ''}
+        >
           <svg width="100%" height="100%" viewBox="0 0 500 300">
             <g subtheme={themeName}>
               {/* Panes */}
@@ -192,3 +197,8 @@ export default class ThemeSettingsTab extends Component {
     return <div className="themes pad-top">{this.renderThemeRows()}</div>;
   }
 }
+
+ThemeSettingsTab.propTypes = {
+  handleChangeTheme: PropTypes.func.isRequired,
+  activeTheme: PropTypes.string.isRequired
+};

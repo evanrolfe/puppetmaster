@@ -19,13 +19,47 @@ import Crawler from './pages/Crawler';
 import Attacks from './pages/Attacks';
 import Scans from './pages/Scans';
 
+import AppPreferences from './models/AppPreferences';
+
 export default class App extends Component {
   constructor() {
     super();
-    document.body.setAttribute('theme', 'default');
+
+    this.handleChangeTheme = this.handleChangeTheme.bind(this);
 
     ipcRenderer.on('toggle-preferences', () => {
       showModal(PreferencesModal);
+    });
+
+    const preferences = new AppPreferences();
+
+    this.state = {
+      preferences: preferences
+    };
+  }
+
+  componentDidMount() {
+    this.setTheme();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.preferences.activeTheme !== prevState.preferences.activeTheme
+    ) {
+      this.setTheme();
+    }
+  }
+
+  setTheme() {
+    document.body.setAttribute('theme', this.state.preferences.activeTheme);
+  }
+
+  handleChangeTheme(theme) {
+    // TODO: Deep clone the state object
+    this.setState(prevState => {
+      const newPreferences = Object.assign({}, prevState.preferences);
+      newPreferences.activeTheme = theme;
+      return { preferences: newPreferences };
     });
   }
 
@@ -41,7 +75,11 @@ export default class App extends Component {
       <HashRouter history={history}>
         <div key="modals" className="modals">
           <AlertModal ref={registerModal} />
-          <PreferencesModal ref={registerModal} />
+          <PreferencesModal
+            ref={registerModal}
+            activeTheme={this.state.preferences.activeTheme}
+            handleChangeTheme={this.handleChangeTheme}
+          />
         </div>
 
         <div id="content-wrapper" className="wrapper">
