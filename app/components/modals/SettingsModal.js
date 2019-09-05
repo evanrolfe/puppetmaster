@@ -11,7 +11,7 @@ import ThemeSettingsTab from '../settings/ThemeSettingsTab';
 export const TAB_INDEX_EXPORT = 1;
 export const TAB_INDEX_SHORTCUTS = 3;
 
-class PreferencesModal extends Component {
+class SettingsModal extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -74,4 +74,4 @@ class PreferencesModal extends Component {
   }
 }
 
-export default PreferencesModal;
+export default SettingsModal;

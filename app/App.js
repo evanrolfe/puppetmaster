@@ -7,7 +7,7 @@ import { HashRouter } from 'react-router-dom';
 import { registerModal, showModal } from './components/modals/index';
 
 import AlertModal from './components/modals/AlertModal';
-import PreferencesModal from './components/modals/PreferencesModal';
+import SettingsModal from './components/modals/SettingsModal';
 
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
@@ -19,7 +19,7 @@ import Crawler from './pages/Crawler';
 import Attacks from './pages/Attacks';
 import Scans from './pages/Scans';
 
-import AppPreferences from './models/AppPreferences';
+import AppSettings from './models/AppSettings';
 
 export default class App extends Component {
   constructor() {
@@ -28,13 +28,13 @@ export default class App extends Component {
     this.handleChangeTheme = this.handleChangeTheme.bind(this);
 
     ipcRenderer.on('toggle-preferences', () => {
-      showModal(PreferencesModal);
+      showModal(SettingsModal);
     });
 
-    const preferences = new AppPreferences();
+    const settings = new AppSettings();
 
     this.state = {
-      preferences: preferences
+      settings: settings
     };
   }
 
@@ -43,23 +43,21 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.preferences.activeTheme !== prevState.preferences.activeTheme
-    ) {
+    if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
       this.setTheme();
     }
   }
 
   setTheme() {
-    document.body.setAttribute('theme', this.state.preferences.activeTheme);
+    document.body.setAttribute('theme', this.state.settings.activeTheme);
   }
 
   handleChangeTheme(theme) {
     // TODO: Deep clone the state object
     this.setState(prevState => {
-      const newPreferences = Object.assign({}, prevState.preferences);
-      newPreferences.activeTheme = theme;
-      return { preferences: newPreferences };
+      const newsettings = Object.assign({}, prevState.settings);
+      newsettings.activeTheme = theme;
+      return { settings: newsettings };
     });
   }
 
@@ -75,9 +73,9 @@ export default class App extends Component {
       <HashRouter history={history}>
         <div key="modals" className="modals">
           <AlertModal ref={registerModal} />
-          <PreferencesModal
+          <SettingsModal
             ref={registerModal}
-            activeTheme={this.state.preferences.activeTheme}
+            activeTheme={this.state.settings.activeTheme}
             handleChangeTheme={this.handleChangeTheme}
           />
         </div>
