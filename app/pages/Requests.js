@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 
 type Props = {};
 
-export default class Attacks extends Component<Props> {
+export default class Requests extends Component<Props> {
   props: Props;
 
   render() {
-    return <div>Attack!!!</div>;
+    return <div>Requests Table goes here</div>;
   }
 }

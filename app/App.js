@@ -16,7 +16,7 @@ import BrowserSessions from './pages/BrowserSessions';
 import BrowserNetwork from './pages/BrowserNetwork';
 import BrowserIntercept from './pages/BrowserIntercept';
 import Crawler from './pages/Crawler';
-import Attacks from './pages/Attacks';
+import Requests from './pages/Requests';
 import Scans from './pages/Scans';
 
 import AppSettings from './models/AppSettings';
@@ -66,7 +66,7 @@ export default class App extends Component {
 
     const BrowserTitle = () => <span className="title">Browser</span>;
     const CrawlerTitle = () => <span className="title">Crawler</span>;
-    const AttacksTitle = () => <span className="title">Attacks</span>;
+    const RequestsTitle = () => <span className="title">Requests</span>;
     const ScansTitle = () => <span className="title">Scans</span>;
 
     return (
@@ -90,7 +90,7 @@ export default class App extends Component {
                   <Route exact path="/" component={BrowserTitle} />
                   <Route path="/browser" component={BrowserTitle} />
                   <Route path="/crawler" component={CrawlerTitle} />
-                  <Route path="/attacks" component={AttacksTitle} />
+                  <Route path="/Requests" component={RequestsTitle} />
                   <Route path="/scans" component={ScansTitle} />
                 </div>
               </header>
@@ -118,7 +118,7 @@ export default class App extends Component {
 
                 <Route exact path="/crawler" component={Crawler} />
 
-                <Route exact path="/attacks" component={Attacks} />
+                <Route exact path="/requests" component={Requests} />
 
                 <Route exact path="/scans" component={Scans} />
               </section>

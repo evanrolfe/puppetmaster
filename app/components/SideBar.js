@@ -26,7 +26,7 @@ export default class SideBar extends Component {
       tabIndex = 0;
     } else if (pathname.includes('/crawler')) {
       tabIndex = 1;
-    } else if (pathname.includes('/attacks')) {
+    } else if (pathname.includes('/requests')) {
       tabIndex = 2;
     } else if (pathname.includes('/scans')) {
       tabIndex = 3;
@@ -80,8 +80,8 @@ export default class SideBar extends Component {
           className={`sidebar-icon theme--sidebar__header ${this.activeClass(
             2
           )}`}
-          title="Attacks (CTRL+3)"
-          onClick={() => this.goTo('/attacks')}
+          title="Requests (CTRL+3)"
+          onClick={() => this.goTo('/requests')}
           role="menuitem"
         >
           <i className="fas fa-crosshairs" />
