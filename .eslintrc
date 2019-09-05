@@ -76,7 +76,8 @@
     "no-prototype-builtins": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "no-param-reassign": "off",
-    "no-continue": "off"
+    "no-continue": "off",
+    "react/no-array-index-key": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
