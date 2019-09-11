@@ -78,7 +78,10 @@
     "no-param-reassign": "off",
     "no-continue": "off",
     "react/no-array-index-key": "off",
-    "prefer-destructuring": "off"
+    "prefer-destructuring": "off",
+    "import/no-dynamic-require": "off",
+    "global-require": "off",
+    "radix": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
@@ -90,7 +93,7 @@
   },
   "overrides": [
     {
-      "files": ["test/*.js"],
+      "files": ["test/**"],
       "rules": {
         "no-undef": "off"
       }

@@ -40,22 +40,19 @@ export default class BackendConnection {
   connectSocket(name, onOpen) {
     this.ipcConnect(name, client => {
       client.on('message', data => {
-        const msg = JSON.parse(data);
+        const response = JSON.parse(data);
 
-        if (msg.type === 'error') {
-          // Up to you whether or not to care about the error
-          const { id } = msg;
-          this.replyHandlers.delete(id);
-        } else if (msg.type === 'reply') {
-          const { id, result } = msg;
-
+        if (response.type === 'reply' || response.type === 'error') {
+          const { id } = response;
           const handler = this.replyHandlers.get(id);
           if (handler) {
             this.replyHandlers.delete(id);
-            handler.resolve(result);
+
+            delete response.id;
+            handler.resolve(response);
           }
-        } else if (msg.type === 'push') {
-          const { listenerName, args } = msg;
+        } else if (response.type === 'push') {
+          const { listenerName, args } = response;
 
           const listens = this.listeners.get(listenerName);
           if (listens) {
@@ -64,7 +61,7 @@ export default class BackendConnection {
             });
           }
         } else {
-          throw new Error(`Unknown message type: ${JSON.stringify(msg)}`);
+          throw new Error(`Unknown message type: ${JSON.stringify(response)}`);
         }
       });
 
@@ -89,15 +86,37 @@ export default class BackendConnection {
   disconnect() {
     ipc.disconnect(this.socketId);
   }
+  /*
+  get(url, args) {
+    this.send('GET', url, args);
+  }
 
-  send(name, args) {
+  post(url, args) {
+    console.log('posting...')
+    this.send('POST', url, args);
+  }
+
+  delete(url, args) {
+    this.send('DELETE', url, args);
+  }
+
+  patch(url, args) {
+    this.send('PATCH', url, args);
+  }
+*/
+
+  send(method, url, args) {
+    console.log('sending...');
     return new Promise((resolve, reject) => {
       const id = this.uuid.v4();
       this.replyHandlers.set(id, { resolve, reject });
       if (this.socketClient) {
-        this.socketClient.emit('message', JSON.stringify({ id, name, args }));
+        this.socketClient.emit(
+          'message',
+          JSON.stringify({ id, method, url, args })
+        );
       } else {
-        this.messageQueue.push(JSON.stringify({ id, name, args }));
+        this.messageQueue.push(JSON.stringify({ id, method, url, args }));
       }
     });
   }
