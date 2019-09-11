@@ -87,5 +87,13 @@
         "config": "configs/webpack.config.eslint.js"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["test/*.js"],
+      "rules": {
+        "no-undef": "off"
+      }
+    }
+  ]
 }

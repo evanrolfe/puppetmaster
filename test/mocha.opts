@@ -1,0 +1,3 @@
+--recursive
+--file ./test/setup
+--globals global
