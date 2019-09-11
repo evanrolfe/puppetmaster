@@ -21,6 +21,10 @@ import Scans from './pages/Scans';
 
 import AppSettings from './models/AppSettings';
 
+import BackendConnection from './lib/BackendConnection';
+
+window.hello = 'world';
+
 export default class App extends Component {
   constructor() {
     super();
@@ -36,6 +40,8 @@ export default class App extends Component {
     this.state = {
       settings: settings
     };
+
+    this.testBackend();
   }
 
   componentDidMount() {
@@ -46,6 +52,12 @@ export default class App extends Component {
     if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
       this.setTheme();
     }
+  }
+
+  async testBackend() {
+    const conn = new BackendConnection();
+    await conn.init();
+    await conn.test();
   }
 
   setTheme() {

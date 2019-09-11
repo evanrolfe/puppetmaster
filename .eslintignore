@@ -47,6 +47,7 @@ dist
 dll
 main.js
 main.js.map
+backend/server-dev.html
 
 .idea
 npm-debug.log.*

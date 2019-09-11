@@ -13,6 +13,9 @@
 import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { fork } from 'child_process';
+import path from 'path';
+
 import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -36,7 +39,7 @@ if (
 ) {
   require('electron-debug')();
 }
-
+/*
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -46,6 +49,42 @@ const installExtensions = async () => {
     extensions.map(name => installer.default(installer[name], forceDownload))
   ).catch(console.log);
 };
+*/
+let serverProcess;
+
+const createBackgroundProcess = socketName => {
+  console.log(`Creating background Process...`);
+  serverProcess = fork('./backend/index.js', [
+    '--subprocess',
+    app.getVersion(),
+    socketName
+  ]);
+
+  serverProcess.on('message', msg => {
+    console.log(msg);
+  });
+};
+
+function createBackgroundWindow(socketName) {
+  const win = new BrowserWindow({
+    x: 500,
+    y: 300,
+    width: 700,
+    height: 500,
+    show: true,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  const file = path.join(__dirname, '../backend/server-dev.html');
+
+  win.loadURL(`file://${file}`);
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('set-socket', { name: socketName });
+  });
+}
 
 /**
  * Add event listeners...
@@ -60,17 +99,25 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
+  const serverSocket = 'pntest1'; // await findOpenSocket();
+
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    await installExtensions();
+    createBackgroundWindow(serverSocket);
+    // await installExtensions();
+  } else {
+    createBackgroundProcess(serverSocket);
   }
 
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
-    height: 728
+    height: 728,
+    webPreferences: {
+      preload: `${__dirname}/lib/backend-connection.js`
+    }
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
@@ -81,12 +128,17 @@ app.on('ready', async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
       mainWindow.show();
       mainWindow.focus();
     }
+
+    mainWindow.webContents.send('set-socket', {
+      name: serverSocket
+    });
   });
 
   mainWindow.on('closed', () => {
