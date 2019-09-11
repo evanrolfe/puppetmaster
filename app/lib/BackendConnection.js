@@ -1,39 +1,28 @@
-const { ipcRenderer } = require('electron');
-const ipc = require('node-ipc');
-const uuid = require('uuid');
+// import { ipcRenderer } from 'electron';
+import ipc from 'node-ipc';
+import uuid from 'uuid';
 
 export default class BackendConnection {
-  constructor() {
+  constructor(socketId) {
     this.replyHandlers = new Map();
     this.listeners = new Map();
     this.messageQueue = [];
     this.socketClient = null;
+    this.socketId = socketId;
   }
 
   // Init
   async init() {
-    let resolveSocketPromise;
-    const socketPromise = new Promise(resolve => {
-      resolveSocketPromise = resolve;
-    });
-
-    window.getServerSocket = () => socketPromise;
-
-    ipcRenderer.on('set-socket', (event, { name }) => {
-      resolveSocketPromise(name);
-    });
-
-    window.ipcConnect = (id, func) => {
+    this.ipcConnect = (id, func) => {
       ipc.config.silent = true;
       ipc.connectTo(id, () => {
         func(ipc.of[id]);
       });
     };
 
-    window.uuid = uuid;
+    this.uuid = uuid;
 
-    const socketName = await window.getServerSocket();
-    this.connectSocket(socketName, () => {
+    this.connectSocket(this.socketId, () => {
       console.log('Connected!');
     });
   }
@@ -49,7 +38,7 @@ export default class BackendConnection {
   }
 
   connectSocket(name, onOpen) {
-    window.ipcConnect(name, client => {
+    this.ipcConnect(name, client => {
       client.on('message', data => {
         const msg = JSON.parse(data);
 
@@ -97,9 +86,13 @@ export default class BackendConnection {
     });
   }
 
+  disconnect() {
+    ipc.disconnect(this.socketId);
+  }
+
   send(name, args) {
     return new Promise((resolve, reject) => {
-      const id = window.uuid.v4();
+      const id = this.uuid.v4();
       this.replyHandlers.set(id, { resolve, reject });
       if (this.socketClient) {
         this.socketClient.emit('message', JSON.stringify({ id, name, args }));

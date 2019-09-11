@@ -23,8 +23,6 @@ import AppSettings from './models/AppSettings';
 
 import BackendConnection from './lib/BackendConnection';
 
-window.hello = 'world';
-
 export default class App extends Component {
   constructor() {
     super();
@@ -55,7 +53,7 @@ export default class App extends Component {
   }
 
   async testBackend() {
-    const conn = new BackendConnection();
+    const conn = new BackendConnection('pntest1');
     await conn.init();
     await conn.test();
   }
