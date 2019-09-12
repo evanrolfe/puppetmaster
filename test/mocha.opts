@@ -1,3 +1,4 @@
 --recursive
 --file ./test/setup
 --globals global
+--timeout 5000

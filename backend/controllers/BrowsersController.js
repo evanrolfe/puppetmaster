@@ -1,10 +1,19 @@
+const puppeteer = require('puppeteer');
+
 class BrowsersController {
   constructor(params) {
     this.params = params;
   }
 
   // POST /browsers
-  create() {
+  async create() {
+    const puppeteerBrowser = await puppeteer.launch({
+      headless: false,
+      args: []
+    });
+
+    global.puppeteer_Bowsers.push(puppeteerBrowser);
+
     return { status: 'OK' };
   }
 

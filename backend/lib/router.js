@@ -3,7 +3,7 @@ const capitalise = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-const getResult = request => {
+const getResult = async request => {
   const params = request.args;
   let result;
 
@@ -25,7 +25,7 @@ const getResult = request => {
         result = controller.index();
         break;
       case 'POST':
-        result = controller.create();
+        result = await controller.create();
         break;
       default:
         throw new Error(`Unknown method: ${request.method}!`);

@@ -11,11 +11,11 @@ function init(socketName) {
   ipc.config.silent = true;
 
   ipc.serve(() => {
-    ipc.server.on('message', (data, socket) => {
+    ipc.server.on('message', async (data, socket) => {
       const request = JSON.parse(data);
 
       try {
-        const result = router.getResult(request);
+        const result = await router.getResult(request);
 
         ipc.server.emit(
           socket,
@@ -26,7 +26,11 @@ function init(socketName) {
         ipc.server.emit(
           socket,
           'message',
-          JSON.stringify({ type: 'error', id: request.id, result: error })
+          JSON.stringify({
+            type: 'error',
+            id: request.id,
+            result: error.message
+          })
         );
       }
     });
