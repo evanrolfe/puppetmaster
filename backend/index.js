@@ -1,9 +1,12 @@
 const ipc = require('./server-ipc');
+const Database = require('./lib/database.js');
 
 console.log('Starting backend server...');
 
 // TODO: Refactor to not use global vars:
+const db = new Database();
 global.puppeteer_browsers = [];
+global.db = db;
 
 if (process.argv[2] === '--subprocess') {
   const socketName = process.argv[4];

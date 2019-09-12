@@ -72,7 +72,7 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      preload: `${__dirname}/lib/backend-connection.js`
+      nodeIntegration: true
     }
   });
 

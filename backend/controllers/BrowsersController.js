@@ -13,6 +13,18 @@ class BrowsersController {
     });
     global.puppeteer_browsers.push(puppeteerBrowser);
 
+    const pages = await puppeteerBrowser.pages();
+    const page = pages[0];
+
+    page.on('response', response => {
+      global.db.db.run(
+        'INSERT INTO requests (method, url, response_status) VALUES (?, ?, ?);',
+        response.request().method(),
+        response.url(),
+        response.status()
+      );
+    });
+
     return { status: 'OK' };
   }
 
