@@ -11,8 +11,7 @@ class BrowsersController {
       headless: false,
       args: []
     });
-
-    global.puppeteer_Bowsers.push(puppeteerBrowser);
+    global.puppeteer_browsers.push(puppeteerBrowser);
 
     return { status: 'OK' };
   }

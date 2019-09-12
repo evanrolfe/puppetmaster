@@ -42,19 +42,20 @@ if (
 /**
  * Add event listeners...
  */
-
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
+
+  window.backendConn.disconnect();
 });
 
 app.on('ready', async () => {
   // TODO: Remove this hardcoded server socket, and also from app/App.js
   const serverSocket = 'pntest1';
-
+  /*
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
@@ -62,8 +63,9 @@ app.on('ready', async () => {
     BackgroundServerStarter.createBackgroundWindow(serverSocket);
     // await installExtensions();
   } else {
-    BackgroundServerStarter.createBackgroundProcess(serverSocket, app);
   }
+*/
+  BackgroundServerStarter.createBackgroundProcess(serverSocket, app);
 
   mainWindow = new BrowserWindow({
     show: false,
