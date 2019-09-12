@@ -1,16 +1,14 @@
 describe('Requests', () => {
   describe('GET /requests', () => {
-    beforeEach(() => {
-      global.db.serialize(() => {
-        global.db.run('Delete FROM requests;');
-        global.db.run("DELETE FROM SQLITE_SEQUENCE WHERE name='requests';");
-        global.db.run(
-          'INSERT INTO requests (method, url, response_status) VALUES ("GET", "http://localhost/api/posts.json", 200);'
-        );
-        global.db.run(
-          'INSERT INTO requests (method, url, response_status) VALUES ("POST", "http://localhost/api/posts.json", 200);'
-        );
-      });
+    beforeEach(async () => {
+      await global.db.run('Delete FROM requests;');
+      await global.db.run("DELETE FROM SQLITE_SEQUENCE WHERE name='requests';");
+      await global.db.run(
+        'INSERT INTO requests (method, url, response_status) VALUES ("GET", "http://localhost/api/posts.json", 200);'
+      );
+      await global.db.run(
+        'INSERT INTO requests (method, url, response_status) VALUES ("POST", "http://localhost/api/posts.json", 200);'
+      );
     });
 
     it('returns the requests stored in the database', async () => {

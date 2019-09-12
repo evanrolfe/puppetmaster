@@ -1,14 +1,13 @@
 import path from 'path';
 import { before, after } from 'mocha';
 import { expect } from 'chai';
-import sqlite3 from 'sqlite3';
+import SqliteAsync from 'sqlite-async';
 
 import Backend from '../app/lib/BackendServerStarter';
 import BackendConn from '../app/lib/BackendConnection';
 
 global.expect = expect;
 global.rootPath = path.join(__dirname, '../');
-global.db = new sqlite3.Database('pntest-test.db');
 
 let serverProcess;
 
@@ -27,6 +26,8 @@ before(async () => {
 
   global.backendConn = new BackendConn('testapp1');
   await global.backendConn.init();
+
+  global.db = await SqliteAsync.open('pntest-test.db');
 });
 
 after(() => {

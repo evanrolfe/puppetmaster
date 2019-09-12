@@ -1,5 +1,3 @@
-const dbasync = require('sqlite-async');
-
 class RequestsController {
   constructor(params) {
     this.params = params;
@@ -7,9 +5,7 @@ class RequestsController {
 
   // GET /requests
   async index() {
-    const db = await dbasync.open('pntest-test.db');
-
-    const requests = await db.all(
+    const requests = await global.db.all(
       'SELECT id, method, url, response_status FROM requests'
     );
     console.log(`Received: ${requests.length} requests!`);

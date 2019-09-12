@@ -18,7 +18,7 @@ class BrowsersController {
     const page = pages[0];
 
     page.on('response', response => {
-      global.db.db.run(
+      global.db.run(
         'INSERT INTO requests (method, url, response_status) VALUES (?, ?, ?);',
         response.request().method(),
         response.url(),

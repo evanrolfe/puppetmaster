@@ -1,17 +1,13 @@
-const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
+const SqliteAsync = require('sqlite-async');
 
-class Database {
-  constructor(fileName) {
-    this.db = new sqlite3.Database(fileName);
+const setupDatabase = async databaseFile => {
+  const db = await SqliteAsync.open(databaseFile);
 
-    this.runSchema();
-  }
+  const schemaSql = fs.readFileSync(`${__dirname}/schema.sql`, 'utf8');
+  await db.run(schemaSql);
 
-  runSchema() {
-    const schemaSql = fs.readFileSync(`${__dirname}/schema.sql`, 'utf8');
-    this.db.run(schemaSql);
-  }
-}
+  return db;
+};
 
-module.exports = Database;
+module.exports = setupDatabase;
