@@ -30,7 +30,7 @@ class BrowsersController {
   }
 
   // GET /browsers
-  index() {
+  async index() {
     return { status: 'OK', body: [0, 1, 2, 3] };
   }
 

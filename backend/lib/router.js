@@ -22,7 +22,7 @@ const getResult = async request => {
 
     switch (request.method) {
       case 'GET':
-        result = controller.index();
+        result = await controller.index();
         break;
       case 'POST':
         result = await controller.create();
@@ -36,13 +36,13 @@ const getResult = async request => {
 
     switch (request.method) {
       case 'GET':
-        result = controller.show();
+        result = await controller.show();
         break;
       case 'PATCH':
-        result = controller.update();
+        result = await controller.update();
         break;
       case 'DELETE':
-        result = controller.delete();
+        result = await controller.delete();
         break;
       default:
         throw new Error(`Unknown method: ${request.method}!`);

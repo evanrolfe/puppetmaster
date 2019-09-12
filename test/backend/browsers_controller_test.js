@@ -1,6 +1,4 @@
-describe('Test', () => {
-  beforeEach(() => {});
-
+describe('BrowsersController', () => {
   describe('POST /browsers', () => {
     it('works', async () => {
       const result = await backendConn.send('POST', '/browsers', {});
@@ -9,12 +7,15 @@ describe('Test', () => {
   });
 
   describe('GET /browsers', () => {
-    it('works', async () => {
+    it('returns the requests stored in the database', async () => {
       const result = await backendConn.send('GET', '/browsers', {});
-
+      console.log(result);
       expect(result).to.eql({
         type: 'reply',
-        result: { status: 'OK', body: [0, 1, 2, 3] }
+        result: {
+          status: 'OK',
+          body: [0, 1, 2, 3]
+        }
       });
     });
   });
