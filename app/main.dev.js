@@ -65,7 +65,11 @@ app.on('ready', async () => {
   } else {
   }
 */
-  BackgroundServerStarter.createBackgroundProcess(serverSocket, app);
+  BackgroundServerStarter.createBackgroundProcess(
+    serverSocket,
+    app,
+    'pntest-prod.db'
+  );
 
   mainWindow = new BrowserWindow({
     show: false,

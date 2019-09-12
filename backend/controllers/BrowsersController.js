@@ -9,6 +9,7 @@ class BrowsersController {
   async create() {
     const puppeteerBrowser = await puppeteer.launch({
       headless: false,
+      defaultViewport: null,
       args: []
     });
     global.puppeteer_browsers.push(puppeteerBrowser);

@@ -3,12 +3,13 @@ import { BrowserWindow } from 'electron';
 import { fork } from 'child_process';
 
 export default {
-  createBackgroundProcess(socketName, app) {
+  createBackgroundProcess(socketName, app, dbFile) {
     console.log(`Starting background Process...`);
     const serverProcess = fork('./backend/index.js', [
       '--subprocess',
       app.getVersion(),
-      socketName
+      socketName,
+      dbFile
     ]);
 
     serverProcess.on('message', msg => {

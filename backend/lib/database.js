@@ -2,8 +2,8 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 
 class Database {
-  constructor() {
-    this.db = new sqlite3.Database('pntest.db');
+  constructor(fileName) {
+    this.db = new sqlite3.Database(fileName);
 
     this.runSchema();
   }

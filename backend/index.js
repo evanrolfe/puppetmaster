@@ -4,7 +4,7 @@ const Database = require('./lib/database.js');
 console.log('Starting backend server...');
 
 // TODO: Refactor to not use global vars:
-const db = new Database();
+const db = new Database(process.argv[5]);
 global.puppeteer_browsers = [];
 global.db = db;
 

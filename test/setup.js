@@ -10,11 +10,16 @@ global.rootPath = path.join(__dirname, '../');
 let serverProcess;
 
 before(async () => {
-  serverProcess = Backend.createBackgroundProcess('testapp1', {
+  const appMock = {
     getVersion() {
       return '1.2.3';
     }
-  });
+  };
+  serverProcess = Backend.createBackgroundProcess(
+    'testapp1',
+    appMock,
+    'pntest-test.db'
+  );
   global.backendConn = new BackendConn('testapp1');
   await global.backendConn.init();
 });
