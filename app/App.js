@@ -39,7 +39,7 @@ export default class App extends Component {
       settings: settings
     };
 
-    this.testBackend();
+    this.connectToBackend();
   }
 
   componentDidMount() {
@@ -52,10 +52,11 @@ export default class App extends Component {
     }
   }
 
-  async testBackend() {
-    const conn = new BackendConnection('pntest1');
-    await conn.init();
-    await conn.test();
+  async connectToBackend() {
+    const backendConn = new BackendConnection('pntest1');
+    await backendConn.init();
+    // TODO: Refactor this so we don't have to use window vars - maybe use a singleton instead?
+    window.backendConn = backendConn;
   }
 
   setTheme() {

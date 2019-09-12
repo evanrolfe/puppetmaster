@@ -13,7 +13,7 @@ function init(socketName) {
   ipc.serve(() => {
     ipc.server.on('message', async (data, socket) => {
       const request = JSON.parse(data);
-
+      console.log(`Received request for ${request.method} ${request.url}`);
       try {
         const result = await router.getResult(request);
 

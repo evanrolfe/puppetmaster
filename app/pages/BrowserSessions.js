@@ -1,18 +1,26 @@
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 
 type Props = {};
 
 export default class BrowserSessions extends Component<Props> {
   props: Props;
 
+  constructor(props) {
+    super(props);
+    this.newBrowser = this.newBrowser.bind(this);
+  }
+
+  newBrowser() {
+    window.backendConn.send('POST', '/browsers', {});
+  }
+
   render() {
     return (
       <div className="hello">
         Browser Sessions!
         <br />
-        <Link to="/browser/intercept">Go to Intercept</Link>
+        <a onClick={() => this.newBrowser()}>Open a new browser</a>
       </div>
     );
   }
