@@ -49,7 +49,7 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 
-  global.backendConn.disconnect();
+  // global.backendConn.disconnect();
 });
 
 app.on('ready', async () => {
