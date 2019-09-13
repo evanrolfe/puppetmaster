@@ -27,16 +27,6 @@ export default class BackendConnection {
     });
   }
 
-  async test() {
-    const result = await this.send('ring-ring', { message: 'this is james' });
-    console.log(`RESULT: ${result}`);
-
-    this.listen('ping', args => {
-      console.log(`Received a ping!`);
-      console.log(args);
-    });
-  }
-
   connectSocket(name, onOpen) {
     this.ipcConnect(name, client => {
       client.on('message', data => {

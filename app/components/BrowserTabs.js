@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Tab, TabList, Tabs } from 'react-tabs';
+import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
 import PropTypes from 'prop-types';
 
 export default class BrowserTabs extends Component {
@@ -81,6 +81,11 @@ export default class BrowserTabs extends Component {
             <button type="button">Sessions</button>
           </Tab>
         </TabList>
+
+        {/* Stupid Hack to avoid a warning from react-tabs: */}
+        <TabPanel />
+        <TabPanel />
+        <TabPanel />
       </Tabs>
     );
   }

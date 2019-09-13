@@ -20,7 +20,6 @@ import Requests from './pages/Requests';
 import Scans from './pages/Scans';
 
 import AppSettings from './models/AppSettings';
-
 import BackendConnection from './lib/BackendConnection';
 
 export default class App extends Component {
@@ -34,12 +33,16 @@ export default class App extends Component {
     });
 
     const settings = new AppSettings();
+    const backendConn = new BackendConnection('pntest1');
+    const backendConnected = backendConn.init();
+    // TODO: Refactor this so we don't have to use global vars - maybe use a singleton instead?
+    global.backendConn = backendConn;
 
     this.state = {
-      settings: settings
+      settings: settings,
+      // eslint-disable-next-line react/no-unused-state
+      backendConnected: backendConnected // Ensure that the app gets re-rendered once we connect to the backend
     };
-
-    this.connectToBackend();
   }
 
   componentDidMount() {
@@ -50,13 +53,6 @@ export default class App extends Component {
     if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
       this.setTheme();
     }
-  }
-
-  async connectToBackend() {
-    const backendConn = new BackendConnection('pntest1');
-    await backendConn.init();
-    // TODO: Refactor this so we don't have to use window vars - maybe use a singleton instead?
-    window.backendConn = backendConn;
   }
 
   setTheme() {
