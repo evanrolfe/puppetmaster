@@ -65,6 +65,14 @@
       "app/app.html",
       "app/main.prod.js",
       "app/main.prod.js.map",
+      "backend/index.js",
+      "backend/server-ipc.js",
+      "backend/server-dev.html",
+      "backend/controllers/BrowsersController.js",
+      "backend/controllers/RequestsController.js",
+      "backend/lib/database.js",
+      "backend/lib/router.js",
+      "backend/lib/schema.sql",
       "package.json"
     ],
     "dmg": {

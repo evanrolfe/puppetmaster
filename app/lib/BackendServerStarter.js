@@ -5,7 +5,16 @@ import { fork } from 'child_process';
 export default {
   createBackgroundProcess(socketName, app, dbFile) {
     console.log(`Starting background Process...`);
-    const serverProcess = fork('./backend/index.js', [
+    let backendDir;
+
+    if (app.isPackaged) {
+      backendDir = './backend';
+    } else {
+      backendDir = '../backend';
+    }
+    const serverPath = `${path.join(app.getAppPath(), backendDir)}/index.js`;
+
+    const serverProcess = fork(serverPath, [
       '--subprocess',
       app.getVersion(),
       socketName,
@@ -18,7 +27,7 @@ export default {
 
     return serverProcess;
   },
-  createBackgroundWindow(socketName) {
+  createBackgroundWindow(socketName, app) {
     const win = new BrowserWindow({
       x: 500,
       y: 300,
@@ -30,7 +39,8 @@ export default {
       }
     });
 
-    const file = path.join(__dirname, '../../backend/server-dev.html');
+    const backendPath = path.join(app.getAppPath(), '../backend');
+    const file = `${backendPath}/server-dev.html`;
 
     win.loadURL(`file://${file}`);
 

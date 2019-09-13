@@ -14,7 +14,7 @@ export default class BrowserNetwork extends Component<Props> {
 
     setInterval(() => {
       this.fetchRequests();
-    }, 1000);
+    }, 3000);
   }
 
   componentDidMount() {
