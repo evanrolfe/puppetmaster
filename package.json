@@ -97,7 +97,7 @@
     },
     "linux": {
       "target": [
-        "snap"
+        "deb"
       ],
       "category": "Development"
     },

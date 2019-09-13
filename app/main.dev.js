@@ -25,6 +25,7 @@ export default class AppUpdater {
   }
 }
 
+let backendProcess;
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -49,7 +50,8 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 
-  // global.backendConn.disconnect();
+  console.log(`Killing backend server process...`);
+  backendProcess.kill('SIGHUP');
 });
 
 app.on('ready', async () => {
@@ -68,7 +70,7 @@ app.on('ready', async () => {
   log.warn('App ready.');
   log.warn('Starting background server...');
 
-  BackgroundServerStarter.createBackgroundProcess(
+  backendProcess = BackgroundServerStarter.createBackgroundProcess(
     serverSocket,
     app,
     'pntest-prod.db'
