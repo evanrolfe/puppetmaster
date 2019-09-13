@@ -4,27 +4,27 @@ import React, { Component } from 'react';
 import { createHashHistory } from 'history';
 import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
-import { registerModal, showModal } from './components/modals/index';
+import log from 'electron-log';
 
+import { registerModal, showModal } from './components/modals/index';
 import AlertModal from './components/modals/AlertModal';
 import SettingsModal from './components/modals/SettingsModal';
-
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
-
 import BrowserSessions from './pages/BrowserSessions';
 import BrowserNetwork from './pages/BrowserNetwork';
 import BrowserIntercept from './pages/BrowserIntercept';
 import Crawler from './pages/Crawler';
 import Requests from './pages/Requests';
 import Scans from './pages/Scans';
-
 import AppSettings from './models/AppSettings';
 import BackendConnection from './lib/BackendConnection';
 
 export default class App extends Component {
   constructor() {
     super();
+
+    log.warn('Inside react constructor!');
 
     this.handleChangeTheme = this.handleChangeTheme.bind(this);
 

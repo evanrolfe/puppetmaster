@@ -19,7 +19,7 @@ import BackgroundServerStarter from './lib/BackendServerStarter';
 
 export default class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
+    log.transports.file.level = 'verbose';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
@@ -49,7 +49,7 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 
-  window.backendConn.disconnect();
+  global.backendConn.disconnect();
 });
 
 app.on('ready', async () => {
@@ -65,11 +65,16 @@ app.on('ready', async () => {
   } else {
   }
 */
+  log.warn('App ready.');
+  log.warn('Starting background server...');
+
   BackgroundServerStarter.createBackgroundProcess(
     serverSocket,
     app,
     'pntest-prod.db'
   );
+
+  log.warn('Started.');
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -79,6 +84,8 @@ app.on('ready', async () => {
       nodeIntegration: true
     }
   });
+
+  log.warn('MainWindow opened.');
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
