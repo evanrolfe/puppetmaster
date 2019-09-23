@@ -9,12 +9,11 @@ export default class BrowserNetwork extends Component<Props> {
   constructor(props) {
     super(props);
     console.log(`BrowserNetwork.constructor`);
-    this.state = { requests: [] };
+    this.state = {
+      requests: [],
+      tableColumnSizes: [24, 100, 500, 100]
+    };
     this.fetchRequests();
-
-    setInterval(() => {
-      this.fetchRequests();
-    }, 3000);
   }
 
   componentDidMount() {
@@ -37,17 +36,47 @@ export default class BrowserNetwork extends Component<Props> {
     const requests = this.state.requests;
 
     return (
-      <div>
-        <h2>Requests</h2>
+      <>
+        <table className="header-table">
+          <thead>
+            <tr>
+              <th width={this.state.tableColumnSizes[0]}>#</th>
+              <th className="ordered" width={this.state.tableColumnSizes[1]}>
+                Method
+                <i className="fas fa-caret-up order-icon" />
+              </th>
+              <th width={this.state.tableColumnSizes[2]}>URL</th>
+              <th width={this.state.tableColumnSizes[3]}>Status</th>
+              <th>Length</th>
+            </tr>
+          </thead>
+        </table>
 
-        <ul>
-          {requests.map(request => (
-            <li key={request.id}>
-              {request.method} {request.url}
-            </li>
-          ))}
-        </ul>
-      </div>
+        <div className="scrollable">
+          <table className="requests-table">
+            <tbody>
+              {requests.map(request => (
+                <tr key={request.id}>
+                  <td width={this.state.tableColumnSizes[0]}>{request.id}</td>
+                  <td
+                    className={`http-method-${request.method}`}
+                    width={this.state.tableColumnSizes[1]}
+                  >
+                    {request.method}
+                  </td>
+                  <td width={this.state.tableColumnSizes[2]}>
+                    {request.url.substr(0, 60)}
+                  </td>
+                  <td width={this.state.tableColumnSizes[3]}>
+                    {request.response_status}
+                  </td>
+                  <td>&nbsp;</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   }
 }
