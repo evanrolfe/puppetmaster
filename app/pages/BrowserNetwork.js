@@ -36,7 +36,7 @@ export default class BrowserNetwork extends Component<Props> {
     const requests = this.state.requests;
 
     return (
-      <>
+      <div className="requests-table-pane">
         <table className="header-table">
           <thead>
             <tr>
@@ -76,7 +76,7 @@ export default class BrowserNetwork extends Component<Props> {
             </tbody>
           </table>
         </div>
-      </>
+      </div>
     );
   }
 }
