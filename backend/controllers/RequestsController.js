@@ -5,7 +5,9 @@ class RequestsController {
 
   // GET /requests
   async index() {
-    const requests = await global.db.all('SELECT * FROM requests');
+    const requests = await global.db.all(
+      'SELECT id, method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address FROM requests'
+    );
     console.log(`Received: ${requests.length} requests!`);
 
     return { status: 'OK', body: requests };

@@ -25,13 +25,15 @@ class BrowsersController {
     const pages = await puppeteerBrowser.pages();
     const page = pages[0];
 
-    page.on('response', response => {
+    page.on('response', async response => {
       const remoteAddress = `${response.remoteAddress().ip}:${
         response.remoteAddress().port
       }`;
 
+      const responseBody = await response.text();
+
       global.db.run(
-        'INSERT INTO requests (method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
+        'INSERT INTO requests (method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address, response_body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
         response.request().method(),
         response.url(),
         response.request().resourceType(),
@@ -40,7 +42,8 @@ class BrowsersController {
         response.status(),
         response.statusText(),
         JSON.stringify(response.headers()),
-        remoteAddress
+        remoteAddress,
+        responseBody
       );
     });
 
