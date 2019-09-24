@@ -26,12 +26,21 @@ class BrowsersController {
     const page = pages[0];
 
     page.on('response', response => {
+      const remoteAddress = `${response.remoteAddress().ip}:${
+        response.remoteAddress().port
+      }`;
+
       global.db.run(
-        'INSERT INTO requests (method, url, response_status, response_status_message) VALUES (?, ?, ?, ?);',
+        'INSERT INTO requests (method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
         response.request().method(),
         response.url(),
+        response.request().resourceType(),
+        JSON.stringify(response.request().headers()),
+        JSON.stringify(response.request().postData()),
         response.status(),
-        response.statusText()
+        response.statusText(),
+        JSON.stringify(response.headers()),
+        remoteAddress
       );
     });
 
