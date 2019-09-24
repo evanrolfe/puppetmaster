@@ -32,8 +32,6 @@ export default class RequestView extends Component<Props> {
     }
 
     const id = this.props.selectedRequestId;
-
-    console.log(`Fetching request ${id}`);
     const response = await global.backendConn.send(
       'GET',
       `/requests/${id}`,
@@ -41,11 +39,9 @@ export default class RequestView extends Component<Props> {
     );
 
     const request = response.result.body;
-    console.log(`Received response!`);
     console.log(request);
 
     if (request.id !== this.state.request.id) {
-      console.log(`Updating request state to ${request.id}`);
       const newState = Object.assign({}, this.state);
       newState.request = request;
       this.setState(newState);
