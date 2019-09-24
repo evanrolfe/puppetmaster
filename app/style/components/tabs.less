@@ -19,7 +19,7 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    background-color: var(--color-bg);
+    background-color: @hl-xs;
     overflow: auto;
 
     @scrollbar-height: @padding-sm;
@@ -113,12 +113,16 @@
       opacity: @opacity-super-subtle;
     }
 
+    &:not(.react-tabs__tab--selected):hover {
+      background-color: @hl-xs;
+      cursor: pointer;
+    }
+
     &.react-tabs__tab--selected:focus {
       background-color: @focus-color;
     }
 
     &.react-tabs__tab button:focus {
-      text-decoration: underline;
     }
 
     &.react-tabs__tab--selected {
@@ -126,6 +130,7 @@
       border-right: 1px solid @border-color;
       border-left: 1px solid @border-color;
       border-bottom-color: transparent;
+      background-color: var(--color-bg);
 
       * {
         color: inherit;
