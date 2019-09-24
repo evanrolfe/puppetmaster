@@ -27,10 +27,11 @@ class BrowsersController {
 
     page.on('response', response => {
       global.db.run(
-        'INSERT INTO requests (method, url, response_status) VALUES (?, ?, ?);',
+        'INSERT INTO requests (method, url, response_status, response_status_message) VALUES (?, ?, ?, ?);',
         response.request().method(),
         response.url(),
-        response.status()
+        response.status(),
+        response.statusText()
       );
     });
 

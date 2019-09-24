@@ -6,7 +6,7 @@ class RequestsController {
   // GET /requests
   async index() {
     const requests = await global.db.all(
-      'SELECT id, method, url, response_status FROM requests'
+      'SELECT id, method, url, response_status, response_status_message FROM requests'
     );
     console.log(`Received: ${requests.length} requests!`);
 

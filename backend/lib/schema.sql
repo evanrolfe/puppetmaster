@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS requests(
   request_post_data TEXT,
   request_resource_type TEXT,
   response_status INTEGER,
+  response_status_message TEXT,
   response_headers TEXT,
   response_body TEXT
 );
