@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
+import RequestTab from './RequestView/RequestTab';
+import ResponseTab from './RequestView/ResponseTab';
+import BodyTab from './RequestView/BodyTab';
+import CookiesTab from './RequestView/CookiesTab';
 
 type Props = {
   selectedRequestId: 'number'
@@ -24,12 +29,8 @@ export default class RequestView extends Component<Props> {
   }
 
   async loadRequest() {
-    if (
-      this.props === undefined ||
-      this.props.selectedRequestId === undefined
-    ) {
+    if (this.props === undefined || this.props.selectedRequestId === undefined)
       return;
-    }
 
     const id = this.props.selectedRequestId;
     const response = await global.backendConn.send(
@@ -37,11 +38,9 @@ export default class RequestView extends Component<Props> {
       `/requests/${id}`,
       {}
     );
-
     const request = response.result.body;
-    console.log(request);
 
-    if (request.id !== this.state.request.id) {
+    if (request !== undefined && request.id !== this.state.request.id) {
       const newState = Object.assign({}, this.state);
       newState.request = request;
       this.setState(newState);
@@ -53,10 +52,39 @@ export default class RequestView extends Component<Props> {
 
     return (
       <>
-        <h2>
-          {request.method} {request.url}
-        </h2>
-        Status: {request.response_status} {request.response_status_message}
+        <Tabs className="pane__tabs theme--pane__body react-tabs">
+          <TabList>
+            <Tab>
+              <button type="button">Request</button>
+            </Tab>
+
+            <Tab>
+              <button type="button">Response</button>
+            </Tab>
+
+            <Tab>
+              <button type="button">Body</button>
+            </Tab>
+
+            <Tab>
+              <button type="button">Cookies</button>
+            </Tab>
+          </TabList>
+
+          {/* Stupid Hack to avoid a warning from react-tabs: */}
+          <TabPanel>
+            <RequestTab request={request} />
+          </TabPanel>
+          <TabPanel>
+            <ResponseTab request={request} />
+          </TabPanel>
+          <TabPanel>
+            <BodyTab request={request} />
+          </TabPanel>
+          <TabPanel>
+            <CookiesTab request={request} />
+          </TabPanel>
+        </Tabs>
       </>
     );
   }
