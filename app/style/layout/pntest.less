@@ -81,7 +81,7 @@
   }
 
   th.ordered {
-    //border-top: 1px solid var(--color-surprise);
+    color: var(--color-surprise);
   }
 
   th:last-child {
@@ -97,6 +97,17 @@
   height: 300px;
   width: 100%;
   background-color: var(--color-bg);
+
+  tr.selected {
+    background-color: @hl-lg;
+  }
+
+  tr {
+    &:not(.selected):hover {
+      cursor: pointer;
+      background-color: @hl-xs;
+    }
+  }
 
   td {
     border-right: 1px solid @hl-md;
