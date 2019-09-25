@@ -31,13 +31,19 @@ class BrowsersController {
       }`;
 
       const responseBody = await response.text();
+      const cookies = await page.cookies();
+      const cookiesStr = cookies
+        .map(cookie => `${cookie.name}=${cookie.value}`)
+        .join('; ');
+      const responseHeaders = response.request().headers();
+      responseHeaders.cookie = cookiesStr;
 
       global.db.run(
         'INSERT INTO requests (method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address, response_body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
         response.request().method(),
         response.url(),
         response.request().resourceType(),
-        JSON.stringify(response.request().headers()),
+        JSON.stringify(responseHeaders),
         JSON.stringify(response.request().postData()),
         response.status(),
         response.statusText(),
