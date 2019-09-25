@@ -24,7 +24,7 @@ export default class ResponseTab extends Component<Props> {
 
         <ul>
           {Object.keys(headers).map(key => (
-            <li>
+            <li key={key}>
               <b>{key}:</b> {headers[key]}
             </li>
           ))}
