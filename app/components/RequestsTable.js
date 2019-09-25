@@ -56,8 +56,8 @@ export default class RequestsTable extends Component<Props> {
     console.log(requestRow);
     requestRow.scrollIntoView({
       behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest'
+      block: 'nearest',
+      inline: 'start'
     });
 
     this.props.setSelectedRequestId(prevRequest.id);
@@ -73,9 +73,9 @@ export default class RequestsTable extends Component<Props> {
     const requestRow = document.getElementById(`requestRow${nextRequest.id}`);
     console.log(requestRow);
     requestRow.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest'
+      behavior: 'auto',
+      block: 'nearest',
+      inline: 'start'
     });
 
     this.props.setSelectedRequestId(nextRequest.id);
