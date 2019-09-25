@@ -3,11 +3,26 @@ const capitalise = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
+const parseParamsUrlToObject = (paramsUrl, params) => {
+  paramsUrl.split('&').forEach(paramSegment => {
+    const paramSplit = paramSegment.split('=');
+
+    params[paramSplit[0]] = paramSplit[1];
+  });
+};
+
 const getResult = async request => {
   const params = request.args;
   let result;
 
-  const urlSegments = request.url.split('/').filter(segment => segment !== '');
+  const mainUrl = request.url.split('?')[0];
+  const paramsUrl = request.url.split('?')[1];
+
+  if (paramsUrl !== undefined) {
+    parseParamsUrlToObject(paramsUrl, params);
+  }
+
+  const urlSegments = mainUrl.split('/').filter(segment => segment !== '');
   const lastSegment = urlSegments[urlSegments.length - 1];
 
   // TODO Make this work for nested controllers)

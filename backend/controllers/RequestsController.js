@@ -7,7 +7,7 @@ class RequestsController {
 
   // GET /requests
   async index() {
-    const requests = await Request.select(
+    let requests = Request.select(
       'id',
       'method',
       'url',
@@ -20,7 +20,18 @@ class RequestsController {
       'response_remote_address'
     );
 
-    return { status: 'OK', body: requests };
+    if (this.params.order_by !== undefined) {
+      let dir = false; // Default is ascending order
+      if (this.params.dir.toLowerCase() === 'desc') dir = true;
+
+      requests = requests.order(this.params.order_by, dir);
+    } else {
+      requests = requests.order('id', true);
+    }
+
+    const body = await requests;
+
+    return { status: 'OK', body: body };
   }
 
   // GET /requests/123
