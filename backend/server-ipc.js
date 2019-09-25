@@ -1,6 +1,6 @@
 const ipc = require('node-ipc');
 const router = require('./lib/router.js');
-const setupDatabase = require('./lib/database.js');
+const { setupDatabaseStore } = require('./lib/database.js');
 
 /*
  * Response (OK): { type: 'reply', id: '1232', result: { status: 'OK', id: '...' } }
@@ -8,7 +8,7 @@ const setupDatabase = require('./lib/database.js');
  * Response (ERROR): { type: 'error', id: '1232', result: 'ERROR: bla bla bla' }
  */
 async function init(socketName, databaseFile) {
-  global.db = await setupDatabase(databaseFile);
+  global.dbStore = await setupDatabaseStore(databaseFile);
 
   ipc.config.id = socketName;
   ipc.config.silent = true;

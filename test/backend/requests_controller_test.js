@@ -1,14 +1,23 @@
 describe('Requests', () => {
   describe('GET /requests', () => {
     beforeEach(async () => {
-      await global.db.run('Delete FROM requests;');
-      await global.db.run("DELETE FROM SQLITE_SEQUENCE WHERE name='requests';");
-      await global.db.run(
-        'INSERT INTO requests (method, url, response_status) VALUES ("GET", "http://localhost/api/posts.json", 200);'
+      await global.dbStore.connection.raw('Delete FROM requests;');
+      await global.dbStore.connection.raw(
+        'DELETE FROM SQLITE_SEQUENCE WHERE name="requests";'
       );
-      await global.db.run(
-        'INSERT INTO requests (method, url, response_status) VALUES ("POST", "http://localhost/api/posts.json", 200);'
-      );
+
+      await global.dbStore.Model('Request').create({
+        method: 'GET',
+        url: 'http://localhost/api/posts.json',
+        response_status: 200,
+        response_body: 'Hello World!'
+      });
+      await global.dbStore.Model('Request').create({
+        method: 'POST',
+        url: 'http://localhost/api/posts.json',
+        response_status: 200,
+        response_body: 'Hello World!'
+      });
     });
 
     it('returns the requests stored in the database', async () => {
@@ -25,6 +34,7 @@ describe('Requests', () => {
               request_headers: null,
               request_payload: null,
               request_type: null,
+              response_body: null,
               response_headers: null,
               response_remote_address: null,
               response_status: 200,
@@ -37,6 +47,7 @@ describe('Requests', () => {
               request_headers: null,
               request_payload: null,
               request_type: null,
+              response_body: null,
               response_headers: null,
               response_remote_address: null,
               response_status: 200,

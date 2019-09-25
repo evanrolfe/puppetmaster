@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const Request = require('../models/Request');
 
 class BrowsersController {
   constructor(params) {
@@ -26,31 +27,7 @@ class BrowsersController {
     const page = pages[0];
 
     page.on('response', async response => {
-      const remoteAddress = `${response.remoteAddress().ip}:${
-        response.remoteAddress().port
-      }`;
-
-      const responseBody = await response.text();
-      const cookies = await page.cookies();
-      const cookiesStr = cookies
-        .map(cookie => `${cookie.name}=${cookie.value}`)
-        .join('; ');
-      const responseHeaders = response.request().headers();
-      responseHeaders.cookie = cookiesStr;
-
-      global.db.run(
-        'INSERT INTO requests (method, url, request_type, request_headers, request_payload, response_status, response_status_message, response_headers, response_remote_address, response_body) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-        response.request().method(),
-        response.url(),
-        response.request().resourceType(),
-        JSON.stringify(responseHeaders),
-        JSON.stringify(response.request().postData()),
-        response.status(),
-        response.statusText(),
-        JSON.stringify(response.headers()),
-        remoteAddress,
-        responseBody
-      );
+      Request.createFromBrowserResponse(page, response);
     });
 
     return { status: 'OK' };

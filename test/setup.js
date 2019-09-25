@@ -1,10 +1,10 @@
 import path from 'path';
 import { before, after } from 'mocha';
 import { expect } from 'chai';
-import SqliteAsync from 'sqlite-async';
 
 import Backend from '../app/lib/BackendServerStarter';
 import BackendConn from '../app/lib/BackendConnection';
+import { setupDatabaseStore } from '../backend/lib/database';
 
 global.expect = expect;
 global.rootPath = path.join('../app/', '');
@@ -31,10 +31,11 @@ before(async () => {
   global.backendConn = new BackendConn('testapp1');
   await global.backendConn.init();
 
-  global.db = await SqliteAsync.open('pntest-test.db');
+  global.dbStore = await setupDatabaseStore('pntest-test.db');
 });
 
 after(() => {
+  global.dbStore.close();
   global.backendConn.disconnect();
   serverProcess.kill('SIGHUP');
   console.log('Process killed.');

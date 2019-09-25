@@ -1,13 +1,18 @@
 const fs = require('fs');
-const SqliteAsync = require('sqlite-async');
+const Store = require('openrecord/store/sqlite3');
 
-const setupDatabase = async databaseFile => {
-  const db = await SqliteAsync.open(databaseFile);
+const setupDatabaseStore = async databaseFile => {
+  const store = new Store({
+    file: databaseFile,
+    autoLoad: true,
+    models: [require('../models/Request')]
+  });
+  await store.ready();
 
   const schemaSql = fs.readFileSync(`${__dirname}/schema.sql`, 'utf8');
-  await db.run(schemaSql);
+  await store.connection.raw(schemaSql);
 
-  return db;
+  return store;
 };
 
-module.exports = setupDatabase;
+module.exports = { setupDatabaseStore };

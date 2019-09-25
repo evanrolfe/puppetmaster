@@ -70,6 +70,7 @@
       "backend/server-dev.html",
       "backend/controllers/BrowsersController.js",
       "backend/controllers/RequestsController.js",
+      "backend/models/Request.js",
       "backend/lib/database.js",
       "backend/lib/router.js",
       "backend/lib/schema.sql",
@@ -257,6 +258,7 @@
     "electron-updater": "^3.2.3",
     "history": "^4.7.2",
     "node-ipc": "^9.1.1",
+    "openrecord": "^2.10.2",
     "puppeteer": "^1.19.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
@@ -265,7 +267,7 @@
     "react-router-dom": "^5.0.1",
     "react-tabs": "^3.0.0",
     "source-map-support": "^0.5.9",
-    "sqlite-async": "^1.0.12"
+    "sqlite3": "^4.1.0"
   },
   "devEngines": {
     "node": ">=7.x",
