@@ -22,13 +22,25 @@ describe('Requests', () => {
             {
               id: 1,
               method: 'GET',
+              request_headers: null,
+              request_payload: null,
+              request_type: null,
+              response_headers: null,
+              response_remote_address: null,
               response_status: 200,
+              response_status_message: null,
               url: 'http://localhost/api/posts.json'
             },
             {
               id: 2,
               method: 'POST',
+              request_headers: null,
+              request_payload: null,
+              request_type: null,
+              response_headers: null,
+              response_remote_address: null,
               response_status: 200,
+              response_status_message: null,
               url: 'http://localhost/api/posts.json'
             }
           ]

@@ -7,7 +7,7 @@ import Backend from '../app/lib/BackendServerStarter';
 import BackendConn from '../app/lib/BackendConnection';
 
 global.expect = expect;
-global.rootPath = path.join(__dirname, '../');
+global.rootPath = path.join('../app/', '');
 
 let serverProcess;
 
@@ -15,7 +15,11 @@ before(async () => {
   const appMock = {
     getVersion() {
       return '1.2.3';
-    }
+    },
+    getAppPath() {
+      return '';
+    },
+    isPackaged: true
   };
 
   serverProcess = Backend.createBackgroundProcess(

@@ -14,6 +14,8 @@ export default {
     }
     const serverPath = `${path.join(app.getAppPath(), backendDir)}/index.js`;
 
+    console.log(`Starting server from: ${serverPath}`);
+
     const serverProcess = fork(serverPath, [
       '--subprocess',
       app.getVersion(),
