@@ -66,7 +66,7 @@ export default class RequestsTable extends Component<Props> {
     const requestRow = document.getElementById(`requestRow${prevRequest.id}`);
     console.log(requestRow);
     requestRow.scrollIntoView({
-      behavior: 'smooth',
+      behavior: 'auto',
       block: 'nearest',
       inline: 'start'
     });
