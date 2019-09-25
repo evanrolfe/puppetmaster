@@ -14,7 +14,9 @@ export default class RequestsTable extends Component<Props> {
     super(props);
     this.state = {
       requests: [],
-      tableColumnSizes: [24, 100, 500, 100]
+      tableColumnSizes: [24, 100, 500, 100],
+      order_by: 'id',
+      dir: 'asc'
     };
     this.loadRequests();
 
@@ -27,16 +29,25 @@ export default class RequestsTable extends Component<Props> {
     this.loadRequests();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.order_by !== prevState.order_by ||
+      this.state.dir !== prevState.dir
+    ) {
+      this.loadRequests();
+    }
+  }
+
   async loadRequests() {
-    console.log(`Fetching requests...`);
-    const response = await global.backendConn.send('GET', '/requests', {});
+    const url = `/requests?order_by=${this.state.order_by}&dir=${
+      this.state.dir
+    }`;
+    const response = await global.backendConn.send('GET', url, {});
     const requests = response.result.body;
 
-    if (requests.length !== this.state.requests.length) {
-      const newState = Object.assign({}, this.state);
-      newState.requests = requests;
-      this.setState(newState);
-    }
+    const newState = Object.assign({}, this.state);
+    newState.requests = requests;
+    this.setState(newState);
   }
 
   getRowClassName(requestId) {
@@ -90,8 +101,43 @@ export default class RequestsTable extends Component<Props> {
     if (e.key === 'ArrowDown') this.selectNextRequest();
   }
 
+  classNameForTableHeader(columnName) {
+    if (columnName === this.state.order_by) {
+      return 'ordered';
+    }
+  }
+
+  toggleColumnOrder(columnName) {
+    const newState = Object.assign({}, this.state);
+
+    if (columnName !== this.state.order_by) {
+      newState.order_by = columnName;
+    } else {
+      newState.dir = this.state.dir === 'asc' ? 'desc' : 'asc';
+    }
+
+    this.setState(newState);
+  }
+
   render() {
     const requests = this.state.requests;
+
+    const TableHeader = props => (
+      <th
+        onClick={props.onClick}
+        className={`requests-table-header ${props.className}`}
+        width={props.width}
+      >
+        {props.children}
+
+        {props.className === 'ordered' && props.orderDir === 'asc' && (
+          <i className="fas fa-caret-up order-icon" />
+        )}
+        {props.className === 'ordered' && props.orderDir === 'desc' && (
+          <i className="fas fa-caret-down order-icon" />
+        )}
+      </th>
+    );
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
@@ -100,14 +146,39 @@ export default class RequestsTable extends Component<Props> {
         <table className="header-table">
           <thead>
             <tr>
-              <th width={this.state.tableColumnSizes[0]}>#</th>
-              <th className="ordered" width={this.state.tableColumnSizes[1]}>
+              <TableHeader
+                onClick={this.toggleColumnOrder.bind(this, 'id')}
+                className={this.classNameForTableHeader('id')}
+                orderDir={this.state.dir}
+                width={this.state.tableColumnSizes[0]}
+              >
+                #
+              </TableHeader>
+              <TableHeader
+                onClick={this.toggleColumnOrder.bind(this, 'method')}
+                className={this.classNameForTableHeader('method')}
+                orderDir={this.state.dir}
+                width={this.state.tableColumnSizes[1]}
+              >
                 Method
-                <i className="fas fa-caret-up order-icon" />
-              </th>
-              <th width={this.state.tableColumnSizes[2]}>URL</th>
-              <th width={this.state.tableColumnSizes[3]}>Status</th>
-              <th>Length</th>
+              </TableHeader>
+              <TableHeader
+                onClick={this.toggleColumnOrder.bind(this, 'url')}
+                className={this.classNameForTableHeader('url')}
+                orderDir={this.state.dir}
+                width={this.state.tableColumnSizes[2]}
+              >
+                URL
+              </TableHeader>
+              <TableHeader
+                onClick={this.toggleColumnOrder.bind(this, 'response_status')}
+                className={this.classNameForTableHeader('response_status')}
+                orderDir={this.state.dir}
+                width={this.state.tableColumnSizes[3]}
+              >
+                Status
+              </TableHeader>
+              <TableHeader>Length</TableHeader>
             </tr>
           </thead>
         </table>
