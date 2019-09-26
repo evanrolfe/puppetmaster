@@ -59,7 +59,6 @@
 .scrollable {
   overflow-x: hidden;
   overflow-y: scroll;
-  height: 300px;
 }
 
 .header-table {
@@ -95,7 +94,6 @@
 }
 
 .requests-table {
-  height: 300px;
   width: 100%;
   background-color: var(--color-bg);
 
@@ -121,7 +119,7 @@
 }
 
 .requests-table-pane {
-  border-bottom: 1px solid @hl-md;
+  //border-bottom: 1px solid @hl-md;
 }
 
 .request-tab-panel {
@@ -136,4 +134,22 @@
 
 .requests-table-header:hover {
   background-color: @hl-xs;
+}
+
+
+.resizable-border {
+  border-top: 1px solid @hl-md;
+  cursor: row-resize;
+}
+
+.resizable-border-transparent {
+  opacity: 0.0;
+  z-index: 999;
+  height: 8px;
+  margin-top: -8px;
+  cursor: row-resize;
+}
+
+.hidden {
+  display: none;
 }

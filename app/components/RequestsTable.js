@@ -4,7 +4,9 @@ import KeydownBinder from './KeydownBinder';
 
 type Props = {
   selectedRequestId: 'number',
-  setSelectedRequestId: 'function'
+  setSelectedRequestId: 'function',
+  paneHeight: 'number',
+  showTransition: 'boolean'
 };
 
 export default class RequestsTable extends Component<Props> {
@@ -183,35 +185,44 @@ export default class RequestsTable extends Component<Props> {
           </thead>
         </table>
 
-        <div className="scrollable">
-          <table className="requests-table">
-            <tbody>
-              {requests.map(request => (
-                <tr
-                  key={request.id}
-                  id={`requestRow${request.id}`}
-                  onClick={() => this.props.setSelectedRequestId(request.id)}
-                  className={this.getRowClassName(request.id)}
-                >
-                  <td width={this.state.tableColumnSizes[0]}>{request.id}</td>
-                  <td
-                    className={`http-method-${request.method}`}
-                    width={this.state.tableColumnSizes[1]}
+        {this.props.showTransition && (
+          <div style={{ height: `${this.props.paneHeight}px` }} />
+        )}
+
+        {!this.props.showTransition && (
+          <div
+            className="scrollable"
+            style={{ height: `${this.props.paneHeight}px` }}
+          >
+            <table className="requests-table">
+              <tbody>
+                {requests.map(request => (
+                  <tr
+                    key={request.id}
+                    id={`requestRow${request.id}`}
+                    onClick={() => this.props.setSelectedRequestId(request.id)}
+                    className={this.getRowClassName(request.id)}
                   >
-                    {request.method}
-                  </td>
-                  <td width={this.state.tableColumnSizes[2]}>
-                    {request.url.substr(0, 60)}
-                  </td>
-                  <td width={this.state.tableColumnSizes[3]}>
-                    <StatusTag statusCode={request.response_status} small />
-                  </td>
-                  <td>&nbsp;</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <td width={this.state.tableColumnSizes[0]}>{request.id}</td>
+                    <td
+                      className={`http-method-${request.method}`}
+                      width={this.state.tableColumnSizes[1]}
+                    >
+                      {request.method}
+                    </td>
+                    <td width={this.state.tableColumnSizes[2]}>
+                      {request.url.substr(0, 60)}
+                    </td>
+                    <td width={this.state.tableColumnSizes[3]}>
+                      <StatusTag statusCode={request.response_status} small />
+                    </td>
+                    <td>&nbsp;</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </KeydownBinder>
     );
   }
