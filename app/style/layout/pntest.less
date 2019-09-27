@@ -136,7 +136,14 @@
   background-color: @hl-xs;
 }
 
+.requests-table-header-title {
+  // debugging:
+  //background-color: antiquewhite;
+  display: inline-block;
+  width: calc(100% - 8px);
+}
 
+/* HORIZONTAL */
 .resizable-border {
   border-top: 1px solid @hl-md;
   cursor: row-resize;
@@ -149,6 +156,27 @@
   margin-top: -8px;
   cursor: row-resize;
 }
+
+/* VERTICAL */
+.resizable-border-vert {
+  // debugging:
+  // background-color: aliceblue;
+  border-left: 1px solid @hl-md;
+  cursor: col-resize;
+  display: inline-block;
+  margin-left: -3px; // To make up for the padding
+}
+
+.resizable-border-vert-transparent {
+  opacity: 0.0;
+  z-index: 999;
+  width: 8px;
+  height: 100%;
+  // margin-left: -8px;
+
+  cursor: col-resize;
+}
+
 
 .hidden {
   display: none;

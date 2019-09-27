@@ -60,8 +60,8 @@ export default class BrowserNetwork extends Component<Props> {
     this.setState({ draggingPaneVertical: true });
   }
 
-  _setRequestTableRef(n) {
-    this._requestTable = n;
+  _setRequestTableRef(element) {
+    this._requestTable = element;
   }
 
   render() {

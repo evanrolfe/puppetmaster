@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
+import RequestsTableHeader from './RequestsTableHeader';
 
 type Props = {
   selectedRequestId: 'number',
@@ -16,11 +17,12 @@ export default class RequestsTable extends Component<Props> {
     super(props);
     this.state = {
       requests: [],
-      tableColumnSizes: [24, 100, 500, 100],
-      order_by: 'id',
+      tableColumnWidths: [100, 100, 500, 100],
+      order_by: 'response_status',
       dir: 'asc'
     };
     this.loadRequests();
+    this.tableHeaderRefs = {};
 
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this.selectPrevRequest = this.selectPrevRequest.bind(this);
@@ -104,9 +106,9 @@ export default class RequestsTable extends Component<Props> {
   }
 
   classNameForTableHeader(columnName) {
-    if (columnName === this.state.order_by) {
-      return 'ordered';
-    }
+    if (columnName === this.state.order_by) return 'ordered';
+
+    return '';
   }
 
   toggleColumnOrder(columnName) {
@@ -121,25 +123,17 @@ export default class RequestsTable extends Component<Props> {
     this.setState(newState);
   }
 
+  setTableColumnWidth(columnIndex, width) {
+    this.setState(prevState => {
+      const tableColumnWidths = [...prevState.tableColumnWidths];
+      tableColumnWidths[columnIndex] = width;
+
+      return { tableColumnWidths: tableColumnWidths };
+    });
+  }
+
   render() {
     const requests = this.state.requests;
-
-    const TableHeader = props => (
-      <th
-        onClick={props.onClick}
-        className={`requests-table-header ${props.className}`}
-        width={props.width}
-      >
-        {props.children}
-
-        {props.className === 'ordered' && props.orderDir === 'asc' && (
-          <i className="fas fa-caret-up order-icon" />
-        )}
-        {props.className === 'ordered' && props.orderDir === 'desc' && (
-          <i className="fas fa-caret-down order-icon" />
-        )}
-      </th>
-    );
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
@@ -148,39 +142,57 @@ export default class RequestsTable extends Component<Props> {
         <table className="header-table">
           <thead>
             <tr>
-              <TableHeader
+              <RequestsTableHeader
                 onClick={this.toggleColumnOrder.bind(this, 'id')}
                 className={this.classNameForTableHeader('id')}
                 orderDir={this.state.dir}
-                width={this.state.tableColumnSizes[0]}
+                width={this.state.tableColumnWidths[0]}
+                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
+                columnIndex={0}
               >
                 #
-              </TableHeader>
-              <TableHeader
+              </RequestsTableHeader>
+              <RequestsTableHeader
                 onClick={this.toggleColumnOrder.bind(this, 'method')}
                 className={this.classNameForTableHeader('method')}
                 orderDir={this.state.dir}
-                width={this.state.tableColumnSizes[1]}
+                width={this.state.tableColumnWidths[1]}
+                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
+                columnIndex={1}
+                minWidth={40} // NOTE: This is the min for the previous column
               >
                 Method
-              </TableHeader>
-              <TableHeader
+              </RequestsTableHeader>
+              <RequestsTableHeader
                 onClick={this.toggleColumnOrder.bind(this, 'url')}
                 className={this.classNameForTableHeader('url')}
                 orderDir={this.state.dir}
-                width={this.state.tableColumnSizes[2]}
+                width={this.state.tableColumnWidths[2]}
+                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
+                columnIndex={2}
+                minWidth={70}
               >
                 URL
-              </TableHeader>
-              <TableHeader
+              </RequestsTableHeader>
+              <RequestsTableHeader
                 onClick={this.toggleColumnOrder.bind(this, 'response_status')}
                 className={this.classNameForTableHeader('response_status')}
                 orderDir={this.state.dir}
-                width={this.state.tableColumnSizes[3]}
+                width={this.state.tableColumnWidths[3]}
+                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
+                columnIndex={3}
+                minWidth={435}
               >
                 Status
-              </TableHeader>
-              <TableHeader>Length</TableHeader>
+              </RequestsTableHeader>
+              <RequestsTableHeader
+                width={this.state.tableColumnWidths[4]}
+                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
+                columnIndex={4}
+                minWidth={60}
+              >
+                Length
+              </RequestsTableHeader>
             </tr>
           </thead>
         </table>
@@ -203,17 +215,19 @@ export default class RequestsTable extends Component<Props> {
                     onClick={() => this.props.setSelectedRequestId(request.id)}
                     className={this.getRowClassName(request.id)}
                   >
-                    <td width={this.state.tableColumnSizes[0]}>{request.id}</td>
+                    <td width={this.state.tableColumnWidths[0]}>
+                      {request.id}
+                    </td>
                     <td
                       className={`http-method-${request.method}`}
-                      width={this.state.tableColumnSizes[1]}
+                      width={this.state.tableColumnWidths[1]}
                     >
                       {request.method}
                     </td>
-                    <td width={this.state.tableColumnSizes[2]}>
+                    <td width={this.state.tableColumnWidths[2]}>
                       {request.url.substr(0, 60)}
                     </td>
-                    <td width={this.state.tableColumnSizes[3]}>
+                    <td width={this.state.tableColumnWidths[3]}>
                       <StatusTag statusCode={request.response_status} small />
                     </td>
                     <td>&nbsp;</td>
