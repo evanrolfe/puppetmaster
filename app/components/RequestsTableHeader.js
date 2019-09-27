@@ -9,7 +9,8 @@ type Props = {
   className: 'string',
   onClick: 'function',
   orderDir: 'string',
-  children: React.Node
+  children: React.Node,
+  noResize: 'boolean'
 };
 
 export default class RequestsTableHeader extends Component<Props> {
@@ -57,15 +58,16 @@ export default class RequestsTableHeader extends Component<Props> {
   _handleMouseMove(e) {
     if (this.state.draggingColumn === true) {
       const tableHeader = ReactDOM.findDOMNode(this.tableHeaderRef);
-      const prevSiblings = this._prevSiblings(tableHeader.previousSibling);
+      const prevSiblings = this._prevSiblings(tableHeader);
       const previousColumnsWidth = prevSiblings.reduce(
         (sum, element) => sum + parseInt(element.width) + 5,
         0
       );
+
       let width = e.clientX - 55 - previousColumnsWidth;
       width = Math.max(width, this.props.minWidth);
-
-      tableHeader.previousSibling.width = `${width}px`;
+      console.log(`Setting width: ${width}`);
+      tableHeader.width = `${width}px`;
       this.setState({ width: width });
     }
   }
@@ -74,10 +76,7 @@ export default class RequestsTableHeader extends Component<Props> {
     if (this.state.draggingColumn === true) {
       this.setState({ draggingColumn: false });
 
-      if (this.props.columnIndex > 0) {
-        const columnIndex = this.props.columnIndex - 1;
-        this.props.setTableColumnWidth(columnIndex, this.state.width);
-      }
+      this.props.setTableColumnWidth(this.props.columnIndex, this.state.width);
     }
   }
 
@@ -92,13 +91,6 @@ export default class RequestsTableHeader extends Component<Props> {
         width={this.props.width}
         ref={this._setTableHeaderRef}
       >
-        <div
-          className="resizable-border-vert"
-          onMouseDown={this.handleStartDragColumn.bind(this)}
-        >
-          <div className="resizable-border-vert-transparent">&nbsp;</div>
-        </div>
-
         <span
           className="requests-table-header-title"
           onClick={this.props.onClick}
@@ -114,6 +106,15 @@ export default class RequestsTableHeader extends Component<Props> {
               <i className="fas fa-caret-down order-icon" />
             )}
         </span>
+
+        {!this.props.noResize && (
+          <div
+            className="resizable-border-vert"
+            onMouseDown={this.handleStartDragColumn.bind(this)}
+          >
+            <div className="resizable-border-vert-transparent">&nbsp;</div>
+          </div>
+        )}
       </th>
     );
   }

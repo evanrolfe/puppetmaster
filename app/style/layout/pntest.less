@@ -138,7 +138,7 @@
 
 .requests-table-header-title {
   // debugging:
-  //background-color: antiquewhite;
+  // background-color: antiquewhite;
   display: inline-block;
   width: calc(100% - 8px);
 }
@@ -161,10 +161,11 @@
 .resizable-border-vert {
   // debugging:
   // background-color: aliceblue;
-  border-left: 1px solid @hl-md;
+  //border-right: 1px solid @hl-md;
   cursor: col-resize;
   display: inline-block;
-  margin-left: -3px; // To make up for the padding
+  float: right;
+  margin-right: -3px; // To make up for the padding
 }
 
 .resizable-border-vert-transparent {
@@ -172,7 +173,7 @@
   z-index: 999;
   width: 8px;
   height: 100%;
-  // margin-left: -8px;
+  // margin-right: -8px;
 
   cursor: col-resize;
 }

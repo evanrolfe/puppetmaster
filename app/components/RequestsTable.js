@@ -17,9 +17,9 @@ export default class RequestsTable extends Component<Props> {
     super(props);
     this.state = {
       requests: [],
-      tableColumnWidths: [100, 100, 500, 100],
-      order_by: 'response_status',
-      dir: 'asc'
+      tableColumnWidths: [40, 100, 500, 100],
+      order_by: 'id',
+      dir: 'desc'
     };
     this.loadRequests();
     this.tableHeaderRefs = {};
@@ -149,6 +149,7 @@ export default class RequestsTable extends Component<Props> {
                 width={this.state.tableColumnWidths[0]}
                 setTableColumnWidth={this.setTableColumnWidth.bind(this)}
                 columnIndex={0}
+                minWidth={40}
               >
                 #
               </RequestsTableHeader>
@@ -159,7 +160,7 @@ export default class RequestsTable extends Component<Props> {
                 width={this.state.tableColumnWidths[1]}
                 setTableColumnWidth={this.setTableColumnWidth.bind(this)}
                 columnIndex={1}
-                minWidth={40} // NOTE: This is the min for the previous column
+                minWidth={70}
               >
                 Method
               </RequestsTableHeader>
@@ -170,7 +171,7 @@ export default class RequestsTable extends Component<Props> {
                 width={this.state.tableColumnWidths[2]}
                 setTableColumnWidth={this.setTableColumnWidth.bind(this)}
                 columnIndex={2}
-                minWidth={70}
+                minWidth={435}
               >
                 URL
               </RequestsTableHeader>
@@ -181,15 +182,13 @@ export default class RequestsTable extends Component<Props> {
                 width={this.state.tableColumnWidths[3]}
                 setTableColumnWidth={this.setTableColumnWidth.bind(this)}
                 columnIndex={3}
-                minWidth={435}
+                minWidth={60}
               >
                 Status
               </RequestsTableHeader>
               <RequestsTableHeader
                 width={this.state.tableColumnWidths[4]}
-                setTableColumnWidth={this.setTableColumnWidth.bind(this)}
-                columnIndex={4}
-                minWidth={60}
+                noResize
               >
                 Length
               </RequestsTableHeader>
