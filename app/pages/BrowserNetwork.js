@@ -7,7 +7,8 @@ import RequestView from '../components/RequestView';
 
 type Props = {
   setBrowserNetworkPaneHeight: 'function',
-  browserNetworkPaneHeight: 'number'
+  browserNetworkPaneHeight: 'number',
+  windowSize: 'array'
 };
 
 export default class BrowserNetwork extends Component<Props> {
@@ -28,10 +29,14 @@ export default class BrowserNetwork extends Component<Props> {
     );
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
+    this.calculateRequestPaneHeight = this.calculateRequestPaneHeight.bind(
+      this
+    );
   }
 
   componentDidMount() {
     document.addEventListener('mouseup', this._handleMouseUp);
+    // TODO: Throttle this event callback
     document.addEventListener('mousemove', this._handleMouseMove);
   }
 
@@ -67,6 +72,14 @@ export default class BrowserNetwork extends Component<Props> {
     this._requestTable = element;
   }
 
+  calculateRequestPaneHeight() {
+    const windowHeight = this.props.windowSize[1];
+    console.log(this.props.browserNetworkPaneHeight);
+    // TODO: Get rid of this stupid static height (212) and use proper css to ensure that the request
+    //       view carreis on to the bottom of the page.
+    return windowHeight - this.props.browserNetworkPaneHeight - 212;
+  }
+
   render() {
     return (
       <>
@@ -92,7 +105,10 @@ export default class BrowserNetwork extends Component<Props> {
         </div>
 
         <div className="requests-view-pane">
-          <RequestView selectedRequestId={this.state.selectedRequestId} />
+          <RequestView
+            selectedRequestId={this.state.selectedRequestId}
+            panelHeight={this.calculateRequestPaneHeight()}
+          />
         </div>
       </>
     );

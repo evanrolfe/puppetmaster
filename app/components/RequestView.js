@@ -6,7 +6,8 @@ import BodyTab from './RequestView/BodyTab';
 import CookiesTab from './RequestView/CookiesTab';
 
 type Props = {
-  selectedRequestId: 'number'
+  selectedRequestId: 'number',
+  panelHeight: 'number'
 };
 
 export default class RequestView extends Component<Props> {
@@ -73,7 +74,7 @@ export default class RequestView extends Component<Props> {
 
           {/* Stupid Hack to avoid a warning from react-tabs: */}
           <TabPanel>
-            <RequestTab request={request} />
+            <RequestTab height={this.props.panelHeight} request={request} />
           </TabPanel>
           <TabPanel>
             <ResponseTab request={request} />
