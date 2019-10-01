@@ -77,7 +77,7 @@ export default class RequestView extends Component<Props> {
             <RequestTab height={this.props.panelHeight} request={request} />
           </TabPanel>
           <TabPanel>
-            <ResponseTab request={request} />
+            <ResponseTab height={this.props.panelHeight} request={request} />
           </TabPanel>
           <TabPanel>
             <BodyTab request={request} />

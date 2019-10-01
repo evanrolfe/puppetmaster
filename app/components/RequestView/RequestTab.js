@@ -22,10 +22,10 @@ export default class RequestsTab extends Component<Props> {
         <span className="selectable">
           {request.method} {request.url}
         </span>
-
         <br />
         <br />
-
+        <span>Headers:</span>
+        <br />
         <table
           key="table"
           className="table--fancy table--striped table--compact"
