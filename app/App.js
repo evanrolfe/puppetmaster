@@ -17,7 +17,6 @@ import BrowserIntercept from './pages/BrowserIntercept';
 import Crawler from './pages/Crawler';
 import Requests from './pages/Requests';
 import Scans from './pages/Scans';
-import AppSettings from './models/AppSettings';
 import BackendConnection from './lib/BackendConnection';
 
 export default class App extends Component {
@@ -32,17 +31,24 @@ export default class App extends Component {
       showModal(SettingsModal);
     });
 
-    const settings = new AppSettings();
     const backendConn = new BackendConnection('pntest1');
     const backendConnected = backendConn.init();
     // TODO: Refactor this so we don't have to use global vars - maybe use a singleton instead?
     global.backendConn = backendConn;
 
     this.state = {
-      settings: settings,
+      settings: {
+        activeTheme: 'default',
+        browserNetworkPaneHeight: 250
+      },
+      // Ensure that the app gets re-rendered once we connect to the backend
       // eslint-disable-next-line react/no-unused-state
-      backendConnected: backendConnected // Ensure that the app gets re-rendered once we connect to the backend
+      backendConnected: backendConnected
     };
+
+    this.setBrowserNetworkPaneHeight = this.setBrowserNetworkPaneHeight.bind(
+      this
+    );
   }
 
   componentDidMount() {
@@ -64,6 +70,14 @@ export default class App extends Component {
     this.setState(prevState => {
       const newsettings = Object.assign({}, prevState.settings);
       newsettings.activeTheme = theme;
+      return { settings: newsettings };
+    });
+  }
+
+  setBrowserNetworkPaneHeight(height) {
+    this.setState(prevState => {
+      const newsettings = Object.assign({}, prevState.settings);
+      newsettings.browserNetworkPaneHeight = height;
       return { settings: newsettings };
     });
   }
@@ -106,11 +120,33 @@ export default class App extends Component {
               <Route path="/browser" component={BrowserTabs} />
 
               <section className="pane__body theme--pane">
-                <Route exact path="/" component={BrowserNetwork} />
+                <Route
+                  exact
+                  path="/"
+                  render={() => (
+                    <BrowserNetwork
+                      setBrowserNetworkPaneHeight={
+                        this.setBrowserNetworkPaneHeight
+                      }
+                      browserNetworkPaneHeight={
+                        this.state.settings.browserNetworkPaneHeight
+                      }
+                    />
+                  )}
+                />
                 <Route
                   exact
                   path="/browser/network"
-                  component={BrowserNetwork}
+                  render={() => (
+                    <BrowserNetwork
+                      setBrowserNetworkPaneHeight={
+                        this.setBrowserNetworkPaneHeight
+                      }
+                      browserNetworkPaneHeight={
+                        this.state.settings.browserNetworkPaneHeight
+                      }
+                    />
+                  )}
                 />
                 <Route
                   exact

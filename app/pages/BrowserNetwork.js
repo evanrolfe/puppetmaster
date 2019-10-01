@@ -5,17 +5,20 @@ import ReactDOM from 'react-dom';
 import RequestsTable from '../components/RequestsTable';
 import RequestView from '../components/RequestView';
 
-type Props = {};
+type Props = {
+  setBrowserNetworkPaneHeight: 'function',
+  browserNetworkPaneHeight: 'number'
+};
 
 export default class BrowserNetwork extends Component<Props> {
   props: Props;
 
   constructor(props) {
     super(props);
+
     this.state = {
       draggingPaneVertical: false,
-      showDragOverlay: false,
-      paneHeight: 250
+      showDragOverlay: false
     };
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
@@ -46,7 +49,7 @@ export default class BrowserNetwork extends Component<Props> {
       const newHeight =
         e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
 
-      this.setState({ paneHeight: newHeight });
+      this.props.setBrowserNetworkPaneHeight(newHeight);
     }
   }
 
@@ -75,7 +78,7 @@ export default class BrowserNetwork extends Component<Props> {
           <RequestsTable
             selectedRequestId={this.state.selectedRequestId}
             setSelectedRequestId={this.setSelectedRequestId}
-            paneHeight={this.state.paneHeight}
+            paneHeight={this.props.browserNetworkPaneHeight}
             ref={this._setRequestTableRef}
             showTransition={this.state.draggingPaneVertical}
           />
