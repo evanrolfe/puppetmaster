@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
@@ -27,6 +28,7 @@ export default class RequestsTable extends Component<Props> {
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this.selectPrevRequest = this.selectPrevRequest.bind(this);
     this.selectNextRequest = this.selectNextRequest.bind(this);
+    this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
   }
 
   componentDidMount() {
@@ -40,6 +42,12 @@ export default class RequestsTable extends Component<Props> {
     ) {
       this.loadRequests();
     }
+  }
+
+  componentWillUnmount() {
+    const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
+    console.log(`Scrolled at: ${requestPanel.scrollTop}`);
+    // TODO: Save the scroll location
   }
 
   async loadRequests() {
@@ -68,7 +76,6 @@ export default class RequestsTable extends Component<Props> {
     if (prevRequest === undefined) return;
 
     const requestRow = document.getElementById(`requestRow${prevRequest.id}`);
-    console.log(requestRow);
     requestRow.scrollIntoView({
       behavior: 'auto',
       block: 'nearest',
@@ -86,7 +93,6 @@ export default class RequestsTable extends Component<Props> {
     if (nextRequest === undefined) return;
 
     const requestRow = document.getElementById(`requestRow${nextRequest.id}`);
-    console.log(requestRow);
     requestRow.scrollIntoView({
       behavior: 'auto',
       block: 'nearest',
@@ -130,6 +136,10 @@ export default class RequestsTable extends Component<Props> {
 
       return { tableColumnWidths: tableColumnWidths };
     });
+  }
+
+  _setRequestsPanelRef(element) {
+    this._requestPanel = element;
   }
 
   render() {
@@ -204,6 +214,7 @@ export default class RequestsTable extends Component<Props> {
           <div
             className="scrollable"
             style={{ height: `${this.props.paneHeight}px` }}
+            ref={this._setRequestsPanelRef}
           >
             <table className="requests-table">
               <tbody>

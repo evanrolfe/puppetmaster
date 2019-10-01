@@ -74,7 +74,6 @@ export default class BrowserNetwork extends Component<Props> {
 
   calculateRequestPaneHeight() {
     const windowHeight = this.props.windowSize[1];
-    console.log(this.props.browserNetworkPaneHeight);
     // TODO: Get rid of this stupid static height (212) and use proper css to ensure that the request
     //       view carreis on to the bottom of the page.
     return windowHeight - this.props.browserNetworkPaneHeight - 212;
