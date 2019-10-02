@@ -25,7 +25,7 @@ class StateController {
   }
 
   // POST /state/BrowserNetworkPage
-  async create() {
+  create() {
     let state = {};
 
     if (fs.existsSync(STATEFILE)) {
