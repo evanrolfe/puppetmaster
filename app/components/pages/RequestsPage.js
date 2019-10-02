@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 type Props = {};
 
-export default class Requests extends Component<Props> {
+export default class RequestsPage extends Component<Props> {
   props: Props;
 
   render() {

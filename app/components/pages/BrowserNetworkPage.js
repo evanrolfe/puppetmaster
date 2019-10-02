@@ -2,22 +2,21 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-import RequestsTable from '../components/RequestsTable';
-import RequestView from '../components/RequestView';
+import RequestsTable from '../RequestsTable';
+import RequestView from '../RequestView';
 
 type Props = {
-  setBrowserNetworkPaneHeight: 'function',
-  browserNetworkPaneHeight: 'number',
   windowSize: 'array'
 };
 
-export default class BrowserNetwork extends Component<Props> {
+export default class BrowserNetworkPage extends Component<Props> {
   props: Props;
 
   constructor(props) {
     super(props);
 
     this.state = {
+      browserNetworkPaneHeight: 250,
       draggingPaneVertical: false,
       showDragOverlay: false
     };
@@ -54,7 +53,7 @@ export default class BrowserNetwork extends Component<Props> {
       const newHeight =
         e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
 
-      this.props.setBrowserNetworkPaneHeight(newHeight);
+      this.setState({ browserNetworkPaneHeight: newHeight });
     }
   }
 
@@ -76,7 +75,7 @@ export default class BrowserNetwork extends Component<Props> {
     const windowHeight = this.props.windowSize[1];
     // TODO: Get rid of this stupid static height (212) and use proper css to ensure that the request
     //       view carreis on to the bottom of the page.
-    return windowHeight - this.props.browserNetworkPaneHeight - 212;
+    return windowHeight - this.state.browserNetworkPaneHeight - 212;
   }
 
   render() {
@@ -90,7 +89,7 @@ export default class BrowserNetwork extends Component<Props> {
           <RequestsTable
             selectedRequestId={this.state.selectedRequestId}
             setSelectedRequestId={this.setSelectedRequestId}
-            paneHeight={this.props.browserNetworkPaneHeight}
+            paneHeight={this.state.browserNetworkPaneHeight}
             ref={this._setRequestTableRef}
             showTransition={this.state.draggingPaneVertical}
           />

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 type Props = {};
 
-export default class BrowserSessions extends Component<Props> {
+export default class BrowserSessionsPage extends Component<Props> {
   props: Props;
 
   constructor(props) {

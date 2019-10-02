@@ -12,12 +12,12 @@ import AlertModal from './components/modals/AlertModal';
 import SettingsModal from './components/modals/SettingsModal';
 import BrowserTabs from './components/BrowserTabs';
 import SideBar from './components/SideBar';
-import BrowserSessions from './pages/BrowserSessions';
-import BrowserNetwork from './pages/BrowserNetwork';
-import BrowserIntercept from './pages/BrowserIntercept';
-import Crawler from './pages/Crawler';
-import Requests from './pages/Requests';
-import Scans from './pages/Scans';
+import BrowserSessionsPage from './components/pages/BrowserSessionsPage';
+import BrowserNetworkPage from './components/pages/BrowserNetworkPage';
+import BrowserInterceptPage from './components/pages/BrowserInterceptPage';
+import CrawlerPage from './components/pages/CrawlerPage';
+import RequestsPage from './components/pages/RequestsPage';
+import ScansPage from './components/pages/ScansPage';
 import BackendConnection from './lib/BackendConnection';
 
 export default class App extends Component {
@@ -40,7 +40,6 @@ export default class App extends Component {
     this.state = {
       settings: {
         activeTheme: 'default',
-        browserNetworkPaneHeight: 250,
         windowSize: remote.getCurrentWindow().getSize()
       },
       // Ensure that the app gets re-rendered once we connect to the backend
@@ -48,9 +47,6 @@ export default class App extends Component {
       backendConnected: backendConnected
     };
 
-    this.setBrowserNetworkPaneHeight = this.setBrowserNetworkPaneHeight.bind(
-      this
-    );
     this.throttledSetWindowSizeState = _.throttle(
       this.setWindowSizeState.bind(this),
       100
@@ -86,14 +82,6 @@ export default class App extends Component {
     this.setState(prevState => {
       const newsettings = Object.assign({}, prevState.settings);
       newsettings.activeTheme = theme;
-      return { settings: newsettings };
-    });
-  }
-
-  setBrowserNetworkPaneHeight(height) {
-    this.setState(prevState => {
-      const newsettings = Object.assign({}, prevState.settings);
-      newsettings.browserNetworkPaneHeight = height;
       return { settings: newsettings };
     });
   }
@@ -140,13 +128,7 @@ export default class App extends Component {
                   exact
                   path="/"
                   render={() => (
-                    <BrowserNetwork
-                      setBrowserNetworkPaneHeight={
-                        this.setBrowserNetworkPaneHeight
-                      }
-                      browserNetworkPaneHeight={
-                        this.state.settings.browserNetworkPaneHeight
-                      }
+                    <BrowserNetworkPage
                       windowSize={this.state.settings.windowSize}
                     />
                   )}
@@ -155,13 +137,7 @@ export default class App extends Component {
                   exact
                   path="/browser/network"
                   render={() => (
-                    <BrowserNetwork
-                      setBrowserNetworkPaneHeight={
-                        this.setBrowserNetworkPaneHeight
-                      }
-                      browserNetworkPaneHeight={
-                        this.state.settings.browserNetworkPaneHeight
-                      }
+                    <BrowserNetworkPage
                       windowSize={this.state.settings.windowSize}
                     />
                   )}
@@ -169,19 +145,19 @@ export default class App extends Component {
                 <Route
                   exact
                   path="/browser/intercept"
-                  component={BrowserIntercept}
+                  component={BrowserInterceptPage}
                 />
                 <Route
                   exact
                   path="/browser/sessions"
-                  component={BrowserSessions}
+                  component={BrowserSessionsPage}
                 />
 
-                <Route exact path="/crawler" component={Crawler} />
+                <Route exact path="/crawler" component={CrawlerPage} />
 
-                <Route exact path="/requests" component={Requests} />
+                <Route exact path="/requests" component={RequestsPage} />
 
-                <Route exact path="/scans" component={Scans} />
+                <Route exact path="/scans" component={ScansPage} />
               </section>
             </section>
           </div>

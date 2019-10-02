@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 type Props = {};
 
-export default class BrowserIntercept extends Component<Props> {
+export default class BrowserInterceptPage extends Component<Props> {
   props: Props;
 
   render() {
