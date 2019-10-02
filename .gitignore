@@ -52,3 +52,4 @@ npm-debug.log.*
 
 *.db
 build/*
+app_state.json

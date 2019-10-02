@@ -16,9 +16,9 @@ export default class BrowserNetworkPage extends Component<Props> {
     super(props);
 
     this.state = {
-      browserNetworkPaneHeight: 250,
       draggingPaneVertical: false,
       showDragOverlay: false,
+      browserNetworkPaneHeight: 250,
       tableColumnWidths: [40, 100, 500, 100],
       order_by: 'id',
       dir: 'desc',

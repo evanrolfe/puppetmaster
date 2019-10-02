@@ -31,6 +31,13 @@ const getResult = async request => {
   let controller;
   const matches = lastSegment.match(/\d+/);
 
+  // Custom routes:
+  if (controllerName === 'StateController' && request.method === 'GET') {
+    controller = new Controller(params);
+    params.page = lastSegment;
+    return controller.show();
+  }
+
   // If the last segment is not a digit(s)
   if (matches === null) {
     controller = new Controller(params);
