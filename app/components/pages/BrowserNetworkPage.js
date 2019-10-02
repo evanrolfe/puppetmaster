@@ -18,7 +18,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.state = {
       browserNetworkPaneHeight: 250,
       draggingPaneVertical: false,
-      showDragOverlay: false
+      showDragOverlay: false,
+      tableColumnWidths: [40, 100, 500, 100],
+      order_by: 'id',
+      dir: 'desc'
     };
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
@@ -31,6 +34,8 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.calculateRequestPaneHeight = this.calculateRequestPaneHeight.bind(
       this
     );
+    this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
+    this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
   }
 
   componentDidMount() {
@@ -78,6 +83,27 @@ export default class BrowserNetworkPage extends Component<Props> {
     return windowHeight - this.state.browserNetworkPaneHeight - 212;
   }
 
+  toggleColumnOrder(columnName) {
+    const newState = Object.assign({}, this.state);
+
+    if (columnName !== this.state.order_by) {
+      newState.order_by = columnName;
+    } else {
+      newState.dir = this.state.dir === 'asc' ? 'desc' : 'asc';
+    }
+
+    this.setState(newState);
+  }
+
+  setTableColumnWidth(columnIndex, width) {
+    this.setState(prevState => {
+      const tableColumnWidths = [...prevState.tableColumnWidths];
+      tableColumnWidths[columnIndex] = width;
+
+      return { tableColumnWidths: tableColumnWidths };
+    });
+  }
+
   render() {
     return (
       <>
@@ -92,6 +118,11 @@ export default class BrowserNetworkPage extends Component<Props> {
             paneHeight={this.state.browserNetworkPaneHeight}
             ref={this._setRequestTableRef}
             showTransition={this.state.draggingPaneVertical}
+            order_by={this.state.order_by}
+            dir={this.state.dir}
+            toggleColumnOrder={this.toggleColumnOrder}
+            tableColumnWidths={this.state.tableColumnWidths}
+            setTableColumnWidth={this.setTableColumnWidth}
           />
         </div>
 
