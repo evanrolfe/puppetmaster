@@ -24,7 +24,7 @@ class StateController {
     return { status: 'OK', body: state };
   }
 
-  // POST /state
+  // POST /state/BrowserNetworkPage
   async create() {
     let state = {};
 

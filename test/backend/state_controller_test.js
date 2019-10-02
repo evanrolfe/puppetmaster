@@ -55,14 +55,17 @@ describe('Requests', () => {
     context('when there is not state file', () => {
       it('creates a state file with the params saved', async () => {
         const params = {
-          page: 'BrowserNetworkPage',
           browserNetworkPaneHeight: 250,
           tableColumnWidths: [40, 100, 500, 100],
           order_by: 'id',
           dir: 'desc',
           requestsTableScrollTop: 0
         };
-        const result = await backendConn.send('POST', '/state', params);
+        const result = await backendConn.send(
+          'POST',
+          '/state/BrowserNetworkPage',
+          params
+        );
 
         expect(result.result.status).to.eql('OK');
 
@@ -107,7 +110,11 @@ describe('Requests', () => {
           dir: 'asc',
           requestsTableScrollTop: 321
         };
-        const result = await backendConn.send('POST', '/state', params);
+        const result = await backendConn.send(
+          'POST',
+          '/state/BrowserNetworkPage',
+          params
+        );
 
         expect(result.result.status).to.eql('OK');
 

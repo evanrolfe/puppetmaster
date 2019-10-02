@@ -32,10 +32,19 @@ const getResult = async request => {
   const matches = lastSegment.match(/\d+/);
 
   // Custom routes:
+
+  // GET /state/BrowserNetworkPage
   if (controllerName === 'StateController' && request.method === 'GET') {
     controller = new Controller(params);
     params.page = lastSegment;
     return controller.show();
+  }
+
+  // POST /state/BrowserNetworkPage
+  if (controllerName === 'StateController' && request.method === 'POST') {
+    controller = new Controller(params);
+    params.page = lastSegment;
+    return controller.create();
   }
 
   // If the last segment is not a digit(s)
