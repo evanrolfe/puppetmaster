@@ -66,7 +66,6 @@ export default class RequestsTableHeader extends Component<Props> {
 
       let width = e.clientX - 55 - previousColumnsWidth;
       width = Math.max(width, this.props.minWidth);
-      console.log(`Setting width: ${width}`);
       tableHeader.width = `${width}px`;
       this.setState({ width: width });
     }

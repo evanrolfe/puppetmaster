@@ -96,7 +96,7 @@ export default class BackendConnection {
 */
 
   send(method, url, args) {
-    console.log('sending...');
+    console.log(`Backend: ${method} ${url}`);
     return new Promise((resolve, reject) => {
       const id = this.uuid.v4();
       this.replyHandlers.set(id, { resolve, reject });

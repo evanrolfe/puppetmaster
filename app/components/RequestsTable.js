@@ -13,7 +13,8 @@ type Props = {
   order_by: 'string',
   dir: 'string',
   toggleColumnOrder: 'function',
-  setTableColumnWidth: 'function'
+  setTableColumnWidth: 'function',
+  setScrollTop: 'function'
 };
 
 export default class RequestsTable extends Component<Props> {
@@ -47,8 +48,7 @@ export default class RequestsTable extends Component<Props> {
 
   componentWillUnmount() {
     const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
-    console.log(`Scrolled at: ${requestPanel.scrollTop}`);
-    // TODO: Save the scroll location
+    this.props.setScrollTop(requestPanel.scrollTop);
   }
 
   async loadRequests() {
