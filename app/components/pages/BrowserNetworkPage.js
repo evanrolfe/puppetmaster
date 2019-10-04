@@ -43,17 +43,49 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
-    this.setRequests = this.setRequests.bind(this);
   }
 
   componentDidMount() {
     document.addEventListener('mouseup', this._handleMouseUp);
     // TODO: Throttle this event callback
     document.addEventListener('mousemove', this._handleMouseMove);
+
+    if (this.state.requests.length === 0) {
+      this.loadRequests();
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // DO not re-render when only the scroll state changes
+    if (
+      this.state.requestsTableScrollTop !== nextState.requestsTableScrollTop
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.order_by !== prevState.order_by ||
+      this.state.dir !== prevState.dir
+    ) {
+      this.loadRequests();
+    }
   }
 
   componentWillUnmount() {
     global.browserNetworkPageState = this.state;
+  }
+
+  async loadRequests() {
+    const url = `/requests?order_by=${this.state.order_by}&dir=${
+      this.state.dir
+    }`;
+    const response = await global.backendConn.send('GET', url, {});
+
+    this.setState({ requests: response.result.body });
   }
 
   setSelectedRequestId(id) {
@@ -120,10 +152,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState({ requestsTableScrollTop: scrollTop });
   }
 
-  setRequests(requests) {
-    this.setState({ requests: requests });
-  }
-
   render() {
     return (
       <>
@@ -143,8 +171,8 @@ export default class BrowserNetworkPage extends Component<Props> {
             toggleColumnOrder={this.toggleColumnOrder}
             tableColumnWidths={this.state.tableColumnWidths}
             setTableColumnWidth={this.setTableColumnWidth}
+            scrollTop={this.state.requestsTableScrollTop}
             setScrollTop={this.setScrollTop}
-            setRequests={this.setRequests}
             requests={this.state.requests}
           />
         </div>

@@ -16,7 +16,7 @@ type Props = {
   toggleColumnOrder: 'function',
   setTableColumnWidth: 'function',
   setScrollTop: 'function',
-  setRequests: 'function'
+  scrollTop: 'number'
 };
 
 export default class RequestsTable extends Component<Props> {
@@ -34,32 +34,13 @@ export default class RequestsTable extends Component<Props> {
   }
 
   componentDidMount() {
-    if (this.props.requests.length === 0) {
-      this.loadRequests();
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.order_by !== prevProps.order_by ||
-      this.props.dir !== prevProps.dir
-    ) {
-      this.loadRequests();
-    }
-  }
-
-  componentWillUnmount() {
+    // Restore the scroll state
     const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
-    this.props.setScrollTop(requestPanel.scrollTop);
-  }
+    requestPanel.scrollTop = this.props.scrollTop;
 
-  async loadRequests() {
-    const url = `/requests?order_by=${this.props.order_by}&dir=${
-      this.props.dir
-    }`;
-    const response = await global.backendConn.send('GET', url, {});
-
-    this.props.setRequests(response.result.body);
+    requestPanel.addEventListener('scroll', () => {
+      this.props.setScrollTop(requestPanel.scrollTop);
+    });
   }
 
   getRowClassName(requestId) {
