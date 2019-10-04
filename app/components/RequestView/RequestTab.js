@@ -19,7 +19,7 @@ export default class RequestsTab extends Component<Props> {
         className="request-tab-panel scrollable"
         style={{ height: this.props.height }}
       >
-        <span className="selectable">
+        <span className="selectable force-wrap">
           {request.method} {request.url}
         </span>
         <br />

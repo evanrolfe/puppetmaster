@@ -43,6 +43,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
+
+    global.backendConn.listen('requestCreated', () => {
+      this.loadRequests();
+    });
   }
 
   componentDidMount() {

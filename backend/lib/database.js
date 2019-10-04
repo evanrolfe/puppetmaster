@@ -9,8 +9,10 @@ const setupDatabaseStore = async databaseFile => {
   });
   await store.ready();
 
+  console.log('Loaded database');
   const schemaSql = fs.readFileSync(`${__dirname}/schema.sql`, 'utf8');
   await store.connection.raw(schemaSql);
+  console.log('Executed schema.sql');
 
   return store;
 };

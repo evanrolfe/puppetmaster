@@ -31,7 +31,6 @@ export default class BackendConnection {
     this.ipcConnect(name, client => {
       client.on('message', data => {
         const response = JSON.parse(data);
-
         if (response.type === 'reply' || response.type === 'error') {
           const { id } = response;
           const handler = this.replyHandlers.get(id);
@@ -42,11 +41,12 @@ export default class BackendConnection {
             handler.resolve(response);
           }
         } else if (response.type === 'push') {
-          const { listenerName, args } = response;
+          const args = response.args;
+          const listenerName = response.name;
 
-          const listens = this.listeners.get(listenerName);
-          if (listens) {
-            listens.forEach(listener => {
+          const listeners = this.listeners.get(listenerName);
+          if (listeners) {
+            listeners.forEach(listener => {
               listener(args);
             });
           }

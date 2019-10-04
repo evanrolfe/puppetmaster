@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const Request = require('../models/Request');
+const ipc = require('../server-ipc');
 
 class BrowsersController {
   constructor(params) {
@@ -27,6 +28,7 @@ class BrowsersController {
     const page = pages[0];
 
     page.on('response', async response => {
+      ipc.send('requestCreated', {});
       Request.createFromBrowserResponse(page, response);
     });
 
