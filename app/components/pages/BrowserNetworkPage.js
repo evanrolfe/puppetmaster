@@ -15,16 +15,20 @@ export default class BrowserNetworkPage extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.state = {
-      draggingPaneVertical: false,
-      showDragOverlay: false,
-      browserNetworkPaneHeight: 250,
-      tableColumnWidths: [40, 100, 500, 100],
-      order_by: 'id',
-      dir: 'desc',
-      requestsTableScrollTop: 0,
-      requests: []
-    };
+    if (global.browserNetworkPageState === undefined) {
+      this.state = {
+        draggingPaneVertical: false,
+        showDragOverlay: false,
+        browserNetworkPaneHeight: 250,
+        tableColumnWidths: [40, 100, 500, 100],
+        order_by: 'id',
+        dir: 'desc',
+        requestsTableScrollTop: 0,
+        requests: []
+      };
+    } else {
+      this.state = global.browserNetworkPageState;
+    }
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
     this._handleMouseMove = this._handleMouseMove.bind(this);
@@ -46,6 +50,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     document.addEventListener('mouseup', this._handleMouseUp);
     // TODO: Throttle this event callback
     document.addEventListener('mousemove', this._handleMouseMove);
+  }
+
+  componentWillUnmount() {
+    global.browserNetworkPageState = this.state;
   }
 
   setSelectedRequestId(id) {

@@ -34,7 +34,9 @@ export default class RequestsTable extends Component<Props> {
   }
 
   componentDidMount() {
-    this.loadRequests();
+    if (this.props.requests.length === 0) {
+      this.loadRequests();
+    }
   }
 
   componentDidUpdate(prevProps) {
