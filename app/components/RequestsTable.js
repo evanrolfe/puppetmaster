@@ -5,6 +5,7 @@ import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
 
 type Props = {
+  requests: 'array',
   selectedRequestId: 'number',
   setSelectedRequestId: 'function',
   paneHeight: 'number',
@@ -14,7 +15,8 @@ type Props = {
   dir: 'string',
   toggleColumnOrder: 'function',
   setTableColumnWidth: 'function',
-  setScrollTop: 'function'
+  setScrollTop: 'function',
+  setRequests: 'function'
 };
 
 export default class RequestsTable extends Component<Props> {
@@ -22,9 +24,7 @@ export default class RequestsTable extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.state = {
-      requests: []
-    };
+
     this.tableHeaderRefs = {};
 
     this._handleKeyDown = this._handleKeyDown.bind(this);
@@ -56,11 +56,8 @@ export default class RequestsTable extends Component<Props> {
       this.props.dir
     }`;
     const response = await global.backendConn.send('GET', url, {});
-    const requests = response.result.body;
 
-    const newState = Object.assign({}, this.state);
-    newState.requests = requests;
-    this.setState(newState);
+    this.props.setRequests(response.result.body);
   }
 
   getRowClassName(requestId) {
@@ -70,10 +67,10 @@ export default class RequestsTable extends Component<Props> {
   }
 
   selectPrevRequest() {
-    const currentI = this.state.requests.findIndex(
+    const currentI = this.props.requests.findIndex(
       request => request.id === this.props.selectedRequestId
     );
-    const prevRequest = this.state.requests[currentI - 1];
+    const prevRequest = this.props.requests[currentI - 1];
     if (prevRequest === undefined) return;
 
     const requestRow = document.getElementById(`requestRow${prevRequest.id}`);
@@ -87,10 +84,10 @@ export default class RequestsTable extends Component<Props> {
   }
 
   selectNextRequest() {
-    const currentI = this.state.requests.findIndex(
+    const currentI = this.props.requests.findIndex(
       request => request.id === this.props.selectedRequestId
     );
-    const nextRequest = this.state.requests[currentI + 1];
+    const nextRequest = this.props.requests[currentI + 1];
     if (nextRequest === undefined) return;
 
     const requestRow = document.getElementById(`requestRow${nextRequest.id}`);
@@ -123,7 +120,7 @@ export default class RequestsTable extends Component<Props> {
   }
 
   render() {
-    const requests = this.state.requests;
+    const requests = this.props.requests;
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>

@@ -22,7 +22,8 @@ export default class BrowserNetworkPage extends Component<Props> {
       tableColumnWidths: [40, 100, 500, 100],
       order_by: 'id',
       dir: 'desc',
-      requestsTableScrollTop: 0
+      requestsTableScrollTop: 0,
+      requests: []
     };
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
@@ -38,6 +39,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
+    this.setRequests = this.setRequests.bind(this);
   }
 
   componentDidMount() {
@@ -110,6 +112,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState({ requestsTableScrollTop: scrollTop });
   }
 
+  setRequests(requests) {
+    this.setState({ requests: requests });
+  }
+
   render() {
     return (
       <>
@@ -130,6 +136,8 @@ export default class BrowserNetworkPage extends Component<Props> {
             tableColumnWidths={this.state.tableColumnWidths}
             setTableColumnWidth={this.setTableColumnWidth}
             setScrollTop={this.setScrollTop}
+            setRequests={this.setRequests}
+            requests={this.state.requests}
           />
         </div>
 
