@@ -2,6 +2,8 @@ describe('BrowsersController', () => {
   describe('POST /browsers', () => {
     it('works', async () => {
       const result = await backendConn.send('POST', '/browsers', {});
+      delete result.sentAt;
+
       expect(result).to.eql({ type: 'reply', result: { status: 'OK' } });
     });
   });
@@ -9,7 +11,8 @@ describe('BrowsersController', () => {
   describe('GET /browsers', () => {
     it('returns the requests stored in the database', async () => {
       const result = await backendConn.send('GET', '/browsers', {});
-      console.log(result);
+      delete result.sentAt;
+
       expect(result).to.eql({
         type: 'reply',
         result: {
@@ -23,6 +26,8 @@ describe('BrowsersController', () => {
   describe('GET /browsers/321', () => {
     it('works', async () => {
       const result = await backendConn.send('GET', '/browsers/321', {});
+      delete result.sentAt;
+
       expect(result).to.eql({
         type: 'reply',
         result: { status: 'OK', body: { id: 321 } }
@@ -33,6 +38,8 @@ describe('BrowsersController', () => {
   describe('PATCH /browsers/123', () => {
     it('works', async () => {
       const result = await backendConn.send('PATCH', '/browsers/123', {});
+      delete result.sentAt;
+
       expect(result).to.eql({ type: 'reply', result: { status: 'INVALID' } });
     });
   });
@@ -40,6 +47,8 @@ describe('BrowsersController', () => {
   describe('DELETE /browsers/123', () => {
     it('works', async () => {
       const result = await backendConn.send('DELETE', '/browsers/123', {});
+      delete result.sentAt;
+
       expect(result).to.eql({ type: 'reply', result: { status: 'OK' } });
     });
   });

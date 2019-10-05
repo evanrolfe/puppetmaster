@@ -7,31 +7,22 @@ class RequestsController {
 
   // GET /requests
   async index() {
-    let requests = Request.select(
-      'id',
-      'method',
-      'url',
-      'request_type',
-      'request_headers',
-      'request_payload',
-      'response_status',
-      'response_status_message',
-      'response_headers',
-      'response_remote_address'
-    );
+    let query =
+      'SELECT id, method, url, request_type, request_payload, response_status, response_status_message, response_remote_address FROM requests';
 
     if (this.params.order_by !== undefined) {
-      let dir = false; // Default is ascending order
-      if (this.params.dir.toLowerCase() === 'desc') dir = true;
-
-      requests = requests.order(this.params.order_by, dir);
+      if (this.params.dir.toUpperCase() === 'DESC') {
+        query += ` ORDER BY ${this.params.order_by} DESC`;
+      } else if (this.params.dir.toUpperCase() === 'ASC') {
+        query += ` ORDER BY ${this.params.order_by} ASC`;
+      }
     } else {
-      requests = requests.order('id', true);
+      query += ` ORDER BY id DESC`;
     }
 
-    const body = await requests;
+    const response = await global.dbStore.connection.raw(query);
 
-    return { status: 'OK', body: body };
+    return { status: 'OK', body: response };
   }
 
   // GET /requests/123

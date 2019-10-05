@@ -23,7 +23,12 @@ async function init(socketName, databaseFile) {
         ipc.server.emit(
           socket,
           'message',
-          JSON.stringify({ type: 'reply', id: request.id, result })
+          JSON.stringify({
+            type: 'reply',
+            id: request.id,
+            sentAt: request.sentAt,
+            result
+          })
         );
       } catch (error) {
         ipc.server.emit(
@@ -32,6 +37,7 @@ async function init(socketName, databaseFile) {
           JSON.stringify({
             type: 'error',
             id: request.id,
+            sentAt: request.sentAt,
             result: error.message
           })
         );

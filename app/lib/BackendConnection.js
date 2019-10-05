@@ -2,6 +2,16 @@
 import ipc from 'node-ipc';
 import uuid from 'uuid';
 
+const getTime = () => {
+  const date = new Date();
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  const n = date.getMilliseconds();
+
+  return `${h}:${m}:${s}:${n}`;
+};
+
 export default class BackendConnection {
   constructor(socketId) {
     this.replyHandlers = new Map();
@@ -32,6 +42,10 @@ export default class BackendConnection {
       client.on('message', data => {
         const response = JSON.parse(data);
         if (response.type === 'reply' || response.type === 'error') {
+          const diffTime = Date.now() - parseInt(response.sentAt);
+          console.log(
+            `${getTime()} - Backend: received response in ${diffTime}ms`
+          );
           const { id } = response;
           const handler = this.replyHandlers.get(id);
           if (handler) {
@@ -96,17 +110,20 @@ export default class BackendConnection {
 */
 
   send(method, url, args) {
-    console.log(`Backend: ${method} ${url}`);
+    console.log(`${getTime()} - Backend: request ${method} ${url}`);
     return new Promise((resolve, reject) => {
       const id = this.uuid.v4();
+      const sentAt = Date.now();
       this.replyHandlers.set(id, { resolve, reject });
       if (this.socketClient) {
         this.socketClient.emit(
           'message',
-          JSON.stringify({ id, method, url, args })
+          JSON.stringify({ id, sentAt, method, url, args })
         );
       } else {
-        this.messageQueue.push(JSON.stringify({ id, method, url, args }));
+        this.messageQueue.push(
+          JSON.stringify({ id, sentAt, method, url, args })
+        );
       }
     });
   }

@@ -24,6 +24,7 @@ describe('Requests', () => {
   describe('GET /requests', () => {
     it('returns the requests ordered by id DESC', async () => {
       const result = await backendConn.send('GET', '/requests', {});
+      delete result.sentAt;
 
       expect(result.result.status).to.eql('OK');
       expect(result.result.body[0].id).to.eql(2);
@@ -38,6 +39,7 @@ describe('Requests', () => {
         '/requests?order_by=url&dir=desc',
         {}
       );
+      delete result.sentAt;
 
       expect(result.result.status).to.eql('OK');
       expect(result.result.body[0].id).to.eql(1);
