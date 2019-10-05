@@ -15,7 +15,9 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
 import MenuBuilder from './menu';
-import BackgroundServerStarter from './lib/BackendServerStarter';
+import BackendServerStarter from './lib/BackendServerStarter';
+
+const DEBUG_BACKEND = false;
 
 export default class AppUpdater {
   constructor() {
@@ -62,19 +64,27 @@ app.on('ready', async () => {
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    BackgroundServerStarter.createBackgroundWindow(serverSocket);
+    BackendServerStarter.createBackgroundWindow(serverSocket);
     // await installExtensions();
   } else {
   }
 */
   log.warn('App ready.');
-  log.warn('Starting background server...');
 
-  backendProcess = BackgroundServerStarter.createBackgroundProcess(
-    serverSocket,
-    app,
-    'pntest-prod.db'
-  );
+  if (DEBUG_BACKEND === true) {
+    log.warn('Starting background server in debug mode...');
+    backendProcess = BackendServerStarter.createBackgroundWindow(
+      serverSocket,
+      app
+    );
+  } else {
+    log.warn('Starting background server...');
+    backendProcess = BackendServerStarter.createBackgroundProcess(
+      serverSocket,
+      app,
+      'pntest-prod.db'
+    );
+  }
 
   log.warn('Started.');
 

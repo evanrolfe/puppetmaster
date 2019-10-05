@@ -41,10 +41,12 @@ export default {
       }
     });
 
-    const backendPath = path.join(app.getAppPath(), '../backend');
-    const file = `${backendPath}/server-dev.html`;
+    const filePath = `${path.join(
+      app.getAppPath(),
+      '../backend'
+    )}/server-dev.html`;
 
-    win.loadURL(`file://${file}`);
+    win.loadURL(`file://${filePath}`);
 
     win.webContents.on('did-finish-load', () => {
       win.webContents.send('set-socket', { name: socketName });

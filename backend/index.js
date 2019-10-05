@@ -13,7 +13,7 @@ if (process.argv[2] === '--subprocess') {
   const { ipcRenderer } = require('electron');
 
   ipcRenderer.on('set-socket', (event, { name }) => {
-    ipc.init(name, process.argv[5]);
+    ipc.init(name, 'pntest-prod.db');
   });
 }
 
