@@ -30,9 +30,21 @@ class Request extends Store.BaseModel {
       `Saving request: ${response.request().method()} ${response.url()}`
     );
 
+    const parsedUrl = new URL(response.url());
+    const splitPath = parsedUrl.pathname.split('.');
+    let ext;
+
+    if (splitPath.length > 1) {
+      ext = splitPath[splitPath.length - 1];
+    }
+
     return Request.create({
       method: response.request().method(),
       url: response.url(),
+      host: parsedUrl.hostname,
+      path: parsedUrl.pathname,
+      ext: ext,
+      created_at: Date.now(),
       request_type: response.request().resourceType(),
       request_headers: JSON.stringify(responseHeaders),
       request_payload: JSON.stringify(response.request().postData()),
@@ -40,7 +52,8 @@ class Request extends Store.BaseModel {
       response_status_message: response.statusText(),
       response_headers: JSON.stringify(response.headers()),
       response_remote_address: remoteAddress,
-      response_body: responseBody
+      response_body: responseBody,
+      response_body_length: responseBody.length
     });
   }
 }
