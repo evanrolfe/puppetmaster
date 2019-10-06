@@ -144,8 +144,6 @@ export default class RequestsTable extends Component<Props> {
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
-        <div style={{ marginLeft: '10px', padding: '6px' }}>Filters</div>
-
         <table className="header-table">
           <thead>
             <tr>

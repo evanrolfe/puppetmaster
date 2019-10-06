@@ -150,7 +150,8 @@ export default class BrowserNetworkPage extends Component<Props> {
     const windowHeight = this.props.windowSize[1];
     // TODO: Get rid of this stupid static height (212) and use proper css to ensure that the request
     //       view carreis on to the bottom of the page.
-    return windowHeight - this.state.browserNetworkPaneHeight - 212;
+    // NOTE: 77 is the height of the search+filter div
+    return windowHeight - this.state.browserNetworkPaneHeight - 186 - 77;
   }
 
   toggleColumnOrder(columnName) {
@@ -185,6 +186,44 @@ export default class BrowserNetworkPage extends Component<Props> {
           {this.state.showDragOverlay ? (
             <div className="blocker-overlay" />
           ) : null}
+
+          <div style={{ marginLeft: '10px', padding: '6px', width: '' }}>
+            <div
+              className="form-control form-control--outlined"
+              style={{
+                width: '70%',
+                maxWidth: '800px',
+                display: 'inline-block'
+              }}
+            >
+              <label>Search:</label>
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                placeholder="Enter search term"
+              />
+            </div>
+
+            <div
+              className="form-control form-control--outlined"
+              style={{ width: '30%', display: 'inline-block' }}
+            >
+              <label style={{ marginLeft: '10px' }}>Filters:</label>
+
+              <button
+                className="pointer btn btn--outlined btn--super-compact"
+                style={{ marginLeft: '10px', display: 'inline-block' }}
+              >
+                Display
+              </button>
+              <button
+                className="pointer btn btn--outlined btn--super-compact"
+                style={{ marginLeft: '10px', display: 'inline-block' }}
+              >
+                Capture (3)
+              </button>
+            </div>
+          </div>
 
           <RequestsTable
             tableColumns={this.state.tableColumns}

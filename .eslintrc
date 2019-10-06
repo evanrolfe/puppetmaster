@@ -82,7 +82,9 @@
     "import/no-dynamic-require": "off",
     "global-require": "off",
     "radix": "off",
-    "no-else-return": "off"
+    "no-else-return": "off",
+    "jsx-a11y/label-has-for": "off",
+    "jsx-a11y/label-has-associated-control": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
