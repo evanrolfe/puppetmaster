@@ -81,7 +81,8 @@
     "prefer-destructuring": "off",
     "import/no-dynamic-require": "off",
     "global-require": "off",
-    "radix": "off"
+    "radix": "off",
+    "no-else-return": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {

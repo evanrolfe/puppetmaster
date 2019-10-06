@@ -20,7 +20,29 @@ export default class BrowserNetworkPage extends Component<Props> {
         draggingPaneVertical: false,
         showDragOverlay: false,
         browserNetworkPaneHeight: 250,
-        tableColumnWidths: [40, 100, 500, 100],
+        // RequestTable state:
+        tableColumns: [
+          { key: 'id', title: '#', minWidth: 40, width: 40 },
+          { key: 'method', title: 'Method', minWidth: 70, width: 70 },
+          { key: 'host', title: 'Host', minWidth: 200, width: 200 },
+          { key: 'path', title: 'Path', minWidth: 250, width: 250 },
+          { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
+          { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
+          { key: 'response_status', title: 'Status', minWidth: 60, width: 70 },
+          {
+            key: 'response_body_length',
+            title: 'Length',
+            minWidth: 65,
+            width: 70
+          },
+          {
+            key: 'response_remote_address',
+            title: 'IP Address',
+            minWidth: 120,
+            width: 130
+          },
+          { key: 'created_at', title: 'Time' }
+        ],
         order_by: 'id',
         dir: 'desc',
         requestsTableScrollTop: 0,
@@ -145,10 +167,10 @@ export default class BrowserNetworkPage extends Component<Props> {
 
   setTableColumnWidth(columnIndex, width) {
     this.setState(prevState => {
-      const tableColumnWidths = [...prevState.tableColumnWidths];
-      tableColumnWidths[columnIndex] = width;
+      const tableColumns = [...prevState.tableColumns];
+      tableColumns[columnIndex].width = width;
 
-      return { tableColumnWidths: tableColumnWidths };
+      return { tableColumns: tableColumns };
     });
   }
 
@@ -165,6 +187,7 @@ export default class BrowserNetworkPage extends Component<Props> {
           ) : null}
 
           <RequestsTable
+            tableColumns={this.state.tableColumns}
             selectedRequestId={this.state.selectedRequestId}
             setSelectedRequestId={this.setSelectedRequestId}
             paneHeight={this.state.browserNetworkPaneHeight}
@@ -173,7 +196,6 @@ export default class BrowserNetworkPage extends Component<Props> {
             order_by={this.state.order_by}
             dir={this.state.dir}
             toggleColumnOrder={this.toggleColumnOrder}
-            tableColumnWidths={this.state.tableColumnWidths}
             setTableColumnWidth={this.setTableColumnWidth}
             scrollTop={this.state.requestsTableScrollTop}
             setScrollTop={this.setScrollTop}

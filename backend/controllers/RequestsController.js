@@ -7,8 +7,23 @@ class RequestsController {
 
   // GET /requests
   async index() {
-    let query =
-      'SELECT id, method, url, request_type, request_payload, response_status, response_status_message, response_remote_address FROM requests';
+    const columns = [
+      'id',
+      'method',
+      'url',
+      'host',
+      'path',
+      'ext',
+      'created_at',
+      'request_type',
+      'request_payload',
+      'response_status',
+      'response_status_message',
+      'response_remote_address',
+      'response_body_length'
+    ];
+
+    let query = `SELECT ${columns.join(',')} FROM requests`;
 
     if (this.params.order_by !== undefined) {
       if (this.params.dir.toUpperCase() === 'DESC') {
