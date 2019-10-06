@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom';
 import RequestsTable from '../RequestsTable';
 import RequestView from '../RequestView';
 
+import { registerModal, showModal } from '../modals/index';
+import DisplayFiltersModal from '../modals/DisplayFiltersModal';
+
 type Props = {
   windowSize: 'array'
 };
@@ -187,6 +190,8 @@ export default class BrowserNetworkPage extends Component<Props> {
             <div className="blocker-overlay" />
           ) : null}
 
+          <DisplayFiltersModal ref={registerModal} />
+
           <div style={{ marginLeft: '10px', padding: '6px', width: '' }}>
             <div
               className="form-control form-control--outlined"
@@ -213,6 +218,7 @@ export default class BrowserNetworkPage extends Component<Props> {
               <button
                 className="pointer btn btn--outlined btn--super-compact"
                 style={{ marginLeft: '10px', display: 'inline-block' }}
+                onClick={() => showModal(DisplayFiltersModal)}
               >
                 Display
               </button>
