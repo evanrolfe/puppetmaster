@@ -11,7 +11,7 @@ class ModalHeader extends PureComponent {
       closeButton = (
         <button
           type="button"
-          className="btn btn--compact modal__close-btn"
+          className="pointer btn btn--compact modal__close-btn"
           data-close-modal="true"
         >
           <i className="fa fa-times" />

@@ -140,7 +140,7 @@ class Modal extends Component {
   }
 
   render() {
-    const { tall, wide, noEscape, className, children } = this.props;
+    const { wide, noEscape, className, children } = this.props;
     const { open, zIndex, forceRefreshCounter } = this.state;
 
     if (!open) {
@@ -151,7 +151,6 @@ class Modal extends Component {
       'modal',
       'theme--pane',
       className,
-      { 'modal--fixed-height': tall },
       { 'modal--noescape': noEscape },
       { 'modal--wide': wide }
     );
@@ -187,7 +186,6 @@ class Modal extends Component {
 }
 
 Modal.propTypes = {
-  tall: PropTypes.bool,
   wide: PropTypes.bool,
   noEscape: PropTypes.bool,
   dontFocus: PropTypes.bool,

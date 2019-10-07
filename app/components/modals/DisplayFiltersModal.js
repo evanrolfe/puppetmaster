@@ -130,7 +130,7 @@ export default class DisplayFiltersModal extends Component {
       >
         <ModalHeader>Display Filters</ModalHeader>
 
-        <ModalBody noScroll>
+        <ModalBody>
           <div className="pad">
             <div className="row-fill row-fill--top">
               <div className="form-control form-control--outlined">
