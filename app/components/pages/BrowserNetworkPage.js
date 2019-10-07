@@ -12,6 +12,23 @@ type Props = {
   windowSize: 'array'
 };
 
+const RESOURCE_TYPES = [
+  'document',
+  'fetch',
+  'manifest',
+  'other',
+  'script',
+  'stylesheet',
+  'xhr'
+];
+
+const STATUS_CODES = {
+  200: '2xx [Success]',
+  300: '3xx [Redirect]',
+  400: '4xx [Request Error]',
+  500: '5xx [Server Error]'
+};
+
 export default class BrowserNetworkPage extends Component<Props> {
   props: Props;
 
@@ -49,7 +66,17 @@ export default class BrowserNetworkPage extends Component<Props> {
         order_by: 'id',
         dir: 'desc',
         requestsTableScrollTop: 0,
-        requests: []
+        requests: [],
+        filters: {
+          hostList: [],
+          hostSetting: '', // ''|'include'|'exclude'
+          pathList: [],
+          pathSetting: '', // ''|'include'|'exclude'
+          statusCodes: Object.keys(STATUS_CODES),
+          resourceTypes: RESOURCE_TYPES,
+          extSetting: '', // ''|'include'|'exclude'
+          extList: []
+        }
       };
     } else {
       this.state = global.browserNetworkPageState;
@@ -68,6 +95,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
+    this.setFilters = this.setFilters.bind(this);
 
     global.backendConn.listen('requestCreated', () => {
       this.loadRequests();
@@ -182,7 +210,13 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState({ requestsTableScrollTop: scrollTop });
   }
 
+  setFilters(filters) {
+    this.setState({ filters: filters });
+  }
+
   render() {
+    const filters = JSON.parse(JSON.stringify(this.state.filters));
+
     return (
       <>
         <div className="requests-table-pane">
@@ -190,7 +224,13 @@ export default class BrowserNetworkPage extends Component<Props> {
             <div className="blocker-overlay" />
           ) : null}
 
-          <DisplayFiltersModal ref={registerModal} />
+          <DisplayFiltersModal
+            ref={registerModal}
+            allStatusCodes={STATUS_CODES}
+            allResourceTypes={RESOURCE_TYPES}
+            origFilters={filters}
+            setFilters={this.setFilters}
+          />
 
           <div style={{ marginLeft: '10px', padding: '6px', width: '' }}>
             <div

@@ -125,8 +125,11 @@ class Modal extends Component {
     return this.state.open;
   }
 
-  hide() {
+  hide(noCallback) {
     this.setState({ open: false });
+
+    if (noCallback === true) return;
+
     if (this.props.onHide) {
       this.props.onHide();
     }
@@ -146,7 +149,7 @@ class Modal extends Component {
 
     const classes = classnames(
       'modal',
-      'theme--dialog',
+      'theme--pane',
       className,
       { 'modal--fixed-height': tall },
       { 'modal--noescape': noEscape },
