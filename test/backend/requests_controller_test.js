@@ -23,7 +23,7 @@ describe('Requests', () => {
 
   describe('GET /requests', () => {
     it('returns the requests ordered by id DESC', async () => {
-      const result = await backendConn.send('GET', '/requests', {});
+      const result = await backendConn.send('RequestsController', 'index', {});
       delete result.sentAt;
 
       expect(result.result.status).to.eql('OK');
@@ -34,11 +34,10 @@ describe('Requests', () => {
 
   describe('GET /requests?order_by=url&dir=desc', () => {
     it('returns the requests ordered by url DESC', async () => {
-      const result = await backendConn.send(
-        'GET',
-        '/requests?order_by=url&dir=desc',
-        {}
-      );
+      const result = await backendConn.send('RequestsController', 'index', {
+        order_by: 'url',
+        dir: 'desc'
+      });
       delete result.sentAt;
 
       expect(result.result.status).to.eql('OK');
@@ -49,7 +48,9 @@ describe('Requests', () => {
 
   describe('GET /requests/1', () => {
     it('returns the request with id 1', async () => {
-      const result = await backendConn.send('GET', '/requests/1', {});
+      const result = await backendConn.send('RequestsController', 'show', {
+        id: 1
+      });
 
       expect(result.result.status).to.eql('OK');
       expect(result.result.body.id).to.eql(1);

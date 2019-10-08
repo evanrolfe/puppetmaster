@@ -1,5 +1,4 @@
 const ipc = require('node-ipc');
-const router = require('./lib/router.js');
 const { setupDatabaseStore } = require('./lib/database.js');
 
 /*
@@ -16,9 +15,14 @@ async function init(socketName, databaseFile) {
   ipc.serve(() => {
     ipc.server.on('message', async (data, socket) => {
       const request = JSON.parse(data);
-      console.log(`Received request for ${request.method} ${request.url}`);
+      console.log(
+        `[Backend] Received request for ${request.controller} ${request.action}`
+      );
+
       try {
-        const result = await router.getResult(request);
+        const Controller = require(`./controllers/${request.controller}`);
+        const controller = new Controller();
+        const result = await controller[request.action](request.args);
 
         ipc.server.emit(
           socket,

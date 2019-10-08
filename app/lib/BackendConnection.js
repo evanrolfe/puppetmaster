@@ -2,6 +2,7 @@
 import ipc from 'node-ipc';
 import uuid from 'uuid';
 
+/*
 const getTime = () => {
   const date = new Date();
   const h = date.getHours();
@@ -11,6 +12,7 @@ const getTime = () => {
 
   return `${h}:${m}:${s}:${n}`;
 };
+*/
 
 export default class BackendConnection {
   constructor(socketId) {
@@ -44,7 +46,7 @@ export default class BackendConnection {
         if (response.type === 'reply' || response.type === 'error') {
           const diffTime = Date.now() - parseInt(response.sentAt);
           console.log(
-            `${getTime()} - Backend: received response in ${diffTime}ms`
+            `[Frontend] received response from backend in ${diffTime}ms`
           );
           const { id } = response;
           const handler = this.replyHandlers.get(id);
@@ -90,27 +92,10 @@ export default class BackendConnection {
   disconnect() {
     ipc.disconnect(this.socketId);
   }
-  /*
-  get(url, args) {
-    this.send('GET', url, args);
-  }
 
-  post(url, args) {
-    console.log('posting...')
-    this.send('POST', url, args);
-  }
+  send(controller, action, args) {
+    console.log(`[Frontend] request to backend ${controller}.${action}`);
 
-  delete(url, args) {
-    this.send('DELETE', url, args);
-  }
-
-  patch(url, args) {
-    this.send('PATCH', url, args);
-  }
-*/
-
-  send(method, url, args) {
-    console.log(`${getTime()} - Backend: request ${method} ${url}`);
     return new Promise((resolve, reject) => {
       const id = this.uuid.v4();
       const sentAt = Date.now();
@@ -118,11 +103,11 @@ export default class BackendConnection {
       if (this.socketClient) {
         this.socketClient.emit(
           'message',
-          JSON.stringify({ id, sentAt, method, url, args })
+          JSON.stringify({ id, sentAt, controller, action, args })
         );
       } else {
         this.messageQueue.push(
-          JSON.stringify({ id, sentAt, method, url, args })
+          JSON.stringify({ id, sentAt, controller, action, args })
         );
       }
     });
