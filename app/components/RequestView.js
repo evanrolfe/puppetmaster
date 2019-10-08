@@ -35,9 +35,9 @@ export default class RequestView extends Component<Props> {
 
     const id = this.props.selectedRequestId;
     const response = await global.backendConn.send(
-      'GET',
-      `/requests/${id}`,
-      {}
+      'RequestsController',
+      `show`,
+      { id: id }
     );
     const request = response.result.body;
 

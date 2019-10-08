@@ -137,12 +137,15 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   async loadRequests() {
-    const url = `/requests?order_by=${this.state.order_by}&dir=${
-      this.state.dir
-    }`;
-    const response = await global.backendConn.send('GET', url, {});
+    /* eslint-disable */
+    const response = await global.backendConn.send(
+      'RequestsController',
+      'index',
+      { order_by: this.state.order_by, dir: this.state.dir }
+    );
 
     this.setState({ requests: response.result.body });
+    /* eslint-enable */
   }
 
   setSelectedRequestId(id) {

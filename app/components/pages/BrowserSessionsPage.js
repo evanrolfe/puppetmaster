@@ -12,7 +12,7 @@ export default class BrowserSessionsPage extends Component<Props> {
   }
 
   newBrowser() {
-    window.backendConn.send('POST', '/browsers', {});
+    global.backendConn.send('BrowsersController', 'create', {});
   }
 
   render() {
