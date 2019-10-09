@@ -100,7 +100,7 @@ describe('Requests', () => {
       const result = await backendConn.send('RequestsController', 'index', {
         statusCodes: ['2', '3']
       });
-      console.log(result);
+
       expect(result.result.status).to.eql('OK');
       expect(result.result.body.length).to.eql(1);
     });
