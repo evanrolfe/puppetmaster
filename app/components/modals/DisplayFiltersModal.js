@@ -142,8 +142,8 @@ export default class DisplayFiltersModal extends Component {
                     onChange={this._handleChangeSetting}
                   >
                     <option value="">No filter</option>
-                    <option value="includes">Includes:</option>
-                    <option value="excludes">Does not include:</option>
+                    <option value="include">Includes:</option>
+                    <option value="exclude">Does not include:</option>
                   </select>
                 </label>
               </div>
@@ -173,8 +173,8 @@ export default class DisplayFiltersModal extends Component {
                     onChange={this._handleChangeSetting}
                   >
                     <option value="">No filter</option>
-                    <option value="includes">Includes segment:</option>
-                    <option value="excludes">Does not include segment:</option>
+                    <option value="include">Includes segment:</option>
+                    <option value="exclude">Does not include segment:</option>
                   </select>
                 </label>
               </div>
@@ -240,8 +240,8 @@ export default class DisplayFiltersModal extends Component {
                     onChange={this._handleChangeSetting}
                   >
                     <option value="">No filter</option>
-                    <option value="includes">Includes:</option>
-                    <option value="excludes">Excludes:</option>
+                    <option value="include">Includes:</option>
+                    <option value="exclude">Excludes:</option>
                   </select>
                 </label>
               </div>

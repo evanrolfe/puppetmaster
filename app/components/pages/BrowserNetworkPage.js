@@ -14,19 +14,25 @@ type Props = {
 
 const RESOURCE_TYPES = [
   'document',
+  'eventsource',
   'fetch',
+  'font',
+  'image',
   'manifest',
+  'media',
   'other',
-  'script',
   'stylesheet',
+  'script',
+  'texttrack',
+  'websocket',
   'xhr'
 ];
 
 const STATUS_CODES = {
-  200: '2xx [Success]',
-  300: '3xx [Redirect]',
-  400: '4xx [Request Error]',
-  500: '5xx [Server Error]'
+  2: '2xx [Success]',
+  3: '3xx [Redirect]',
+  4: '4xx [Request Error]',
+  5: '5xx [Server Error]'
 };
 
 export default class BrowserNetworkPage extends Component<Props> {
@@ -126,7 +132,20 @@ export default class BrowserNetworkPage extends Component<Props> {
   componentDidUpdate(prevProps, prevState) {
     if (
       this.state.order_by !== prevState.order_by ||
-      this.state.dir !== prevState.dir
+      this.state.dir !== prevState.dir ||
+      this.state.filters.hostSetting !== prevState.filters.hostSetting ||
+      this.state.filters.pathSetting !== prevState.filters.pathSetting ||
+      this.state.filters.extSetting !== prevState.filters.extSetting ||
+      JSON.stringify(this.state.filters.pathList) !==
+        JSON.stringify(prevState.filters.pathList) ||
+      JSON.stringify(this.state.filters.hostList) !==
+        JSON.stringify(prevState.filters.hostList) ||
+      JSON.stringify(this.state.filters.extList) !==
+        JSON.stringify(prevState.filters.extList) ||
+      JSON.stringify(this.state.filters.resourceTypes) !==
+        JSON.stringify(prevState.filters.resourceTypes) ||
+      JSON.stringify(this.state.filters.statusCodes) !==
+        JSON.stringify(prevState.filters.statusCodes)
     ) {
       this.loadRequests();
     }
@@ -141,7 +160,18 @@ export default class BrowserNetworkPage extends Component<Props> {
     const response = await global.backendConn.send(
       'RequestsController',
       'index',
-      { order_by: this.state.order_by, dir: this.state.dir }
+      {
+        order_by: this.state.order_by,
+        dir: this.state.dir,
+        hostSetting: this.state.filters.hostSetting,
+        hostList: this.state.filters.hostList,
+        pathSetting: this.state.filters.pathSetting,
+        pathList: this.state.filters.pathList,
+        extSetting: this.state.filters.extSetting,
+        extList: this.state.filters.extList,
+        resourceTypes: this.state.filters.resourceTypes,
+        statusCodes: this.state.filters.statusCodes
+      }
     );
 
     this.setState({ requests: response.result.body });
@@ -214,6 +244,7 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   setFilters(filters) {
+    console.log(filters);
     this.setState({ filters: filters });
   }
 
