@@ -45,9 +45,9 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     if (global.browserNetworkPageState === undefined) {
       this.state = {
-        draggingPaneVertical: false,
+        draggingPane: false,
         showDragOverlay: false,
-        browserNetworkPaneHeight: 250,
+        paneLength: 300,
         // RequestTable state:
         tableColumns: [
           { key: 'id', title: '#', minWidth: 40, width: 40 },
@@ -94,9 +94,7 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
     this._handleMouseMove = this._handleMouseMove.bind(this);
-    this.handleStartDragPaneVertical = this.handleStartDragPaneVertical.bind(
-      this
-    );
+    this.handleStartDragPane = this.handleStartDragPane.bind(this);
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
@@ -186,25 +184,29 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   _handleMouseMove(e) {
-    if (this.state.draggingPaneVertical) {
+    if (this.state.draggingPane) {
       this.setState({ showDragOverlay: true });
 
-      const requestTable = ReactDOM.findDOMNode(this._requestTable);
-      const newHeight =
-        e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
+      this.setState(prevState => {
+        const requestTable = ReactDOM.findDOMNode(this._requestTable);
+        const newHeight =
+          e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
 
-      this.setState({ browserNetworkPaneHeight: newHeight });
+        const paneLength = prevState.paneLength + newHeight;
+
+        return { paneLength: paneLength };
+      });
     }
   }
 
   _handleMouseUp() {
-    if (this.state.draggingPaneVertical) {
-      this.setState({ draggingPaneVertical: false, showDragOverlay: false });
+    if (this.state.draggingPane) {
+      this.setState({ draggingPane: false, showDragOverlay: false });
     }
   }
 
-  handleStartDragPaneVertical() {
-    this.setState({ draggingPaneVertical: true });
+  handleStartDragPane() {
+    this.setState({ draggingPane: true });
   }
 
   _setRequestTableRef(element) {
@@ -254,10 +256,10 @@ export default class BrowserNetworkPage extends Component<Props> {
           setFilters={this.setFilters}
         />
 
-        <div className="pane-container-horz">
+        <div className="pane-container-vert">
           <div
             className="pane-fixed pane-container-vert"
-            style={{ width: '700px' }}
+            style={{ height: `${this.state.paneLength}px` }}
           >
             <div className="pane-fixed">
               <BrowserTabs
@@ -314,7 +316,7 @@ export default class BrowserNetworkPage extends Component<Props> {
               setSelectedRequestId={this.setSelectedRequestId}
               paneHeight={this.state.browserNetworkPaneHeight}
               ref={this._setRequestTableRef}
-              showTransition={this.state.draggingPaneVertical}
+              showTransition={this.state.draggingPane}
               order_by={this.state.order_by}
               dir={this.state.dir}
               toggleColumnOrder={this.toggleColumnOrder}
@@ -325,7 +327,10 @@ export default class BrowserNetworkPage extends Component<Props> {
             />
           </div>
 
-          <div className="pane-border pane-fixed">
+          <div
+            className="pane-border pane-fixed"
+            onMouseDown={this.handleStartDragPane}
+          >
             <div className="pane-border-transparent" />
           </div>
 
