@@ -15,7 +15,7 @@ export default class RequestView extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.state = { request: {} };
+    this.state = { request: {}, tabIndex: 0 };
     this.loadRequest();
   }
 
@@ -48,45 +48,58 @@ export default class RequestView extends Component<Props> {
     }
   }
 
+  goTo(tabIndex) {
+    this.setState({ tabIndex: tabIndex });
+  }
+
   render() {
     const request = this.state.request;
 
     return (
-      <>
-        <Tabs className="pane__tabs theme--pane__body react-tabs">
-          <TabList>
-            <Tab>
-              <button type="button">Request</button>
-            </Tab>
+      <div className="pane-remaining pane-container-vert ">
+        <div className="pane-fixed">
+          <Tabs
+            className="theme--pane__body react-tabs"
+            selectedIndex={this.state.tabIndex}
+            onSelect={tabIndex => this.goTo(tabIndex)}
+          >
+            <TabList>
+              <Tab>
+                <button type="button">Request</button>
+              </Tab>
 
-            <Tab>
-              <button type="button">Response</button>
-            </Tab>
+              <Tab>
+                <button type="button">Response</button>
+              </Tab>
 
-            <Tab>
-              <button type="button">Body</button>
-            </Tab>
+              <Tab>
+                <button type="button">Body</button>
+              </Tab>
 
-            <Tab>
-              <button type="button">Cookies</button>
-            </Tab>
-          </TabList>
+              <Tab>
+                <button type="button">Cookies</button>
+              </Tab>
+            </TabList>
 
-          {/* Stupid Hack to avoid a warning from react-tabs: */}
-          <TabPanel>
+            {/* Stupid Hack to avoid a warning from react-tabs: */}
+            <TabPanel />
+            <TabPanel />
+            <TabPanel />
+            <TabPanel />
+          </Tabs>
+        </div>
+
+        <div className="pane-remaining">
+          {this.state.tabIndex === 0 && (
             <RequestTab height={this.props.panelHeight} request={request} />
-          </TabPanel>
-          <TabPanel>
+          )}
+          {this.state.tabIndex === 1 && (
             <ResponseTab height={this.props.panelHeight} request={request} />
-          </TabPanel>
-          <TabPanel>
-            <BodyTab request={request} />
-          </TabPanel>
-          <TabPanel>
-            <CookiesTab request={request} />
-          </TabPanel>
-        </Tabs>
-      </>
+          )}
+          {this.state.tabIndex === 2 && <BodyTab request={request} />}
+          {this.state.tabIndex === 3 && <CookiesTab request={request} />}
+        </div>
+      </div>
     );
   }
 }

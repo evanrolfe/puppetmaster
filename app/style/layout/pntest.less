@@ -2,28 +2,6 @@
 @import '../constants/dimensions';
 @import '../constants/fonts';
 
-#content-wrapper {
-  background-color: var(--color-bg);
-/*
-  position: absolute;
-  top: 0;
-  bottom: 0;
-*/
-  width: 100%;
-  display: flex;
-}
-
-#sidebar {
-  min-width: 50px;
-  background-color: var(--color-bg);
-  border-right: 1px solid @hl-md;
-}
-
-#mainbar {
-  width: 100%;
-  background-color: var(--color-bg);
-}
-
 .sidebar-icon {
   background-color: var(--color-bg);
   border-bottom: 1px solid @hl-md;
@@ -51,51 +29,59 @@
   color: @hl-md;
 }
 
-#content {
-  background-color: var(--color-bg);
-  height: 100%;
-}
-
 .scrollable {
   overflow-x: hidden;
   overflow-y: scroll;
 }
 
-.header-table {
-  margin-top: 2px;
-  background-color: @hl-xs;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  width: 100%;
-
-  th {
-    text-align: left;
-    border-right: 1px solid @hl-md;
-    border-top: 1px solid @hl-md;
-    border-bottom: 1px solid @hl-md;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 2px;
-    text-transform: none;
-  }
-
-  th.ordered {
-    color: var(--color-surprise);
-  }
-
-  th:last-child {
-    width: auto;
-  }
-}
-
+/*------------------------------------------------------------------------------
+ * Requests Table
+ *----------------------------------------------------------------------------*/
 .order-icon {
   float: right;
 }
 
 .requests-table {
-  width: 100%;
   background-color: var(--color-bg);
+  border-collapse: separate;
+  width: 100%;
+  border-bottom: 1px solid @hl-md;
+
+  thead {
+    th {
+      // TODO: Make this color come from the theme var(--hl-xs)
+      background-color: #393A36;
+      opacity: 1.0;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 2px;
+      text-transform: none;
+      cursor: pointer;
+
+      border-right: 1px solid @hl-md;
+      border-top: 1px solid @hl-md;
+      border-bottom: 1px solid @hl-md;
+
+
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    th.ordered {
+      color: var(--color-surprise);
+    }
+
+    th:hover {
+      // TODO: Make this color come from the theme var(--hl-sm)
+      background-color: #464643;
+    }
+
+    th:last-child {
+      width: auto;
+    }
+  }
 
   tr.selected {
     background-color: @hl-lg;
@@ -111,6 +97,7 @@
   td {
     border-right: 1px solid @hl-md;
     padding: 2px;
+    white-space: nowrap;
   }
 
   td:last-child {
@@ -118,22 +105,10 @@
   }
 }
 
-.requests-table-pane {
-  //border-bottom: 1px solid @hl-md;
-}
-
 .request-tab-panel {
   padding: 5px;
   margin-left: 10px;
   margin-top: 10px;
-}
-
-.requests-table-header {
-  cursor: pointer;
-}
-
-.requests-table-header:hover {
-  background-color: @hl-xs;
 }
 
 .requests-table-header-title {
@@ -143,21 +118,7 @@
   width: calc(100% - 8px);
 }
 
-/* HORIZONTAL */
-.resizable-border {
-  border-top: 1px solid @hl-md;
-  cursor: row-resize;
-}
-
-.resizable-border-transparent {
-  opacity: 0.0;
-  z-index: 999;
-  height: 8px;
-  margin-top: -8px;
-  cursor: row-resize;
-}
-
-/* VERTICAL */
+/* THESE ARE FOR THE RequestTableHeader Component */
 .resizable-border-vert {
   // debugging:
   // background-color: aliceblue;
@@ -186,4 +147,98 @@
   height: 100px !important;
   overflow: auto !important;
   white-space: nowrap;
+}
+
+/*------------------------------------------------------------------------------
+ * Layout
+ *----------------------------------------------------------------------------*/
+.app-container {
+  color: var(--color-font);
+  background-color: var(--color-bg);
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  .app-sidebar {
+    width: 50px;
+    min-width: 50px;
+    flex: 0 0 auto;
+    background-color: var(--color-bg);
+    border-right: 1px solid @hl-md;
+  }
+
+  .app-content {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+}
+
+.pane-container-vert {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  .pane-fixed {
+    flex: 0 0 auto;
+  }
+
+  .pane-remaining {
+    flex: 1 1 auto; // Fill remaining space
+    height: 100%;
+    overflow-y: scroll;
+  }
+
+  /* PANE BORDER vertical (border runs left to right) */
+  .pane-border {
+    border-top: 1px solid @hl-md;
+    cursor: row-resize;
+    float: right;
+  }
+
+  .pane-border-transparent {
+    opacity: 0.0;
+    z-index: 999;
+    height: 8px;
+    width: 100%;
+    margin-top: -8px;
+    cursor: row-resize;
+  }
+}
+
+.pane-container-horz {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  .pane-fixed {
+    flex: 0 0 auto;
+  }
+
+  .pane-remaining {
+    flex: 1 1 auto; // Fill remaining space
+    width: 100%;
+  }
+
+  /* PANE BORDER Horizontal (border runs top to bottom) */
+  .pane-border {
+    border-left: 1px solid @hl-md;
+    cursor: col-resize;
+    float: right;
+  }
+
+  .pane-border-transparent {
+    opacity: 0.0;
+    z-index: 999;
+    width: 8px;
+    height: 100%;
+    margin-right: -8px;
+    cursor: col-resize;
+  }
 }

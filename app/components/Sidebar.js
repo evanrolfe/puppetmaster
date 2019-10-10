@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-export default class SideBar extends Component {
+export default class Sidebar extends Component {
   constructor(props) {
     super(props);
     this.state = { tabIndex: 0 };
@@ -53,7 +53,7 @@ export default class SideBar extends Component {
 
   render() {
     return (
-      <div id="sidebar" className="theme--sidebar">
+      <div className="app-sidebar theme--sidebar">
         <div
           className={`sidebar-icon theme--sidebar__header ${this.activeClass(
             0
@@ -102,7 +102,7 @@ export default class SideBar extends Component {
   }
 }
 
-SideBar.propTypes = {
+Sidebar.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func.isRequired
   }).isRequired,

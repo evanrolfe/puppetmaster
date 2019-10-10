@@ -57,7 +57,7 @@ export default class BrowserTabs extends Component {
       default:
         path = '/browser/network';
     }
-
+    console.log(`Going to ${path}`);
     this.props.history.push(path);
   }
 

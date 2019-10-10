@@ -10,8 +10,7 @@ import _ from 'lodash';
 import { registerModal, showModal } from './components/modals/index';
 import AlertModal from './components/modals/AlertModal';
 import SettingsModal from './components/modals/SettingsModal';
-import BrowserTabs from './components/BrowserTabs';
-import SideBar from './components/SideBar';
+import Sidebar from './components/Sidebar';
 import BrowserSessionsPage from './components/pages/BrowserSessionsPage';
 import BrowserNetworkPage from './components/pages/BrowserNetworkPage';
 import BrowserInterceptPage from './components/pages/BrowserInterceptPage';
@@ -89,11 +88,6 @@ export default class App extends Component {
   render() {
     const history = createHashHistory();
 
-    const BrowserTitle = () => <span className="title">Browser</span>;
-    const CrawlerTitle = () => <span className="title">Crawler</span>;
-    const RequestsTitle = () => <span className="title">Requests</span>;
-    const ScansTitle = () => <span className="title">Scans</span>;
-
     return (
       <HashRouter history={history}>
         <div key="modals" className="modals">
@@ -105,61 +99,31 @@ export default class App extends Component {
           />
         </div>
 
-        <div id="content-wrapper" className="wrapper">
-          <Route path="/" component={SideBar} />
+        <div className="app-container">
+          <Route path="/" component={Sidebar} />
 
-          <div id="mainbar">
-            <section className="theme--pane pane">
-              <header className="pane__header theme--pane__header">
-                <div className="header-bar">
-                  <Route exact path="/" component={BrowserTitle} />
-                  <Route path="/browser" component={BrowserTitle} />
-                  <Route path="/crawler" component={CrawlerTitle} />
-                  <Route path="/Requests" component={RequestsTitle} />
-                  <Route path="/scans" component={ScansTitle} />
-                </div>
-              </header>
+          <div className="theme--pane app-content">
+            <Route exact path="/" component={BrowserNetworkPage} />
+            <Route
+              exact
+              path="/browser/network"
+              component={BrowserNetworkPage}
+            />
 
-              <Route exact path="/" component={BrowserTabs} />
-              <Route path="/browser" component={BrowserTabs} />
+            <Route
+              exact
+              path="/browser/intercept"
+              component={BrowserInterceptPage}
+            />
+            <Route
+              exact
+              path="/browser/sessions"
+              component={BrowserSessionsPage}
+            />
 
-              <section className="pane__body theme--pane">
-                <Route
-                  exact
-                  path="/"
-                  render={() => (
-                    <BrowserNetworkPage
-                      windowSize={this.state.settings.windowSize}
-                    />
-                  )}
-                />
-                <Route
-                  exact
-                  path="/browser/network"
-                  render={() => (
-                    <BrowserNetworkPage
-                      windowSize={this.state.settings.windowSize}
-                    />
-                  )}
-                />
-                <Route
-                  exact
-                  path="/browser/intercept"
-                  component={BrowserInterceptPage}
-                />
-                <Route
-                  exact
-                  path="/browser/sessions"
-                  component={BrowserSessionsPage}
-                />
-
-                <Route exact path="/crawler" component={CrawlerPage} />
-
-                <Route exact path="/requests" component={RequestsPage} />
-
-                <Route exact path="/scans" component={ScansPage} />
-              </section>
-            </section>
+            <Route exact path="/crawler" component={CrawlerPage} />
+            <Route exact path="/requests" component={RequestsPage} />
+            <Route exact path="/scans" component={ScansPage} />
           </div>
         </div>
       </HashRouter>

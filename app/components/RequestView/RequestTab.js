@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 
 type Props = {
-  request: 'object',
-  height: 'number'
+  request: 'object'
 };
 
 export default class RequestsTab extends Component<Props> {
@@ -15,10 +14,7 @@ export default class RequestsTab extends Component<Props> {
     const headers = JSON.parse(request.request_headers);
 
     return (
-      <div
-        className="request-tab-panel scrollable"
-        style={{ height: this.props.height }}
-      >
+      <div className="request-tab-panel">
         <span className="selectable force-wrap">
           {request.method} {request.url}
         </span>

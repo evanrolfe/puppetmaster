@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
@@ -8,14 +7,12 @@ type Props = {
   requests: 'array',
   selectedRequestId: 'number',
   setSelectedRequestId: 'function',
-  paneHeight: 'number',
-  showTransition: 'boolean',
   order_by: 'string',
   dir: 'string',
   toggleColumnOrder: 'function',
   setTableColumnWidth: 'function',
-  setScrollTop: 'function',
-  scrollTop: 'number',
+  // setScrollTop: 'function',
+  // scrollTop: 'number',
   tableColumns: 'array'
 };
 
@@ -32,7 +29,7 @@ export default class RequestsTable extends Component<Props> {
     this.selectNextRequest = this.selectNextRequest.bind(this);
     this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
   }
-
+  /*
   componentDidMount() {
     // Restore the scroll state
     const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
@@ -42,6 +39,7 @@ export default class RequestsTable extends Component<Props> {
       this.props.setScrollTop(requestPanel.scrollTop);
     });
   }
+  */
 
   getRowClassName(requestId) {
     if (parseInt(this.props.selectedRequestId) === parseInt(requestId)) {
@@ -144,81 +142,69 @@ export default class RequestsTable extends Component<Props> {
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
-        <table className="header-table">
-          <thead>
-            <tr>
-              {this.props.tableColumns.map((column, i) => {
-                if (i < this.props.tableColumns.length - 1) {
-                  return (
-                    <RequestsTableHeader
-                      key={`RequestsTableHeader${i}`}
-                      onClick={this.props.toggleColumnOrder.bind(
-                        this,
-                        column.key
-                      )}
-                      className={this.classNameForTableHeader(column.key)}
-                      orderDir={this.props.dir}
-                      width={column.width}
-                      setTableColumnWidth={this.props.setTableColumnWidth.bind(
-                        this
-                      )}
-                      columnIndex={i}
-                      minWidth={column.minWidth}
-                    >
-                      {column.title}
-                    </RequestsTableHeader>
-                  );
-                } else {
-                  return (
-                    <RequestsTableHeader
-                      key={`RequestsTableHeader${i}`}
-                      onClick={this.props.toggleColumnOrder.bind(
-                        this,
-                        lastTableColumn.key
-                      )}
-                      className={this.classNameForTableHeader(
-                        lastTableColumn.key
-                      )}
-                      orderDir={this.props.dir}
-                      noResize
-                    >
-                      {lastTableColumn.title}
-                    </RequestsTableHeader>
-                  );
-                }
-              })}
-            </tr>
-          </thead>
-        </table>
-
-        {this.props.showTransition && (
-          <div style={{ height: `${this.props.paneHeight}px` }} />
-        )}
-
-        {!this.props.showTransition && (
-          <div
-            className="scrollable"
-            style={{ height: `${this.props.paneHeight}px` }}
-            ref={this._setRequestsPanelRef}
-          >
-            <table className="requests-table">
-              <tbody>
-                {requests.map(request => (
-                  <tr
-                    key={request.id}
-                    id={`requestRow${request.id}`}
-                    onClick={() => this.props.setSelectedRequestId(request.id)}
-                    className={this.getRowClassName(request.id)}
-                  >
-                    {this.props.tableColumns.map(column =>
-                      this.renderTableCell(column, request)
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="pane-remaining" style={{ overflowX: 'auto' }}>
+          <table className="requests-table">
+            <thead>
+              <tr>
+                {this.props.tableColumns.map((column, i) => {
+                  if (i < this.props.tableColumns.length - 1) {
+                    return (
+                      <RequestsTableHeader
+                        key={`RequestsTableHeader${i}`}
+                        onClick={this.props.toggleColumnOrder.bind(
+                          this,
+                          column.key
+                        )}
+                        className={this.classNameForTableHeader(column.key)}
+                        orderDir={this.props.dir}
+                        width={column.width}
+                        setTableColumnWidth={this.props.setTableColumnWidth.bind(
+                          this
+                        )}
+                        columnIndex={i}
+                        minWidth={column.minWidth}
+                      >
+                        {column.title}
+                      </RequestsTableHeader>
+                    );
+                  } else {
+                    return (
+                      <RequestsTableHeader
+                        key={`RequestsTableHeader${i}`}
+                        onClick={this.props.toggleColumnOrder.bind(
+                          this,
+                          lastTableColumn.key
+                        )}
+                        className={this.classNameForTableHeader(
+                          lastTableColumn.key
+                        )}
+                        orderDir={this.props.dir}
+                        minWidth={column.minWidth}
+                        noResize
+                      >
+                        {lastTableColumn.title}
+                      </RequestsTableHeader>
+                    );
+                  }
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {requests.map(request => (
+                <tr
+                  key={request.id}
+                  id={`requestRow${request.id}`}
+                  onClick={() => this.props.setSelectedRequestId(request.id)}
+                  className={this.getRowClassName(request.id)}
+                >
+                  {this.props.tableColumns.map(column =>
+                    this.renderTableCell(column, request)
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </KeydownBinder>
     );
   }

@@ -86,9 +86,10 @@ export default class RequestsTableHeader extends Component<Props> {
   render() {
     return (
       <th
-        className={`requests-table-header ${this.props.className}`}
+        className={`${this.props.className}`}
         width={this.props.width}
         ref={this._setTableHeaderRef}
+        style={{ minWidth: this.props.minWidth }}
       >
         <span
           className="requests-table-header-title"

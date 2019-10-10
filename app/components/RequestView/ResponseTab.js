@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 
 type Props = {
-  request: 'object',
-  height: 'number'
+  request: 'object'
 };
 
 export default class ResponseTab extends Component<Props> {
@@ -15,10 +14,7 @@ export default class ResponseTab extends Component<Props> {
     const headers = JSON.parse(request.response_headers);
 
     return (
-      <div
-        className="request-tab-panel scrollable"
-        style={{ height: this.props.height }}
-      >
+      <div className="request-tab-panel">
         <span>Response status: {request.response_status}</span>
         <br />
         <br />

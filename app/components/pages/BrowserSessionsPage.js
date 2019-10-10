@@ -1,7 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import BrowserTabs from '../BrowserTabs';
 
-type Props = {};
+type Props = {
+  history: 'array',
+  location: 'object'
+};
 
 export default class BrowserSessionsPage extends Component<Props> {
   props: Props;
@@ -17,10 +21,19 @@ export default class BrowserSessionsPage extends Component<Props> {
 
   render() {
     return (
-      <div className="hello">
-        Browser Sessions!
-        <br />
-        <a onClick={() => this.newBrowser()}>Open a new browser</a>
+      <div className="pane-container-vert">
+        <div className="pane-fixed">
+          <BrowserTabs
+            history={this.props.history}
+            location={this.props.location}
+          />
+        </div>
+
+        <div className="pane-remaining">
+          Browser Sessions!
+          <br />
+          <a onClick={() => this.newBrowser()}>Open a new browser</a>
+        </div>
       </div>
     );
   }

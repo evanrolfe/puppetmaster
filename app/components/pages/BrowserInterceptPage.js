@@ -1,18 +1,26 @@
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import BrowserTabs from '../BrowserTabs';
 
-type Props = {};
+type Props = {
+  history: 'array',
+  location: 'object'
+};
 
 export default class BrowserInterceptPage extends Component<Props> {
   props: Props;
 
   render() {
     return (
-      <div>
-        Browser Intercept!
-        <br />
-        <Link to="/browser/sessions">Back</Link>
+      <div className="pane-container-vert">
+        <div className="pane-fixed">
+          <BrowserTabs
+            history={this.props.history}
+            location={this.props.location}
+          />
+        </div>
+
+        <div className="pane-remaining">Browser Intercept!</div>
       </div>
     );
   }

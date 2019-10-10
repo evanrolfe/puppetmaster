@@ -10,10 +10,6 @@ export default class BodyTab extends Component<Props> {
   render() {
     const request = this.props.request;
 
-    return (
-      <div className="request-tab-panel">
-        <div className="scrollable">{request.response_body}</div>
-      </div>
-    );
+    return <div className="request-tab-panel">{request.response_body}</div>;
   }
 }

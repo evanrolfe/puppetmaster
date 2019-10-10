@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
+import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
 import RequestView from '../RequestView';
 
@@ -9,7 +10,8 @@ import { registerModal, showModal } from '../modals/index';
 import DisplayFiltersModal from '../modals/DisplayFiltersModal';
 
 type Props = {
-  windowSize: 'array'
+  history: 'array',
+  location: 'object'
 };
 
 const RESOURCE_TYPES = [
@@ -52,9 +54,10 @@ export default class BrowserNetworkPage extends Component<Props> {
           { key: 'method', title: 'Method', minWidth: 70, width: 70 },
           { key: 'host', title: 'Host', minWidth: 200, width: 200 },
           { key: 'path', title: 'Path', minWidth: 250, width: 250 },
-          { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
-          { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
-          { key: 'response_status', title: 'Status', minWidth: 60, width: 70 },
+          // { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
+          // { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
+          { key: 'response_status', title: 'Status', minWidth: 60, width: 70 }
+          /*
           {
             key: 'response_body_length',
             title: 'Length',
@@ -67,7 +70,8 @@ export default class BrowserNetworkPage extends Component<Props> {
             minWidth: 120,
             width: 130
           },
-          { key: 'created_at', title: 'Time' }
+          { key: 'created_at', title: 'Time', minwidth: 200 }
+*/
         ],
         order_by: 'id',
         dir: 'desc',
@@ -95,9 +99,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     );
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
-    this.calculateRequestPaneHeight = this.calculateRequestPaneHeight.bind(
-      this
-    );
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
@@ -210,14 +211,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     this._requestTable = element;
   }
 
-  calculateRequestPaneHeight() {
-    const windowHeight = this.props.windowSize[1];
-    // TODO: Get rid of this stupid static height (212) and use proper css to ensure that the request
-    //       view carreis on to the bottom of the page.
-    // NOTE: 77 is the height of the search+filter div
-    return windowHeight - this.state.browserNetworkPaneHeight - 186 - 77;
-  }
-
   toggleColumnOrder(columnName) {
     const newState = Object.assign({}, this.state);
 
@@ -253,87 +246,90 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     return (
       <>
-        <div className="requests-table-pane">
-          {this.state.showDragOverlay ? (
-            <div className="blocker-overlay" />
-          ) : null}
+        <DisplayFiltersModal
+          ref={registerModal}
+          allStatusCodes={STATUS_CODES}
+          allResourceTypes={RESOURCE_TYPES}
+          origFilters={filters}
+          setFilters={this.setFilters}
+        />
 
-          <DisplayFiltersModal
-            ref={registerModal}
-            allStatusCodes={STATUS_CODES}
-            allResourceTypes={RESOURCE_TYPES}
-            origFilters={filters}
-            setFilters={this.setFilters}
-          />
-
-          <div style={{ marginLeft: '10px', padding: '6px', width: '' }}>
-            <div
-              className="form-control form-control--outlined"
-              style={{
-                width: '70%',
-                maxWidth: '800px',
-                display: 'inline-block'
-              }}
-            >
-              <label>Search:</label>
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                placeholder="Enter search term"
+        <div className="pane-container-horz">
+          <div
+            className="pane-fixed pane-container-vert"
+            style={{ width: '700px' }}
+          >
+            <div className="pane-fixed">
+              <BrowserTabs
+                history={this.props.history}
+                location={this.props.location}
               />
             </div>
 
             <div
-              className="form-control form-control--outlined"
-              style={{ width: '30%', display: 'inline-block' }}
+              className="pane-fixed"
+              style={{ marginLeft: '10px', padding: '6px', width: '' }}
             >
-              <label style={{ marginLeft: '10px' }}>Filters:</label>
+              <div
+                className="form-control form-control--outlined"
+                style={{
+                  width: '60%',
+                  maxWidth: '800px',
+                  display: 'inline-block'
+                }}
+              >
+                <label>Search:</label>
+                <input
+                  type="text"
+                  style={{ width: '100%' }}
+                  placeholder="Enter search term"
+                />
+              </div>
 
-              <button
-                className="pointer btn btn--outlined btn--super-compact"
-                style={{ marginLeft: '10px', display: 'inline-block' }}
-                onClick={() => showModal(DisplayFiltersModal)}
+              <div
+                className="form-control form-control--outlined"
+                style={{ width: '40%', display: 'inline-block' }}
               >
-                Display
-              </button>
-              <button
-                className="pointer btn btn--outlined btn--super-compact"
-                style={{ marginLeft: '10px', display: 'inline-block' }}
-              >
-                Capture (3)
-              </button>
+                <label style={{ marginLeft: '10px' }}>Filters:</label>
+
+                <button
+                  className="pointer btn btn--outlined btn--super-compact"
+                  style={{ marginLeft: '10px', display: 'inline-block' }}
+                  onClick={() => showModal(DisplayFiltersModal)}
+                >
+                  Display
+                </button>
+                <button
+                  className="pointer btn btn--outlined btn--super-compact"
+                  style={{ marginLeft: '10px', display: 'inline-block' }}
+                >
+                  Capture (3)
+                </button>
+              </div>
             </div>
+
+            <RequestsTable
+              tableColumns={this.state.tableColumns}
+              selectedRequestId={this.state.selectedRequestId}
+              setSelectedRequestId={this.setSelectedRequestId}
+              paneHeight={this.state.browserNetworkPaneHeight}
+              ref={this._setRequestTableRef}
+              showTransition={this.state.draggingPaneVertical}
+              order_by={this.state.order_by}
+              dir={this.state.dir}
+              toggleColumnOrder={this.toggleColumnOrder}
+              setTableColumnWidth={this.setTableColumnWidth}
+              scrollTop={this.state.requestsTableScrollTop}
+              setScrollTop={this.setScrollTop}
+              requests={this.state.requests}
+            />
           </div>
 
-          <RequestsTable
-            tableColumns={this.state.tableColumns}
-            selectedRequestId={this.state.selectedRequestId}
-            setSelectedRequestId={this.setSelectedRequestId}
-            paneHeight={this.state.browserNetworkPaneHeight}
-            ref={this._setRequestTableRef}
-            showTransition={this.state.draggingPaneVertical}
-            order_by={this.state.order_by}
-            dir={this.state.dir}
-            toggleColumnOrder={this.toggleColumnOrder}
-            setTableColumnWidth={this.setTableColumnWidth}
-            scrollTop={this.state.requestsTableScrollTop}
-            setScrollTop={this.setScrollTop}
-            requests={this.state.requests}
-          />
-        </div>
+          <div className="pane-border pane-fixed">
+            <div className="pane-border-transparent" />
+          </div>
 
-        <div
-          className="resizable-border"
-          onMouseDown={this.handleStartDragPaneVertical}
-        >
-          <div className="resizable-border-transparent" />
-        </div>
-
-        <div className="requests-view-pane">
-          <RequestView
-            selectedRequestId={this.state.selectedRequestId}
-            panelHeight={this.calculateRequestPaneHeight()}
-          />
+          <RequestView selectedRequestId={this.state.selectedRequestId} />
         </div>
       </>
     );
