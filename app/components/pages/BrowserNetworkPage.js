@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import _ from 'lodash';
 
 import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
@@ -13,6 +14,9 @@ type Props = {
   history: 'array',
   location: 'object'
 };
+
+const MIN_PANE_WIDTH = 300;
+const MIN_PANE_HEIGHT = 150;
 
 const RESOURCE_TYPES = [
   'document',
@@ -94,7 +98,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     }
 
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
-    this._handleMouseMove = this._handleMouseMove.bind(this);
     this.handleStartDragPane = this.handleStartDragPane.bind(this);
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
@@ -103,6 +106,11 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setScrollTop = this.setScrollTop.bind(this);
     this.setFilters = this.setFilters.bind(this);
 
+    this.throttledHandleMouseMove = _.throttle(
+      this.handleMouseMove.bind(this),
+      25
+    );
+
     global.backendConn.listen('requestCreated', () => {
       this.loadRequests();
     });
@@ -110,8 +118,7 @@ export default class BrowserNetworkPage extends Component<Props> {
 
   componentDidMount() {
     document.addEventListener('mouseup', this._handleMouseUp);
-    // TODO: Throttle this event callback
-    document.addEventListener('mousemove', this._handleMouseMove);
+    document.addEventListener('mousemove', this.throttledHandleMouseMove);
 
     if (this.state.requests.length === 0) {
       this.loadRequests();
@@ -184,7 +191,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState(newState);
   }
 
-  _handleMouseMove(e) {
+  handleMouseMove(e) {
     if (this.state.draggingPane) {
       this.setState({ showDragOverlay: true });
 
@@ -200,6 +207,18 @@ export default class BrowserNetworkPage extends Component<Props> {
         }
 
         const paneLength = prevState.paneLength + diff;
+
+        // Check minimum lengths
+        if (
+          prevState.orientation === 'horizontal' &&
+          paneLength < MIN_PANE_WIDTH
+        )
+          return;
+        if (
+          prevState.orientation === 'vertical' &&
+          paneLength < MIN_PANE_HEIGHT
+        )
+          return;
 
         return { paneLength: paneLength };
       });

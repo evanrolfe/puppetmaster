@@ -1,11 +1,10 @@
 // @flow
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import { createHashHistory } from 'history';
 import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 import log from 'electron-log';
-import _ from 'lodash';
 
 import { registerModal, showModal } from './components/modals/index';
 import AlertModal from './components/modals/AlertModal';
@@ -38,38 +37,22 @@ export default class App extends Component {
 
     this.state = {
       settings: {
-        activeTheme: 'default',
-        windowSize: remote.getCurrentWindow().getSize()
+        activeTheme: 'default'
       },
       // Ensure that the app gets re-rendered once we connect to the backend
       // eslint-disable-next-line react/no-unused-state
       backendConnected: backendConnected
     };
-
-    this.throttledSetWindowSizeState = _.throttle(
-      this.setWindowSizeState.bind(this),
-      100
-    );
   }
 
   componentDidMount() {
     this.setTheme();
-
-    window.addEventListener('resize', this.throttledSetWindowSizeState);
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
       this.setTheme();
     }
-  }
-
-  setWindowSizeState() {
-    this.setState(prevState => {
-      const newsettings = Object.assign({}, prevState.settings);
-      newsettings.windowSize = remote.getCurrentWindow().getSize();
-      return { settings: newsettings };
-    });
   }
 
   setTheme() {
