@@ -108,7 +108,7 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     this.throttledHandleMouseMove = _.throttle(
       this.handleMouseMove.bind(this),
-      25
+      15
     );
 
     global.backendConn.listen('requestCreated', () => {
