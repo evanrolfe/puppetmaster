@@ -12,7 +12,7 @@ export default class BrowserInterceptPage extends Component<Props> {
 
   render() {
     return (
-      <div className="pane-container-vert">
+      <div className="pane-container-vertical">
         <div className="pane-fixed">
           <BrowserTabs
             history={this.props.history}

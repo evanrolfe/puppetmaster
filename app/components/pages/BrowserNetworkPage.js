@@ -45,9 +45,10 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     if (global.browserNetworkPageState === undefined) {
       this.state = {
+        orientation: 'horizontal', // 'vertical' or 'horizontal'
+        paneLength: 650,
         draggingPane: false,
         showDragOverlay: false,
-        paneLength: 300,
         // RequestTable state:
         tableColumns: [
           { key: 'id', title: '#', minWidth: 40, width: 40 },
@@ -189,10 +190,16 @@ export default class BrowserNetworkPage extends Component<Props> {
 
       this.setState(prevState => {
         const requestTable = ReactDOM.findDOMNode(this._requestTable);
-        const newHeight =
-          e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
 
-        const paneLength = prevState.paneLength + newHeight;
+        let diff;
+
+        if (prevState.orientation === 'horizontal') {
+          diff = e.clientX - requestTable.offsetLeft - requestTable.offsetWidth;
+        } else if (prevState.orientation === 'vertical') {
+          diff = e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
+        }
+
+        const paneLength = prevState.paneLength + diff;
 
         return { paneLength: paneLength };
       });
@@ -246,6 +253,14 @@ export default class BrowserNetworkPage extends Component<Props> {
   render() {
     const filters = JSON.parse(JSON.stringify(this.state.filters));
 
+    const paneStyle = {};
+
+    if (this.state.orientation === 'horizontal') {
+      paneStyle.width = this.state.paneLength;
+    } else if (this.state.orientation === 'vertical') {
+      paneStyle.height = this.state.paneLength;
+    }
+
     return (
       <>
         <DisplayFiltersModal
@@ -256,11 +271,8 @@ export default class BrowserNetworkPage extends Component<Props> {
           setFilters={this.setFilters}
         />
 
-        <div className="pane-container-vert">
-          <div
-            className="pane-fixed pane-container-vert"
-            style={{ height: `${this.state.paneLength}px` }}
-          >
+        <div className={`pane-container-${this.state.orientation}`}>
+          <div className="pane-fixed pane-container-vertical" style={paneStyle}>
             <div className="pane-fixed">
               <BrowserTabs
                 history={this.props.history}
