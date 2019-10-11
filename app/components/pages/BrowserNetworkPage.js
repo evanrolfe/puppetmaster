@@ -292,7 +292,7 @@ export default class BrowserNetworkPage extends Component<Props> {
 
             <div
               className="pane-fixed"
-              style={{ marginLeft: '10px', padding: '6px', width: '' }}
+              style={{ marginLeft: '10px', padding: '6px' }}
             >
               <RequestsFilterForm
                 allStatusCodes={STATUS_CODES}
