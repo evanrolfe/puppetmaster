@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 
 type Props = {
   width: 'number',
-  minWidth: 'number',
   columnIndex: 'number',
   setTableColumnWidth: 'function',
   className: 'string',
@@ -27,12 +26,6 @@ export default class RequestsTableHeader extends Component<Props> {
   componentDidMount() {
     document.addEventListener('mouseup', this._handleMouseUp);
     document.addEventListener('mousemove', this._handleMouseMove);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.draggingColumn === true) return false;
-
-    return true;
   }
 
   _setTableHeaderRef(element) {
@@ -64,9 +57,13 @@ export default class RequestsTableHeader extends Component<Props> {
         0
       );
 
-      let width = e.clientX - 55 - previousColumnsWidth;
-      width = Math.max(width, this.props.minWidth);
+      const width = e.clientX - 55 - previousColumnsWidth;
+      // TODO: Min width
+      // width = Math.max(width, this.props.minWidth);
+
       tableHeader.width = `${width}px`;
+      tableHeader.style.minWidth = `${width}px`;
+
       this.setState({ width: width });
     }
   }
@@ -89,7 +86,7 @@ export default class RequestsTableHeader extends Component<Props> {
         className={`${this.props.className}`}
         width={this.props.width}
         ref={this._setTableHeaderRef}
-        style={{ minWidth: this.props.minWidth }}
+        style={{ minWidth: this.props.width, maxWidth: 0 }}
       >
         <span
           className="requests-table-header-title"

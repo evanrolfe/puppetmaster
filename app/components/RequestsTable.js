@@ -103,11 +103,11 @@ export default class RequestsTable extends Component<Props> {
   renderTableCell(column, request) {
     switch (column.key) {
       case 'id':
-        return <td width={column.width}>{request.id}</td>;
+        return <td>{request.id}</td>;
 
       case 'method':
         return (
-          <td width={column.width}>
+          <td>
             <span className={`http-method-${request.method}`}>
               {request.method}
             </span>
@@ -115,30 +115,27 @@ export default class RequestsTable extends Component<Props> {
         );
 
       case 'host':
-        return <td width={column.width}>{request.host}</td>;
+        return <td>{request.host}</td>;
 
       case 'response_status':
         return (
-          <td width={column.width}>
+          <td>
             <StatusTag statusCode={request.response_status} small />
           </td>
         );
 
       case 'created_at': {
         const time = new Date(request.created_at);
-        return <td width={column.width}>{time.toUTCString()}</td>;
+        return <td>{time.toUTCString()}</td>;
       }
 
       default:
-        return <td width={column.width}>{request[column.key]}</td>;
+        return <td>{request[column.key]}</td>;
     }
   }
 
   render() {
     const requests = this.props.requests;
-    const lastTableColumn = this.props.tableColumns[
-      this.props.tableColumns.length - 1
-    ];
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
@@ -146,47 +143,25 @@ export default class RequestsTable extends Component<Props> {
           <table className="requests-table">
             <thead>
               <tr>
-                {this.props.tableColumns.map((column, i) => {
-                  if (i < this.props.tableColumns.length - 1) {
-                    return (
-                      <RequestsTableHeader
-                        key={`RequestsTableHeader${i}`}
-                        onClick={this.props.toggleColumnOrder.bind(
-                          this,
-                          column.key
-                        )}
-                        className={this.classNameForTableHeader(column.key)}
-                        orderDir={this.props.dir}
-                        width={column.width}
-                        setTableColumnWidth={this.props.setTableColumnWidth.bind(
-                          this
-                        )}
-                        columnIndex={i}
-                        minWidth={column.minWidth}
-                      >
-                        {column.title}
-                      </RequestsTableHeader>
-                    );
-                  } else {
-                    return (
-                      <RequestsTableHeader
-                        key={`RequestsTableHeader${i}`}
-                        onClick={this.props.toggleColumnOrder.bind(
-                          this,
-                          lastTableColumn.key
-                        )}
-                        className={this.classNameForTableHeader(
-                          lastTableColumn.key
-                        )}
-                        orderDir={this.props.dir}
-                        minWidth={column.minWidth}
-                        noResize
-                      >
-                        {lastTableColumn.title}
-                      </RequestsTableHeader>
-                    );
-                  }
-                })}
+                {this.props.tableColumns.map((column, i) => (
+                  <RequestsTableHeader
+                    key={`RequestsTableHeader${i}`}
+                    onClick={this.props.toggleColumnOrder.bind(
+                      this,
+                      column.key
+                    )}
+                    className={this.classNameForTableHeader(column.key)}
+                    orderDir={this.props.dir}
+                    width={column.width}
+                    setTableColumnWidth={this.props.setTableColumnWidth.bind(
+                      this
+                    )}
+                    columnIndex={i}
+                    minWidth={column.minWidth}
+                  >
+                    {column.title}
+                  </RequestsTableHeader>
+                ))}
               </tr>
             </thead>
             <tbody>
