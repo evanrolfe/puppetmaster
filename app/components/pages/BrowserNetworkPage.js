@@ -7,8 +7,7 @@ import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
 import RequestView from '../RequestView';
 
-import { registerModal, showModal } from '../modals/index';
-import DisplayFiltersModal from '../modals/DisplayFiltersModal';
+import RequestsFilterForm from '../RequestsFilterForm';
 
 type Props = {
   history: 'array',
@@ -282,14 +281,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     console.log(`Rendering BrowserNetworkPage`);
     return (
       <>
-        <DisplayFiltersModal
-          ref={registerModal}
-          allStatusCodes={STATUS_CODES}
-          allResourceTypes={RESOURCE_TYPES}
-          origFilters={filters}
-          setFilters={this.setFilters}
-        />
-
         <div className={`pane-container-${this.state.orientation}`}>
           <div className="pane-fixed pane-container-vertical" style={paneStyle}>
             <div className="pane-fixed">
@@ -303,42 +294,12 @@ export default class BrowserNetworkPage extends Component<Props> {
               className="pane-fixed"
               style={{ marginLeft: '10px', padding: '6px', width: '' }}
             >
-              <div
-                className="form-control form-control--outlined"
-                style={{
-                  width: '60%',
-                  maxWidth: '800px',
-                  display: 'inline-block'
-                }}
-              >
-                <label>Search:</label>
-                <input
-                  type="text"
-                  style={{ width: '100%' }}
-                  placeholder="Enter search term"
-                />
-              </div>
-
-              <div
-                className="form-control form-control--outlined"
-                style={{ width: '40%', display: 'inline-block' }}
-              >
-                <label style={{ marginLeft: '10px' }}>Filters:</label>
-
-                <button
-                  className="pointer btn btn--outlined btn--super-compact"
-                  style={{ marginLeft: '10px', display: 'inline-block' }}
-                  onClick={() => showModal(DisplayFiltersModal)}
-                >
-                  Display
-                </button>
-                <button
-                  className="pointer btn btn--outlined btn--super-compact"
-                  style={{ marginLeft: '10px', display: 'inline-block' }}
-                >
-                  Capture (3)
-                </button>
-              </div>
+              <RequestsFilterForm
+                allStatusCodes={STATUS_CODES}
+                allResourceTypes={RESOURCE_TYPES}
+                filters={filters}
+                setFilters={this.setFilters}
+              />
             </div>
 
             <RequestsTable
