@@ -56,7 +56,7 @@ export default class RequestView extends Component<Props> {
     const request = this.state.request;
 
     return (
-      <div className="pane-container-vertical">
+      <div className="pane-remaining pane-container-vertical ">
         <div className="pane-fixed">
           <Tabs
             className="theme--pane__body react-tabs"

@@ -6,7 +6,9 @@ import _ from 'lodash';
 import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
 import RequestView from '../RequestView';
-import RequestsFilterForm from '../RequestsFilterForm';
+
+import { registerModal, showModal } from '../modals/index';
+import DisplayFiltersModal from '../modals/DisplayFiltersModal';
 
 type Props = {
   history: 'array',
@@ -279,28 +281,66 @@ export default class BrowserNetworkPage extends Component<Props> {
     }
     console.log(`Rendering BrowserNetworkPage`);
     return (
-      <div className={`pane-container-${this.state.orientation}`}>
-        <div className="pane-fixed pane-container-vertical" style={paneStyle}>
-          <div className="pane-fixed">
-            <BrowserTabs
-              history={this.props.history}
-              location={this.props.location}
-            />
-          </div>
+      <>
+        <DisplayFiltersModal
+          ref={registerModal}
+          allStatusCodes={STATUS_CODES}
+          allResourceTypes={RESOURCE_TYPES}
+          origFilters={filters}
+          setFilters={this.setFilters}
+        />
 
-          <div
-            className="pane-fixed"
-            style={{ marginLeft: '10px', padding: '6px', width: '' }}
-          >
-            <RequestsFilterForm
-              allStatusCodes={STATUS_CODES}
-              allResourceTypes={RESOURCE_TYPES}
-              filters={filters}
-              setFilters={this.setFilters}
-            />
-          </div>
+        <div className={`pane-container-${this.state.orientation}`}>
+          <div className="pane-fixed pane-container-vertical" style={paneStyle}>
+            <div className="pane-fixed">
+              <BrowserTabs
+                history={this.props.history}
+                location={this.props.location}
+              />
+            </div>
 
-          <div className="pane-remaining" style={{ overflowX: 'auto' }}>
+            <div
+              className="pane-fixed"
+              style={{ marginLeft: '10px', padding: '6px', width: '' }}
+            >
+              <div
+                className="form-control form-control--outlined"
+                style={{
+                  width: '60%',
+                  maxWidth: '800px',
+                  display: 'inline-block'
+                }}
+              >
+                <label>Search:</label>
+                <input
+                  type="text"
+                  style={{ width: '100%' }}
+                  placeholder="Enter search term"
+                />
+              </div>
+
+              <div
+                className="form-control form-control--outlined"
+                style={{ width: '40%', display: 'inline-block' }}
+              >
+                <label style={{ marginLeft: '10px' }}>Filters:</label>
+
+                <button
+                  className="pointer btn btn--outlined btn--super-compact"
+                  style={{ marginLeft: '10px', display: 'inline-block' }}
+                  onClick={() => showModal(DisplayFiltersModal)}
+                >
+                  Display
+                </button>
+                <button
+                  className="pointer btn btn--outlined btn--super-compact"
+                  style={{ marginLeft: '10px', display: 'inline-block' }}
+                >
+                  Capture (3)
+                </button>
+              </div>
+            </div>
+
             <RequestsTable
               tableColumns={this.state.tableColumns}
               selectedRequestId={this.state.selectedRequestId}
@@ -317,19 +357,17 @@ export default class BrowserNetworkPage extends Component<Props> {
               requests={this.state.requests}
             />
           </div>
-        </div>
 
-        <div
-          className="pane-border pane-fixed"
-          onMouseDown={this.handleStartDragPane}
-        >
-          <div className="pane-border-transparent" />
-        </div>
+          <div
+            className="pane-border pane-fixed"
+            onMouseDown={this.handleStartDragPane}
+          >
+            <div className="pane-border-transparent" />
+          </div>
 
-        <div className="pane-remaining">
           <RequestView selectedRequestId={this.state.selectedRequestId} />
         </div>
-      </div>
+      </>
     );
   }
 }
