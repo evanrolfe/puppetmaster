@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { registerModal, showModal } from './modals/index';
 import DisplayFiltersModal from './modals/DisplayFiltersModal';
+import SettingsModal from './modals/SettingsModal';
 
 type Props = {
   allStatusCodes: 'array',
@@ -57,6 +58,14 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
             style={{ marginLeft: '10px', display: 'inline-block' }}
           >
             Capture
+          </button>
+
+          <button
+            className="pointer btn btn--outlined btn--super-compact"
+            style={{ marginLeft: '10px', display: 'inline-block' }}
+            onClick={() => showModal(SettingsModal, { tabIndex: 2 })}
+          >
+            <i className="fas fa-cog" />
           </button>
         </div>
       </>

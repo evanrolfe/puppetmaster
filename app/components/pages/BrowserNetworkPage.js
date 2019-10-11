@@ -17,7 +17,7 @@ type Props = {
 const MIN_PANE_WIDTH = 300;
 const MIN_PANE_HEIGHT = 150;
 
-const RESOURCE_TYPES = [
+export const RESOURCE_TYPES = [
   'document',
   'eventsource',
   'fetch',
@@ -33,12 +33,35 @@ const RESOURCE_TYPES = [
   'xhr'
 ];
 
-const STATUS_CODES = {
+export const STATUS_CODES = {
   2: '2xx [Success]',
   3: '3xx [Redirect]',
   4: '4xx [Request Error]',
   5: '5xx [Server Error]'
 };
+
+export const ALL_TABLE_COLUMNS = [
+  { key: 'id', title: '#', minWidth: 40, width: 40 },
+  { key: 'method', title: 'Method', minWidth: 70, width: 70 },
+  { key: 'host', title: 'Host', minWidth: 200, width: 200 },
+  { key: 'path', title: 'Path', minWidth: 250, width: 250 },
+  { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
+  { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
+  { key: 'response_status', title: 'Status', minWidth: 60, width: 70 },
+  {
+    key: 'response_body_length',
+    title: 'Length',
+    minWidth: 65,
+    width: 70
+  },
+  {
+    key: 'response_remote_address',
+    title: 'IP Address',
+    minWidth: 120,
+    width: 130
+  },
+  { key: 'created_at', title: 'Time', minwidth: 200 }
+];
 
 export default class BrowserNetworkPage extends Component<Props> {
   props: Props;
@@ -51,31 +74,12 @@ export default class BrowserNetworkPage extends Component<Props> {
         orientation: 'horizontal', // 'vertical' or 'horizontal'
         paneLength: 650,
         draggingPane: false,
-        showDragOverlay: false,
-        // RequestTable state:
         tableColumns: [
           { key: 'id', title: '#', minWidth: 40, width: 40 },
           { key: 'method', title: 'Method', minWidth: 70, width: 70 },
           { key: 'host', title: 'Host', minWidth: 200, width: 200 },
           { key: 'path', title: 'Path', minWidth: 250, width: 250 },
-          // { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
-          // { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
           { key: 'response_status', title: 'Status', minWidth: 60, width: 70 }
-          /*
-          {
-            key: 'response_body_length',
-            title: 'Length',
-            minWidth: 65,
-            width: 70
-          },
-          {
-            key: 'response_remote_address',
-            title: 'IP Address',
-            minWidth: 120,
-            width: 130
-          },
-          { key: 'created_at', title: 'Time', minwidth: 200 }
-*/
         ],
         order_by: 'id',
         dir: 'desc',
@@ -192,8 +196,6 @@ export default class BrowserNetworkPage extends Component<Props> {
 
   handleMouseMove(e) {
     if (this.state.draggingPane) {
-      this.setState({ showDragOverlay: true });
-
       this.setState(prevState => {
         const requestTable = ReactDOM.findDOMNode(this._requestTable);
 
@@ -226,7 +228,7 @@ export default class BrowserNetworkPage extends Component<Props> {
 
   _handleMouseUp() {
     if (this.state.draggingPane) {
-      this.setState({ draggingPane: false, showDragOverlay: false });
+      this.setState({ draggingPane: false });
     }
   }
 

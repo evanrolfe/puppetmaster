@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
@@ -11,8 +13,8 @@ type Props = {
   dir: 'string',
   toggleColumnOrder: 'function',
   setTableColumnWidth: 'function',
-  // setScrollTop: 'function',
-  // scrollTop: 'number',
+  setScrollTop: 'function',
+  scrollTop: 'number',
   tableColumns: 'array'
 };
 
@@ -29,7 +31,7 @@ export default class RequestsTable extends Component<Props> {
     this.selectNextRequest = this.selectNextRequest.bind(this);
     this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
   }
-  /*
+
   componentDidMount() {
     // Restore the scroll state
     const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
@@ -39,7 +41,6 @@ export default class RequestsTable extends Component<Props> {
       this.props.setScrollTop(requestPanel.scrollTop);
     });
   }
-  */
 
   getRowClassName(requestId) {
     if (parseInt(this.props.selectedRequestId) === parseInt(requestId)) {
@@ -139,7 +140,11 @@ export default class RequestsTable extends Component<Props> {
 
     return (
       <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
-        <div className="pane-remaining" style={{ overflowX: 'auto' }}>
+        <div
+          className="pane-remaining"
+          style={{ overflowX: 'auto' }}
+          ref={this._setRequestsPanelRef}
+        >
           <table className="requests-table">
             <thead>
               <tr>
