@@ -41,26 +41,24 @@ export const STATUS_CODES = {
 };
 
 export const ALL_TABLE_COLUMNS = [
-  { key: 'id', title: '#', minWidth: 40, width: 40 },
-  { key: 'method', title: 'Method', minWidth: 70, width: 70 },
-  { key: 'host', title: 'Host', minWidth: 200, width: 200 },
-  { key: 'path', title: 'Path', minWidth: 250, width: 250 },
-  { key: 'request_type', title: 'Type', minWidth: 75, width: 75 },
-  { key: 'ext', title: 'Ext', minWidth: 40, width: 40 },
-  { key: 'response_status', title: 'Status', minWidth: 60, width: 70 },
+  { key: 'id', title: '#', width: 40 },
+  { key: 'method', title: 'Method', width: 70 },
+  { key: 'host', title: 'Host', width: 200 },
+  { key: 'path', title: 'Path', width: 250 },
+  { key: 'request_type', title: 'Type', width: 75 },
+  { key: 'ext', title: 'Ext', width: 40 },
+  { key: 'response_status', title: 'Status', width: 70 },
   {
     key: 'response_body_length',
     title: 'Length',
-    minWidth: 65,
     width: 70
   },
   {
     key: 'response_remote_address',
     title: 'IP Address',
-    minWidth: 120,
     width: 130
   },
-  { key: 'created_at', title: 'Time', minwidth: 200 }
+  { key: 'created_at', title: 'Time' }
 ];
 
 export default class BrowserNetworkPage extends Component<Props> {
@@ -71,16 +69,21 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     if (global.browserNetworkPageState === undefined) {
       this.state = {
+        // Persistant state:
         orientation: 'horizontal', // 'vertical' or 'horizontal'
         paneLength: 650,
-        draggingPane: false,
+
+        // TODO: Seperate width from defaultWidth
         tableColumns: [
-          { key: 'id', title: '#', minWidth: 40, width: 40 },
-          { key: 'method', title: 'Method', minWidth: 70, width: 70 },
-          { key: 'host', title: 'Host', minWidth: 200, width: 200 },
-          { key: 'path', title: 'Path', minWidth: 250, width: 250 },
-          { key: 'response_status', title: 'Status', minWidth: 60, width: 70 }
+          { key: 'id', title: '#', width: 40 },
+          { key: 'method', title: 'Method', width: 70 },
+          { key: 'host', title: 'Host', width: 200 },
+          { key: 'path', title: 'Path', width: 250 },
+          { key: 'response_status', title: 'Status', width: 70 }
         ],
+
+        // Volatile state(?):
+        draggingPane: false,
         order_by: 'id',
         dir: 'desc',
         requestsTableScrollTop: 0,
