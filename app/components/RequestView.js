@@ -7,7 +7,9 @@ import CookiesTab from './RequestView/CookiesTab';
 
 type Props = {
   selectedRequestId: 'number',
-  panelHeight: 'number'
+  panelHeight: 'number',
+  draggingPane: 'boolean',
+  codeMirrorWidth: 'number'
 };
 
 export default class RequestView extends Component<Props> {
@@ -21,6 +23,14 @@ export default class RequestView extends Component<Props> {
 
   componentDidMount() {
     this.loadRequest();
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.draggingPane === true) {
+      return false;
+    }
+
+    return true;
   }
 
   componentDidUpdate(previousProps) {
@@ -99,7 +109,12 @@ export default class RequestView extends Component<Props> {
             <ResponseTab height={this.props.panelHeight} request={request} />
           </div>
         )}
-        {this.state.tabIndex === 2 && <BodyTab request={request} />}
+        {this.state.tabIndex === 2 && (
+          <BodyTab
+            request={request}
+            codeMirrorWidth={this.props.codeMirrorWidth}
+          />
+        )}
         {this.state.tabIndex === 3 && (
           <div className="pane-remaining">
             <CookiesTab request={request} />

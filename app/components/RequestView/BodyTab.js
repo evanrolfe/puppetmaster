@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import CodeMirror from 'codemirror';
 
 type Props = {
-  request: 'object'
+  request: 'object',
+  codeMirrorWidth: 'number'
 };
 
 const TAB_SIZE = 2;
@@ -73,7 +74,10 @@ export default class BodyTab extends Component<Props> {
 
   render() {
     return (
-      <div className="pane-remaining" style={{ width: '600px' }}>
+      <div
+        className="pane-remaining"
+        style={{ width: `${this.props.codeMirrorWidth}px` }}
+      >
         <textarea
           ref={this._handleInitTextarea}
           value={this.props.request.response_body}

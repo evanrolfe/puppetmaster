@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
+import { remote } from 'electron';
 
 import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
@@ -71,7 +72,7 @@ export default class BrowserNetworkPage extends Component<Props> {
       this.state = {
         // Persistant state:
         orientation: 'horizontal', // 'vertical' or 'horizontal'
-        paneLength: 650,
+        paneLength: 700,
 
         // TODO: Seperate width from defaultWidth
         tableColumns: [
@@ -97,7 +98,8 @@ export default class BrowserNetworkPage extends Component<Props> {
           resourceTypes: RESOURCE_TYPES,
           extSetting: '', // ''|'include'|'exclude'
           extList: []
-        }
+        },
+        windowSize: remote.getCurrentWindow().getSize()
       };
     } else {
       this.state = global.browserNetworkPageState;
@@ -111,20 +113,28 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
     this.setFilters = this.setFilters.bind(this);
+    this.getCodeMirrorWidth = this.getCodeMirrorWidth.bind(this);
 
     this.throttledHandleMouseMove = _.throttle(
       this.handleMouseMove.bind(this),
-      15
+      50
     );
+
+    this.throttledSetWindowSizeState = _.throttle(() => {
+      this.setState({ windowSize: remote.getCurrentWindow().getSize() });
+    }, 200);
 
     global.backendConn.listen('requestCreated', () => {
       this.loadRequests();
     });
+
+    console.log(this.state.windowSize);
   }
 
   componentDidMount() {
     document.addEventListener('mouseup', this._handleMouseUp);
     document.addEventListener('mousemove', this.throttledHandleMouseMove);
+    window.addEventListener('resize', this.throttledSetWindowSizeState);
 
     if (this.state.requests.length === 0) {
       this.loadRequests();
@@ -273,6 +283,20 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState({ filters: filters });
   }
 
+  getCodeMirrorWidth() {
+    let codeMirrorWidth;
+    const windowWidth = this.state.windowSize[0];
+    const sideBarWidth = 53;
+
+    if (this.state.orientation === 'horizontal') {
+      codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneLength;
+    } else if (this.state.orientation === 'vertical') {
+      codeMirrorWidth = windowWidth - sideBarWidth;
+    }
+
+    return codeMirrorWidth;
+  }
+
   render() {
     const filters = JSON.parse(JSON.stringify(this.state.filters));
 
@@ -331,7 +355,11 @@ export default class BrowserNetworkPage extends Component<Props> {
             <div className="pane-border-transparent" />
           </div>
 
-          <RequestView selectedRequestId={this.state.selectedRequestId} />
+          <RequestView
+            selectedRequestId={this.state.selectedRequestId}
+            codeMirrorWidth={this.getCodeMirrorWidth()}
+            draggingPane={this.state.draggingPane}
+          />
         </div>
       </>
     );
