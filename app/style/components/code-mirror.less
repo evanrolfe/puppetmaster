@@ -3,11 +3,13 @@
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
   font-family: monospace;
-  color: black;
   direction: ltr;
   height: 100%;
   overflow-y: auto;
   overflow-x: scroll;
+
+  color: var(--color-font);
+  background-color: var(--color-bg);
 }
 
 /* PADDING */
@@ -21,14 +23,14 @@
 }
 
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
-  background-color: white; /* The little square between H and V scrollbars */
+  background-color: transparent !important;
 }
 
 /* GUTTER */
 
 .CodeMirror-gutters {
-  border-right: 1px solid #ddd;
-  background-color: #f7f7f7;
+  border-right: 1px solid var(--hl-md);
+  background-color: transparent !important;
   white-space: nowrap;
 }
 .CodeMirror-linenumbers {}
@@ -36,7 +38,7 @@
   padding: 0 3px 0 5px;
   min-width: 20px;
   text-align: right;
-  color: #999;
+  color: var(--hl-xl);
   white-space: nowrap;
 }
 
@@ -161,7 +163,6 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
 .CodeMirror {
   position: relative;
   overflow: hidden;
-  background: white;
 }
 
 .CodeMirror-scroll {
