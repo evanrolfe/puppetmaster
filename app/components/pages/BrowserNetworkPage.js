@@ -99,7 +99,8 @@ export default class BrowserNetworkPage extends Component<Props> {
           extSetting: '', // ''|'include'|'exclude'
           extList: []
         },
-        windowSize: remote.getCurrentWindow().getSize()
+        windowSize: remote.getCurrentWindow().getSize(),
+        requestViewTabIndex: 0
       };
     } else {
       this.state = global.browserNetworkPageState;
@@ -114,6 +115,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setScrollTop = this.setScrollTop.bind(this);
     this.setFilters = this.setFilters.bind(this);
     this.getCodeMirrorWidth = this.getCodeMirrorWidth.bind(this);
+    this.setRequestViewTabIndex = this.setRequestViewTabIndex.bind(this);
 
     this.throttledHandleMouseMove = _.throttle(
       this.handleMouseMove.bind(this),
@@ -297,6 +299,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     return codeMirrorWidth;
   }
 
+  setRequestViewTabIndex(tabIndex) {
+    this.setState({ requestViewTabIndex: tabIndex });
+  }
+
   render() {
     const filters = JSON.parse(JSON.stringify(this.state.filters));
 
@@ -359,6 +365,8 @@ export default class BrowserNetworkPage extends Component<Props> {
             selectedRequestId={this.state.selectedRequestId}
             codeMirrorWidth={this.getCodeMirrorWidth()}
             draggingPane={this.state.draggingPane}
+            tabIndex={this.state.requestViewTabIndex}
+            setRequestViewTabIndex={this.setRequestViewTabIndex}
           />
         </div>
       </>

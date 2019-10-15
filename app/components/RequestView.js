@@ -9,7 +9,9 @@ type Props = {
   selectedRequestId: 'number',
   panelHeight: 'number',
   draggingPane: 'boolean',
-  codeMirrorWidth: 'number'
+  codeMirrorWidth: 'number',
+  tabIndex: 'number',
+  setRequestViewTabIndex: 'function'
 };
 
 export default class RequestView extends Component<Props> {
@@ -58,10 +60,6 @@ export default class RequestView extends Component<Props> {
     }
   }
 
-  goTo(tabIndex) {
-    this.setState({ tabIndex: tabIndex });
-  }
-
   render() {
     const request = this.state.request;
 
@@ -70,8 +68,8 @@ export default class RequestView extends Component<Props> {
         <div className="pane-fixed">
           <Tabs
             className="theme--pane__body react-tabs"
-            selectedIndex={this.state.tabIndex}
-            onSelect={tabIndex => this.goTo(tabIndex)}
+            selectedIndex={this.props.tabIndex}
+            onSelect={tabIndex => this.props.setRequestViewTabIndex(tabIndex)}
           >
             <TabList>
               <Tab>
@@ -99,23 +97,23 @@ export default class RequestView extends Component<Props> {
           </Tabs>
         </div>
 
-        {this.state.tabIndex === 0 && (
+        {this.props.tabIndex === 0 && (
           <div className="pane-remaining">
             <RequestTab height={this.props.panelHeight} request={request} />
           </div>
         )}
-        {this.state.tabIndex === 1 && (
+        {this.props.tabIndex === 1 && (
           <div className="pane-remaining">
             <ResponseTab height={this.props.panelHeight} request={request} />
           </div>
         )}
-        {this.state.tabIndex === 2 && (
+        {this.props.tabIndex === 2 && (
           <BodyTab
             request={request}
             codeMirrorWidth={this.props.codeMirrorWidth}
           />
         )}
-        {this.state.tabIndex === 3 && (
+        {this.props.tabIndex === 3 && (
           <div className="pane-remaining">
             <CookiesTab request={request} />
           </div>
