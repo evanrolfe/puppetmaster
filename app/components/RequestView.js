@@ -15,7 +15,7 @@ export default class RequestView extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.state = { request: {}, tabIndex: 0 };
+    this.state = { request: {}, tabIndex: 2 };
     this.loadRequest();
   }
 
@@ -89,16 +89,22 @@ export default class RequestView extends Component<Props> {
           </Tabs>
         </div>
 
-        <div className="pane-remaining">
-          {this.state.tabIndex === 0 && (
+        {this.state.tabIndex === 0 && (
+          <div className="pane-remaining">
             <RequestTab height={this.props.panelHeight} request={request} />
-          )}
-          {this.state.tabIndex === 1 && (
+          </div>
+        )}
+        {this.state.tabIndex === 1 && (
+          <div className="pane-remaining">
             <ResponseTab height={this.props.panelHeight} request={request} />
-          )}
-          {this.state.tabIndex === 2 && <BodyTab request={request} />}
-          {this.state.tabIndex === 3 && <CookiesTab request={request} />}
-        </div>
+          </div>
+        )}
+        {this.state.tabIndex === 2 && <BodyTab request={request} />}
+        {this.state.tabIndex === 3 && (
+          <div className="pane-remaining">
+            <CookiesTab request={request} />
+          </div>
+        )}
       </div>
     );
   }
