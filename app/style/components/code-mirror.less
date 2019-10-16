@@ -8,8 +8,9 @@
   overflow-y: auto;
   overflow-x: scroll;
 
-  color: var(--color-font);
-  background-color: var(--color-bg);
+  //background-color: var(--hl-xs) !important;
+  color: var(--color-font) !important;
+  background-color: transparent !important;
 }
 
 /* PADDING */
@@ -30,7 +31,7 @@
 
 .CodeMirror-gutters {
   border-right: 1px solid var(--hl-md);
-  background-color: transparent !important;
+  background-color: var(--hl-xs) !important;
   white-space: nowrap;
 }
 .CodeMirror-linenumbers {}
@@ -38,7 +39,7 @@
   padding: 0 3px 0 5px;
   min-width: 20px;
   text-align: right;
-  color: var(--hl-xl);
+  color: var(--color-font) !important;
   white-space: nowrap;
 }
 

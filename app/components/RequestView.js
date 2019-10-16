@@ -19,7 +19,7 @@ export default class RequestView extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.state = { request: {}, tabIndex: 2 };
+    this.state = { request: {}, tabIndex: 0 };
     this.loadRequest();
   }
 

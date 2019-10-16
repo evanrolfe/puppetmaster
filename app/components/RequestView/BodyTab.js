@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import CodeMirror from 'codemirror';
+import CodeMirror from 'codemirror/lib/codemirror';
+import 'codemirror/mode/javascript/javascript';
 
 type Props = {
   request: 'object',
@@ -8,6 +9,8 @@ type Props = {
 
 const TAB_SIZE = 2;
 const BASE_CODEMIRROR_OPTIONS = {
+  mode: 'javascript',
+  theme: 'material',
   lineNumbers: true,
   placeholder: 'Start Typing...',
   foldGutter: true,
@@ -44,6 +47,7 @@ export default class BodyTab extends Component<Props> {
   componentDidUpdate(prevProps) {
     if (this.props.request.response_body !== prevProps.request.response_body) {
       this._codemirrorSetValue();
+
       setTimeout(() => {
         if (!this.codeMirror) return;
         console.log('Refreshing codemirror');
@@ -74,15 +78,36 @@ export default class BodyTab extends Component<Props> {
 
   render() {
     return (
-      <div
-        className="pane-remaining"
-        style={{ width: `${this.props.codeMirrorWidth}px` }}
-      >
-        <textarea
-          ref={this._handleInitTextarea}
-          value={this.props.request.response_body}
-        />
-      </div>
+      <>
+        <div
+          className="pane-fixed code-editor-controls"
+          style={{ padding: '6px' }}
+        >
+          <div
+            className="form-control form-control--outlined"
+            style={{ display: 'inline-block' }}
+          >
+            <label style={{ marginLeft: '10px' }}>View code as:</label>
+            <button
+              className="pointer btn btn--outlined btn--super-compact"
+              style={{ marginLeft: '10px', display: 'inline-block' }}
+            >
+              Pretty
+            </button>
+          </div>
+        </div>
+
+        <div
+          className="pane-remaining"
+          style={{ width: `${this.props.codeMirrorWidth}px` }}
+        >
+          <textarea
+            ref={this._handleInitTextarea}
+            value={this.props.request.response_body}
+            readOnly
+          />
+        </div>
+      </>
     );
   }
 }
