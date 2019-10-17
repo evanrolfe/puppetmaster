@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import CodeEditor from './CodeEditor';
 import ViewModeDropdown from './ViewModeDropdown';
+import { getContentTypeFromResponse } from '../../lib/CodeEditorUtils';
 
 type Props = {
   request: 'object',
@@ -22,6 +23,14 @@ export default class BodyTab extends Component<Props> {
   }
 
   render() {
+    if (Object.entries(this.props.request).length === 0) return <></>;
+
+    const code = this.props.request.response_body || '';
+    const codeMode = getContentTypeFromResponse(
+      code,
+      this.props.request.response_headers
+    );
+
     return (
       <>
         <div
@@ -45,7 +54,10 @@ export default class BodyTab extends Component<Props> {
           className="pane-remaining"
           style={{ width: `${this.props.codeMirrorWidth}px` }}
         >
-          <CodeEditor request={this.props.request} />
+          <CodeEditor
+            value={this.props.request.response_body}
+            mode={codeMode}
+          />
         </div>
       </>
     );

@@ -1,3 +1,7 @@
+import formatJson from './JsonLint';
+
+const INDENT_CHARS = '  ';
+
 const ACCEPTED_MIME_TYPES = [
   'text/css',
   'text/x-scss',
@@ -14,7 +18,33 @@ const ACCEPTED_MIME_TYPES = [
 
 const DEFAULT_MIME_TYPE = 'text/javascript';
 
-const getContentTypeFromResponse = (body, headers) => {
+const isJSON = mimeType => mimeType.indexOf('json') !== -1;
+const isXML = mimeType => mimeType.indexOf('xml') !== -1;
+
+export const canPrettify = mimeType => isJSON(mimeType) || isXML(mimeType);
+
+const prettifyJSON = code => {
+  try {
+    return formatJson(code, INDENT_CHARS);
+  } catch (e) {
+    return code;
+  }
+};
+
+// TODO:
+const prettifyXML = code => code;
+
+export const prettifyCode = (code, mimeType) => {
+  if (isJSON(mimeType)) {
+    return prettifyJSON(code);
+  } else if (isXML(mimeType)) {
+    return prettifyXML(code);
+  }
+
+  return code;
+};
+
+export const getContentTypeFromResponse = (body, headers) => {
   // Convert all header keys to lower case
   const lowcaseHeaders = {};
 
@@ -38,5 +68,3 @@ const getContentTypeFromResponse = (body, headers) => {
 
   return DEFAULT_MIME_TYPE;
 };
-
-export default getContentTypeFromResponse;

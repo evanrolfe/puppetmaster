@@ -5,10 +5,11 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/css/css';
 
-import getContentTypeFromResponse from '../../lib/GetContentTypeFromResponse';
+import { canPrettify, prettifyCode } from '../../lib/CodeEditorUtils';
 
 type Props = {
-  request: 'object'
+  value: 'string',
+  mode: 'string'
 };
 
 const TAB_SIZE = 2;
@@ -50,7 +51,7 @@ export default class CodeEditor extends Component<Props> {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.request.response_body !== prevProps.request.response_body) {
+    if (this.props.value !== prevProps.value) {
       this._codemirrorSetValue();
 
       setTimeout(() => {
@@ -62,15 +63,14 @@ export default class CodeEditor extends Component<Props> {
   }
 
   _codemirrorSetValue() {
-    const code = this.props.request.response_body || '';
-    const mode = getContentTypeFromResponse(
-      code,
-      this.props.request.response_headers
-    );
-    console.log(`Setting mode to ${mode}`);
+    let code = this.props.value;
+
+    if (canPrettify(this.props.mode)) {
+      code = prettifyCode(code, this.props.mode);
+    }
 
     this.codeMirror.setValue(code);
-    this.codeMirror.setOption('mode', mode);
+    this.codeMirror.setOption('mode', this.props.mode);
   }
 
   _handleInitTextarea(ref) {
@@ -88,11 +88,15 @@ export default class CodeEditor extends Component<Props> {
     console.log('Codemirror setup.');
   }
 
+  _canPrettify() {}
+
+  _prettifyCode() {}
+
   render() {
     return (
       <textarea
         ref={this._handleInitTextarea}
-        value={this.props.request.response_body}
+        value={this.props.value}
         readOnly
       />
     );
