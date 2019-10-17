@@ -35,7 +35,7 @@ export default class BodyTab extends Component<Props> {
       this.props.request.response_headers
     );
 
-    if (canPrettify(mimeType)) {
+    if (this.state.viewMode === 'pretty' && canPrettify(mimeType)) {
       code = prettifyCode(code, mimeType);
     }
 
