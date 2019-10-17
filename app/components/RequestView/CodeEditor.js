@@ -5,11 +5,9 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/css/css';
 
-import { canPrettify, prettifyCode } from '../../lib/CodeEditorUtils';
-
 type Props = {
   value: 'string',
-  mode: 'string'
+  mimeType: 'string'
 };
 
 const TAB_SIZE = 2;
@@ -56,21 +54,14 @@ export default class CodeEditor extends Component<Props> {
 
       setTimeout(() => {
         if (!this.codeMirror) return;
-        console.log('Refreshing codemirror');
         this.codeMirror.refresh();
       }, 200);
     }
   }
 
   _codemirrorSetValue() {
-    let code = this.props.value;
-
-    if (canPrettify(this.props.mode)) {
-      code = prettifyCode(code, this.props.mode);
-    }
-
-    this.codeMirror.setValue(code);
-    this.codeMirror.setOption('mode', this.props.mode);
+    this.codeMirror.setValue(this.props.value);
+    this.codeMirror.setOption('mode', this.props.mimeType);
   }
 
   _handleInitTextarea(ref) {
@@ -84,13 +75,7 @@ export default class CodeEditor extends Component<Props> {
     setTimeout(() => {
       this.codeMirror.refresh();
     }, 200);
-
-    console.log('Codemirror setup.');
   }
-
-  _canPrettify() {}
-
-  _prettifyCode() {}
 
   render() {
     return (

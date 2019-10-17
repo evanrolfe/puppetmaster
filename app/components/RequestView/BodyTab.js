@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import CodeEditor from './CodeEditor';
 import ViewModeDropdown from './ViewModeDropdown';
-import { getContentTypeFromResponse } from '../../lib/CodeEditorUtils';
+import {
+  getContentTypeFromResponse,
+  canPrettify,
+  prettifyCode
+} from '../../lib/CodeEditorUtils';
 
 type Props = {
   request: 'object',
@@ -18,18 +22,22 @@ export default class BodyTab extends Component<Props> {
   }
 
   setViewMode(viewMode) {
-    console.log(`Setting viewMode to ${viewMode}`);
     this.setState({ viewMode: viewMode });
   }
 
   render() {
     if (Object.entries(this.props.request).length === 0) return <></>;
 
-    const code = this.props.request.response_body || '';
-    const codeMode = getContentTypeFromResponse(
+    let code = this.props.request.response_body || '';
+
+    const mimeType = getContentTypeFromResponse(
       code,
       this.props.request.response_headers
     );
+
+    if (canPrettify(mimeType)) {
+      code = prettifyCode(code, mimeType);
+    }
 
     return (
       <>
@@ -54,10 +62,7 @@ export default class BodyTab extends Component<Props> {
           className="pane-remaining"
           style={{ width: `${this.props.codeMirrorWidth}px` }}
         >
-          <CodeEditor
-            value={this.props.request.response_body}
-            mode={codeMode}
-          />
+          <CodeEditor value={code} mimeType={mimeType} />
         </div>
       </>
     );
