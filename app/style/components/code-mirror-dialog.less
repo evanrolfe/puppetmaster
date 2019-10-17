@@ -1,0 +1,77 @@
+/*
+.CodeMirror-dialog {
+  background: var(--color-bg);
+  opacity: 0.95;
+  color: var(--hl);
+  border-color: var(--hl-md);
+  box-sizing: border-box;
+  width: 100%;
+  padding: @padding-sm @padding-xs @padding-xs @padding-xs;
+  box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
+
+  input {
+    font-family: @font-monospace !important;
+    border: 0 !important;
+    height: 1em !important;
+    padding: 0 !important;
+    display: block;
+    width: 100% !important;
+    color: var(--color-font);
+    min-height: 1.5em;
+  }
+
+  * {
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+  }
+
+  button {
+    color: var(--hl);
+    &:hover {
+      color: var(--color-font);
+    }
+  }
+}
+*/
+
+.CodeMirror-dialog {
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 15;
+  padding: .1em .8em;
+  overflow: hidden;
+
+  background: var(--color-bg);
+  opacity: 0.95;
+  color: var(--color-font) !important;
+  border-color: var(--hl-md);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.CodeMirror-dialog-top {
+  border-bottom: 1px solid var(--hl-md);
+  top: 0;
+}
+
+.CodeMirror-dialog-bottom {
+  border-top: 1px solid var(--hl-md);
+  bottom: 0;
+}
+
+.CodeMirror-dialog input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 40% !important;
+  color: var(--color-font) !important;
+  font-family: monospace;
+}
+
+.CodeMirror-dialog button {
+  font-size: 70%;
+}

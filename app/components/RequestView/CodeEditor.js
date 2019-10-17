@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import CodeMirror from 'codemirror/lib/codemirror';
 
+import 'codemirror/addon/search/search';
+import 'codemirror/addon/search/searchcursor';
+import 'codemirror/addon/dialog/dialog';
+
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import 'codemirror/mode/css/css';
@@ -9,6 +13,9 @@ type Props = {
   value: 'string',
   mimeType: 'string'
 };
+
+// TODO: Make this work:
+const isMac = () => false;
 
 const TAB_SIZE = 2;
 const BASE_CODEMIRROR_OPTIONS = {
@@ -26,13 +33,19 @@ const BASE_CODEMIRROR_OPTIONS = {
   indentUnit: TAB_SIZE,
   hintOptions: null,
   dragDrop: true,
-  viewportMargin: 30, // default 10
+  viewportMargin: 10, // default 10
   selectionPointer: 'default',
   styleActiveLine: true,
   indentWithTabs: true,
   showCursorWhenSelecting: false,
   cursorScrollMargin: 12, // NOTE: This is px
   keyMap: 'default',
+  extraKeys: CodeMirror.normalizeKeyMap({
+    // Change default find command from "find" to "findPersistent" so the
+    // search box stays open after pressing Enter
+    [isMac() ? 'Cmd-F' : 'Ctrl-F']: 'findPersistent'
+  }),
+
   // NOTE: Because the lint mode is initialized immediately, the lint gutter needs to
   //   be in the default options. DO NOT REMOVE THIS.
   gutters: ['CodeMirror-lint-markers']
