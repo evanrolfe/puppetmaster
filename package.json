@@ -259,6 +259,7 @@
     "electron-log": "^3.0.7",
     "electron-updater": "^3.2.3",
     "history": "^4.7.2",
+    "js-beautify": "^1.10.2",
     "lodash": "^4.17.15",
     "node-ipc": "^9.1.1",
     "openrecord": "^2.10.2",

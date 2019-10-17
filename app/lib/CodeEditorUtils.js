@@ -1,5 +1,5 @@
 import vkBeautify from 'vkbeautify';
-
+import jsBeautify from 'js-beautify';
 import formatJson from './JsonLint';
 
 const INDENT_CHARS = '  ';
@@ -22,8 +22,18 @@ const DEFAULT_MIME_TYPE = 'text/javascript';
 
 const isJSON = mimeType => mimeType.indexOf('json') !== -1;
 const isXML = mimeType => mimeType.indexOf('xml') !== -1;
+const isJavascript = mimeType => mimeType.indexOf('javascript') !== -1;
 
-export const canPrettify = mimeType => isJSON(mimeType) || isXML(mimeType);
+export const canPrettify = mimeType =>
+  isJSON(mimeType) || isXML(mimeType) || isJavascript(mimeType);
+
+const prettifyJavascript = code => {
+  try {
+    return jsBeautify(code, { indent_size: 2, space_in_empty_paren: true });
+  } catch (e) {
+    return code;
+  }
+};
 
 const prettifyJSON = code => {
   try {
@@ -33,7 +43,6 @@ const prettifyJSON = code => {
   }
 };
 
-// TODO:
 const prettifyXML = code => {
   try {
     return vkBeautify.xml(code, INDENT_CHARS);
@@ -47,6 +56,8 @@ export const prettifyCode = (code, mimeType) => {
     return prettifyJSON(code);
   } else if (isXML(mimeType)) {
     return prettifyXML(code);
+  } else if (isJavascript(mimeType)) {
+    return prettifyJavascript(code);
   }
 
   return code;
