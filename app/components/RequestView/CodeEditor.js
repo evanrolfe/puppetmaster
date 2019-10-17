@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import CodeMirror from 'codemirror/lib/codemirror';
+
 import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/css/css';
+
+import getContentTypeFromResponse from '../../lib/GetContentTypeFromResponse';
 
 type Props = {
-  value: 'string'
+  request: 'object'
 };
 
 const TAB_SIZE = 2;
 const BASE_CODEMIRROR_OPTIONS = {
-  mode: 'javascript',
   theme: 'material',
   lineNumbers: true,
   placeholder: 'Start Typing...',
@@ -40,13 +44,13 @@ export default class CodeEditor extends Component<Props> {
 
   constructor(props) {
     super(props);
-
+    console.log(CodeMirror.modes);
     this._handleInitTextarea = this._handleInitTextarea.bind(this);
     this._codemirrorSetValue = this._codemirrorSetValue.bind(this);
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.value !== prevProps.value) {
+    if (this.props.request.response_body !== prevProps.request.response_body) {
       this._codemirrorSetValue();
 
       setTimeout(() => {
@@ -58,8 +62,15 @@ export default class CodeEditor extends Component<Props> {
   }
 
   _codemirrorSetValue() {
-    const code = this.props.value || '';
+    const code = this.props.request.response_body || '';
+    const mode = getContentTypeFromResponse(
+      code,
+      this.props.request.response_headers
+    );
+    console.log(`Setting mode to ${mode}`);
+
     this.codeMirror.setValue(code);
+    this.codeMirror.setOption('mode', mode);
   }
 
   _handleInitTextarea(ref) {
@@ -81,7 +92,7 @@ export default class CodeEditor extends Component<Props> {
     return (
       <textarea
         ref={this._handleInitTextarea}
-        value={this.props.value}
+        value={this.props.request.response_body}
         readOnly
       />
     );

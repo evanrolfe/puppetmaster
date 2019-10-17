@@ -45,7 +45,7 @@ export default class BodyTab extends Component<Props> {
           className="pane-remaining"
           style={{ width: `${this.props.codeMirrorWidth}px` }}
         >
-          <CodeEditor value={this.props.request.response_body} />
+          <CodeEditor request={this.props.request} />
         </div>
       </>
     );
