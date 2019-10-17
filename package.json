@@ -270,7 +270,8 @@
     "react-router-dom": "^5.0.1",
     "react-tabs": "^3.0.0",
     "source-map-support": "^0.5.9",
-    "sqlite3": "^4.1.0"
+    "sqlite3": "^4.1.0",
+    "vkbeautify": "^0.99.3"
   },
   "devEngines": {
     "node": ">=7.x",

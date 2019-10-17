@@ -1,3 +1,5 @@
+import vkBeautify from 'vkbeautify';
+
 import formatJson from './JsonLint';
 
 const INDENT_CHARS = '  ';
@@ -32,7 +34,13 @@ const prettifyJSON = code => {
 };
 
 // TODO:
-const prettifyXML = code => code;
+const prettifyXML = code => {
+  try {
+    return vkBeautify.xml(code, INDENT_CHARS);
+  } catch (e) {
+    return code;
+  }
+};
 
 export const prettifyCode = (code, mimeType) => {
   if (isJSON(mimeType)) {
