@@ -29,7 +29,16 @@ export const canPrettify = mimeType =>
 
 const prettifyJavascript = code => {
   try {
-    return jsBeautify(code, { indent_size: 2, space_in_empty_paren: true });
+    const start = Date.now();
+    const prettyCode = jsBeautify(code, {
+      indent_size: 2,
+      space_in_empty_paren: true
+    });
+    const end = Date.now();
+
+    console.log(`Beautified the code in ${end - start}ms`);
+
+    return prettyCode;
   } catch (e) {
     return code;
   }
