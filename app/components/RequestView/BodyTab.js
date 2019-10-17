@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import CodeEditor from './CodeEditor';
 import ViewModeDropdown from './ViewModeDropdown';
 import {
-  getContentTypeFromResponse,
+  getMimeTypeFromResponse,
   canPrettify,
   prettifyCode
 } from '../../lib/CodeEditorUtils';
@@ -30,7 +30,7 @@ export default class BodyTab extends Component<Props> {
 
     let code = this.props.request.response_body || '';
 
-    const mimeType = getContentTypeFromResponse(
+    const mimeType = getMimeTypeFromResponse(
       code,
       this.props.request.response_headers
     );
