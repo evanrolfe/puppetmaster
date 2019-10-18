@@ -23,9 +23,13 @@ const DEFAULT_MIME_TYPE = 'text/javascript';
 const isJSON = mimeType => mimeType.indexOf('json') !== -1;
 const isXML = mimeType => mimeType.indexOf('xml') !== -1;
 const isJavascript = mimeType => mimeType.indexOf('javascript') !== -1;
+const isCSS = mimeType => mimeType.indexOf('css') !== -1;
 
 export const canPrettify = mimeType =>
-  isJSON(mimeType) || isXML(mimeType) || isJavascript(mimeType);
+  isJSON(mimeType) ||
+  isXML(mimeType) ||
+  isJavascript(mimeType) ||
+  isCSS(mimeType);
 
 const prettifyJavascript = code => {
   try {
@@ -60,6 +64,14 @@ const prettifyXML = code => {
   }
 };
 
+const prettifyCSS = code => {
+  try {
+    return vkBeautify.css(code, INDENT_CHARS);
+  } catch (e) {
+    return code;
+  }
+};
+
 export const prettifyCode = (code, mimeType) => {
   if (isJSON(mimeType)) {
     return prettifyJSON(code);
@@ -67,6 +79,8 @@ export const prettifyCode = (code, mimeType) => {
     return prettifyXML(code);
   } else if (isJavascript(mimeType)) {
     return prettifyJavascript(code);
+  } else if (isCSS(mimeType)) {
+    return prettifyCSS(code);
   }
 
   return code;
