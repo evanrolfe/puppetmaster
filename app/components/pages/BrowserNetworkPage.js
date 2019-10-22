@@ -97,7 +97,8 @@ export default class BrowserNetworkPage extends Component<Props> {
           statusCodes: Object.keys(STATUS_CODES),
           resourceTypes: RESOURCE_TYPES,
           extSetting: '', // ''|'include'|'exclude'
-          extList: []
+          extList: [],
+          search: ''
         },
         windowSize: remote.getCurrentWindow().getSize(),
         requestViewTabIndex: 0
@@ -116,6 +117,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setFilters = this.setFilters.bind(this);
     this.getCodeMirrorWidth = this.getCodeMirrorWidth.bind(this);
     this.setRequestViewTabIndex = this.setRequestViewTabIndex.bind(this);
+    this.setSearch = this.setSearch.bind(this);
 
     this.throttledHandleMouseMove = _.throttle(
       this.handleMouseMove.bind(this),
@@ -158,6 +160,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     if (
       this.state.order_by !== prevState.order_by ||
       this.state.dir !== prevState.dir ||
+      this.state.filters.search !== prevState.filters.search ||
       this.state.filters.hostSetting !== prevState.filters.hostSetting ||
       this.state.filters.pathSetting !== prevState.filters.pathSetting ||
       this.state.filters.extSetting !== prevState.filters.extSetting ||
@@ -195,7 +198,8 @@ export default class BrowserNetworkPage extends Component<Props> {
         extSetting: this.state.filters.extSetting,
         extList: this.state.filters.extList,
         resourceTypes: this.state.filters.resourceTypes,
-        statusCodes: this.state.filters.statusCodes
+        statusCodes: this.state.filters.statusCodes,
+        search: this.state.filters.search
       }
     );
 
@@ -281,8 +285,15 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   setFilters(filters) {
-    console.log(filters);
     this.setState({ filters: filters });
+  }
+
+  setSearch(searchTerm) {
+    this.setState(prevState => {
+      const newFilters = Object.assign({}, prevState.filters);
+      newFilters.search = searchTerm;
+      return { filters: newFilters };
+    });
   }
 
   getCodeMirrorWidth() {
@@ -334,6 +345,7 @@ export default class BrowserNetworkPage extends Component<Props> {
                 allResourceTypes={RESOURCE_TYPES}
                 filters={filters}
                 setFilters={this.setFilters}
+                setSearch={this.setSearch}
               />
             </div>
 

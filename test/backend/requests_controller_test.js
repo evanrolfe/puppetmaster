@@ -104,6 +104,16 @@ describe('Requests', () => {
       expect(result.result.status).to.eql('OK');
       expect(result.result.body.length).to.eql(1);
     });
+
+    it('returns the requests filtered by search term', async () => {
+      const result = await backendConn.send('RequestsController', 'index', {
+        search: 'secrets'
+      });
+
+      expect(result.result.status).to.eql('OK');
+      expect(result.result.body.length).to.eql(1);
+      expect(result.result.body[0].id).to.eql(1);
+    });
   });
 
   describe('show', () => {

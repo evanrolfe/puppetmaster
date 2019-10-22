@@ -9,10 +9,21 @@ type Props = {
   allStatusCodes: 'array',
   allResourceTypes: 'array',
   filters: 'object',
-  setFilters: 'function'
+  setFilters: 'function',
+  setSearch: 'function'
 };
 
 export default class RequestsFilterForm extends React.PureComponent<Props> {
+  constructor(props) {
+    super(props);
+
+    this.handleSearch = this.handleSearch.bind(this);
+  }
+
+  handleSearch(event) {
+    this.props.setSearch(event.target.value);
+  }
+
   render() {
     return (
       <>
@@ -37,6 +48,8 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
             type="text"
             style={{ width: '100%' }}
             placeholder="Enter search term"
+            value={this.props.filters.search}
+            onChange={this.handleSearch}
           />
         </div>
 

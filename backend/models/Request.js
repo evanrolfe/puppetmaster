@@ -18,6 +18,8 @@ const RESOURCE_TYPES = [
 
 const STATUS_CODES = ['2', '3', '4', '5'];
 
+const SEARCHABLE_COLUMNS = ['id', 'method', 'url'];
+
 class Request extends Store.BaseModel {
   static async createFromBrowserResponse(page, response) {
     const remoteAddress = `${response.remoteAddress().ip}:${
@@ -135,6 +137,17 @@ class Request extends Store.BaseModel {
         `SUBSTR(CAST(response_status AS text),0,2) IN (${questionMarks})`,
         params.statusCodes
       );
+    }
+
+    // Search filter:
+    if (params.search !== undefined) {
+      // query = query.where('path', 'like', `%${params.search}%`);
+      // eslint-disable-next-line func-names
+      query = query.where(function() {
+        SEARCHABLE_COLUMNS.forEach(column => {
+          this.orWhere(column, 'like', `%${params.search}%`);
+        });
+      });
     }
 
     // Order
