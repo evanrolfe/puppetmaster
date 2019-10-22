@@ -72,6 +72,13 @@ export default class CodeEditor extends Component<Props> {
     }
   }
 
+  componentWillUnmount() {
+    // Need to manually remove the codeMirror DOM element otherwise it will just stay there
+    const codeMirrorWrapper = this.codeMirror.getWrapperElement();
+
+    codeMirrorWrapper.parentNode.removeChild(codeMirrorWrapper);
+  }
+
   _codemirrorSetValue() {
     this.codeMirror.setValue(this.props.value);
     this.codeMirror.setOption('mode', this.props.mimeType);

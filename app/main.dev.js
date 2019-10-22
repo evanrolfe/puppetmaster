@@ -93,7 +93,8 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webviewTag: true
     }
   });
 

@@ -20,16 +20,31 @@ const ACCEPTED_MIME_TYPES = [
 
 const DEFAULT_MIME_TYPE = 'text/javascript';
 
-const isJSON = mimeType => mimeType.indexOf('json') !== -1;
-const isXML = mimeType => mimeType.indexOf('xml') !== -1;
-const isJavascript = mimeType => mimeType.indexOf('javascript') !== -1;
-const isCSS = mimeType => mimeType.indexOf('css') !== -1;
+export const isHTML = mimeType => mimeType.indexOf('html') !== -1;
+export const isJSON = mimeType => mimeType.indexOf('json') !== -1;
+export const isXML = mimeType => mimeType.indexOf('xml') !== -1;
+export const isJavascript = mimeType => mimeType.indexOf('javascript') !== -1;
+export const isCSS = mimeType => mimeType.indexOf('css') !== -1;
 
 export const canPrettify = mimeType =>
   isJSON(mimeType) ||
   isXML(mimeType) ||
   isJavascript(mimeType) ||
   isCSS(mimeType);
+
+export const prettifyCode = (code, mimeType) => {
+  if (isJSON(mimeType)) {
+    return prettifyJSON(code);
+  } else if (isXML(mimeType)) {
+    return prettifyXML(code);
+  } else if (isJavascript(mimeType)) {
+    return prettifyJavascript(code);
+  } else if (isCSS(mimeType)) {
+    return prettifyCSS(code);
+  }
+
+  return code;
+};
 
 const prettifyJavascript = code => {
   try {
@@ -70,20 +85,6 @@ const prettifyCSS = code => {
   } catch (e) {
     return code;
   }
-};
-
-export const prettifyCode = (code, mimeType) => {
-  if (isJSON(mimeType)) {
-    return prettifyJSON(code);
-  } else if (isXML(mimeType)) {
-    return prettifyXML(code);
-  } else if (isJavascript(mimeType)) {
-    return prettifyJavascript(code);
-  } else if (isCSS(mimeType)) {
-    return prettifyCSS(code);
-  }
-
-  return code;
 };
 
 export const getMimeTypeFromResponse = (body, headers) => {
