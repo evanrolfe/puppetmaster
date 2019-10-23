@@ -19,8 +19,21 @@ describe('CaptureFiltersController', () => {
       .insert({ id: 1, filters: JSON.stringify(DEFAULT_FILTERS) });
   });
 
+  describe('show', () => {
+    it('returns capture filters', async () => {
+      const result = await backendConn.send(
+        'CaptureFiltersController',
+        'show',
+        {}
+      );
+
+      expect(result.result.status).to.eql('OK');
+      expect(result.result.body).to.eql(DEFAULT_FILTERS);
+    });
+  });
+
   describe('update', () => {
-    it('returns the requests filtered by search term', async () => {
+    it('updates the capture filters', async () => {
       const result = await backendConn.send(
         'CaptureFiltersController',
         'update',
