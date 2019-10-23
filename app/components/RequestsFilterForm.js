@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { registerModal, showModal } from './modals/index';
 import DisplayFiltersModal from './modals/DisplayFiltersModal';
+import CaptureFiltersModal from './modals/CaptureFiltersModal';
 import SettingsModal from './modals/SettingsModal';
 
 type Props = {
@@ -34,6 +35,8 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
           origFilters={this.props.filters}
           setFilters={this.props.setFilters}
         />
+
+        <CaptureFiltersModal ref={registerModal} />
 
         <div
           className="form-control form-control--outlined"
@@ -69,6 +72,7 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ marginLeft: '10px', display: 'inline-block' }}
+            onClick={() => showModal(CaptureFiltersModal)}
           >
             Capture
           </button>
