@@ -1,4 +1,5 @@
 const Store = require('openrecord/store/sqlite3');
+const CaptureFilters = require('../models/CaptureFilters');
 
 const RESOURCE_TYPES = [
   'document',
@@ -58,7 +59,7 @@ class Request extends Store.BaseModel {
       ext = splitPath[splitPath.length - 1];
     }
 
-    return Request.create({
+    const request = Request.new({
       method: response.request().method(),
       url: response.url(),
       host: parsedUrl.hostname,
@@ -75,6 +76,14 @@ class Request extends Store.BaseModel {
       response_body: responseBody,
       response_body_length: responseBody.length
     });
+
+    const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
+      request
+    );
+
+    if (shouldRequestBeCaptured === true) {
+      await request.save();
+    }
   }
 
   static findByParams(columns, params) {
