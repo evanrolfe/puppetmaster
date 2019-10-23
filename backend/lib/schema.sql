@@ -16,3 +16,8 @@ CREATE TABLE IF NOT EXISTS requests(
   response_body TEXT,
   response_body_length INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS capture_filters(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  filters TEXT NOT NULL
+);
