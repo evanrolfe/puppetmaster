@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS requests(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  method TEXT NOT NULL,
+  method TEXT,
   url TEXT NOT NULL,
   host TEXT,
   path TEXT,
@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS requests(
   response_headers TEXT,
   response_remote_address TEXT,
   response_body TEXT,
-  response_body_length INTEGER
+  response_body_length INTEGER,
+  response_body_rendered TEXT
 );
 
 CREATE TABLE IF NOT EXISTS capture_filters(

@@ -10,7 +10,12 @@ export default class RequestsTab extends Component<Props> {
   render() {
     const request = this.props.request;
 
-    if (request === undefined || Object.keys(request).length === 0) return null;
+    if (
+      request.method === null ||
+      request === undefined ||
+      Object.keys(request).length === 0
+    )
+      return null;
     const headers = JSON.parse(request.request_headers);
 
     return (

@@ -119,11 +119,15 @@ export default class RequestsTable extends Component<Props> {
         return <td>{request.host}</td>;
 
       case 'response_status':
-        return (
-          <td>
-            <StatusTag statusCode={request.response_status} small />
-          </td>
-        );
+        if (request.response_status === null) {
+          return <td>&nbsp;</td>;
+        } else {
+          return (
+            <td>
+              <StatusTag statusCode={request.response_status} small />
+            </td>
+          );
+        }
 
       case 'created_at': {
         const time = new Date(request.created_at);

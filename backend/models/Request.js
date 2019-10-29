@@ -38,6 +38,7 @@ class Request extends Store.BaseModel {
           .request()
           .method()} ${response.url()}`
       );
+      responseBody = '';
     }
 
     const cookies = await page.cookies();
@@ -84,6 +85,8 @@ class Request extends Store.BaseModel {
     if (shouldRequestBeCaptured === true) {
       await request.save();
     }
+
+    return request;
   }
 
   static findByParams(columns, params) {

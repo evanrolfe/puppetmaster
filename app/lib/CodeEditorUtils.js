@@ -91,6 +91,8 @@ export const getMimeTypeFromResponse = (body, headers) => {
   // Convert all header keys to lower case
   const lowcaseHeaders = {};
 
+  if (headers === undefined || headers === null) return DEFAULT_MIME_TYPE;
+
   try {
     headers = JSON.parse(headers);
   } catch (e) {

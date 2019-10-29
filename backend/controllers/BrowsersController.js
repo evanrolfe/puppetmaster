@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer');
-const Request = require('../models/Request');
-const ipc = require('../server-ipc');
+const { handleNewPage } = require('../lib/BrowserUtils');
 
 class BrowsersController {
   // POST /browsers
@@ -9,7 +8,6 @@ class BrowsersController {
     const puppeteerExec = puppeteer
       .executablePath()
       .replace('app.asar', 'app.asar.unpacked');
-    console.log(puppeteerExec);
 
     const puppeteerBrowser = await puppeteer.launch({
       headless: false,
@@ -23,20 +21,12 @@ class BrowsersController {
     const pages = await puppeteerBrowser.pages();
     const page = pages[0];
 
-    page.on('response', async response => {
-      Request.createFromBrowserResponse(page, response);
-      ipc.send('requestCreated', {});
-    });
+    handleNewPage(page);
 
     // Intercept any new tabs created in the browser:
     puppeteerBrowser.on('targetcreated', async target => {
-      console.log('New target created');
       const newPage = await target.page();
-
-      newPage.on('response', async response => {
-        Request.createFromBrowserResponse(newPage, response);
-        ipc.send('requestCreated', {});
-      });
+      handleNewPage(newPage);
     });
 
     return { status: 'OK' };
