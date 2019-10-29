@@ -324,7 +324,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     } else if (this.state.orientation === 'vertical') {
       paneStyle.height = this.state.paneLength;
     }
-    console.log(`Rendering BrowserNetworkPage`);
+
     return (
       <>
         <div className={`pane-container-${this.state.orientation}`}>

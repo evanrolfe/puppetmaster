@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 
 type Props = {
-  value: 'string'
+  value: 'string',
+  // eslint-disable-next-line react/no-unused-prop-types
+  request: 'object'
 };
 
 export default class Preview extends Component<Props> {
@@ -10,20 +11,36 @@ export default class Preview extends Component<Props> {
 
   constructor(props) {
     super(props);
+
     this.setWebViewRef = this.setWebViewRef.bind(this);
+    this._handleDOMReady = this._handleDOMReady.bind(this);
+    this._setBody = this._setBody.bind(this);
   }
 
   componentDidMount() {
-    const contentEncoded = Buffer.from(this.props.value).toString('base64');
-    const src = `data:text/html;base64,${contentEncoded}`;
+    this.webViewRef.addEventListener('dom-ready', this._handleDOMReady);
+  }
 
-    const webView = ReactDOM.findDOMNode(this.webViewRef);
-    console.log('componentDidMount');
+  componentDidUpdate() {
+    this._setBody();
+  }
 
-    webView.addEventListener('did-start-loading', () => {
-      console.log('WebView Ready!!!');
-      webView.loadURL(src, {});
-    });
+  _handleDOMReady() {
+    this.webViewRef.removeEventListener('dom-ready', this._handleDOMReady);
+    this._setBody();
+  }
+
+  _setBody() {
+    const content = this.props.value;
+    // const contentEncoded = Buffer.from(content).toString('base64');
+    const src = `data:text/plain,${encodeURIComponent(content)}`;
+
+    this.webViewRef.loadURL(
+      src
+      // {baseURL: this.props.request.url}
+    );
+
+    // this.webViewRef.webContents = this.webViewRef;
   }
 
   setWebViewRef(ref) {
@@ -34,7 +51,7 @@ export default class Preview extends Component<Props> {
     return (
       <webview
         ref={this.setWebViewRef}
-        src="data:text/html;hello world"
+        src="about:blank"
         style={{ display: 'inline-flex', width: '100%', height: '100%' }}
       />
     );

@@ -103,8 +103,10 @@ export const getMimeTypeFromResponse = (body, headers) => {
   });
 
   const contentType = lowcaseHeaders['content-type'];
-  const mimeType = contentType.split(';')[0];
 
+  if (contentType === undefined) return DEFAULT_MIME_TYPE;
+
+  const mimeType = contentType.split(';')[0];
   if (ACCEPTED_MIME_TYPES.includes(mimeType)) {
     return mimeType;
   }

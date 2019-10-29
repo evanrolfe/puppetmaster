@@ -92,7 +92,9 @@ export default class BodyTab extends Component<Props> {
           className="pane-remaining"
           style={{ width: `${this.props.codeMirrorWidth}px` }}
         >
-          {this.showPreview() && <Preview value={code} />}
+          {this.showPreview() && (
+            <Preview value={code} request={this.props.request} />
+          )}
           {this.showEditor() && <CodeEditor value={code} mimeType={mimeType} />}
         </div>
       </>
