@@ -24,8 +24,19 @@ class BrowsersController {
     const page = pages[0];
 
     page.on('response', async response => {
-      ipc.send('requestCreated', {});
       Request.createFromBrowserResponse(page, response);
+      ipc.send('requestCreated', {});
+    });
+
+    // Intercept any new tabs created in the browser:
+    puppeteerBrowser.on('targetcreated', async target => {
+      console.log('New target created');
+      const newPage = await target.page();
+
+      newPage.on('response', async response => {
+        Request.createFromBrowserResponse(newPage, response);
+        ipc.send('requestCreated', {});
+      });
     });
 
     return { status: 'OK' };
