@@ -87,7 +87,7 @@ const prettifyCSS = code => {
   }
 };
 
-export const getMimeTypeFromResponse = (body, headers) => {
+export const getMimeTypeFromResponse = headers => {
   // Convert all header keys to lower case
   const lowcaseHeaders = {};
 
@@ -112,13 +112,13 @@ export const getMimeTypeFromResponse = (body, headers) => {
   if (ACCEPTED_MIME_TYPES.includes(mimeType)) {
     return mimeType;
   }
-
+  /*
   const isProbablyHTML = body
     .slice(0, 100)
     .trim()
     .match(/^<!doctype html.*>/i);
 
   if (isProbablyHTML === true) return 'text/html';
-
+*/
   return DEFAULT_MIME_TYPE;
 };

@@ -30,15 +30,17 @@ export default class Preview extends Component<Props> {
     this._setBody();
   }
 
-  _setBody() {
+  async _setBody() {
     const content = this.props.value;
     // const contentEncoded = Buffer.from(content).toString('base64');
-    const src = `data:text/plain,${encodeURIComponent(content)}`;
-
-    this.webViewRef.loadURL(
-      src
-      // {baseURL: this.props.request.url}
-    );
+    const src = `data:text/html;charset=utf-8,${encodeURIComponent(content)}`;
+    console.log(this.props.request.url);
+    try {
+      // See: https://github.com/electron/electron/issues/17526
+      await this.webViewRef.loadURL(src, { baseURL: this.props.request.url });
+    } catch (err) {
+      console.log(err);
+    }
 
     // this.webViewRef.webContents = this.webViewRef;
   }

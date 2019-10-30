@@ -45,20 +45,12 @@ export default class BodyTab extends Component<Props> {
   render() {
     if (Object.entries(this.props.request).length === 0) return <></>;
 
-    let code = this.props.request.response_body || '';
     let mimeType;
     if (this.props.request.request_type === 'navigation') {
       // Navigation requests are always HTML:
       mimeType = 'text/html';
     } else {
-      mimeType = getMimeTypeFromResponse(
-        code,
-        this.props.request.response_headers
-      );
-    }
-
-    if (this.state.viewMode === 'pretty' && canPrettify(mimeType)) {
-      code = prettifyCode(code, mimeType);
+      mimeType = getMimeTypeFromResponse(this.props.request.response_headers);
     }
 
     /*
@@ -111,6 +103,21 @@ export default class BodyTab extends Component<Props> {
 
     const showEditor = normalisedViewMode !== 'preview';
     const showPreview = !showEditor;
+
+    /*
+     *  Code Behaviour:
+     *    Use ...
+     */
+    let code;
+    if (normalisedViewContent === 'render') {
+      code = this.props.request.response_body_rendered || '';
+    } else {
+      code = this.props.request.response_body || '';
+    }
+
+    if (this.state.viewMode === 'pretty' && canPrettify(mimeType)) {
+      code = prettifyCode(code, mimeType);
+    }
 
     return (
       <>
