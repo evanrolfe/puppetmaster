@@ -23,7 +23,6 @@ export default class BodyTab extends Component<Props> {
       viewContent: 'render' // source | render
     };
 
-    this.showEditor = this.showEditor.bind(this);
     this.openInBrowser = this.openInBrowser.bind(this);
     this.selectDropdownItem = this.selectDropdownItem.bind(this);
   }
@@ -33,14 +32,6 @@ export default class BodyTab extends Component<Props> {
     const viewContent = args[1];
 
     this.setState({ viewMode: viewMode, viewContent: viewContent });
-  }
-
-  showEditor() {
-    return this.state.viewMode !== 'preview';
-  }
-
-  showPreview() {
-    return !this.showEditor();
   }
 
   openInBrowser() {
@@ -104,6 +95,23 @@ export default class BodyTab extends Component<Props> {
       normalisedViewContent = 'source';
     }
 
+    /*
+     *  Normalised viewMode behaviour:
+     *    request-html can display raw,pretty,preview
+     *    navigation-html can display raw,pretty,preview
+     *    request-other can display raw,pretty
+     */
+    let normalisedViewMode = this.state.viewMode;
+    if (normalisedViewMode === 'preview' && bodyType === 'request-other') {
+      normalisedViewMode = 'pretty';
+    }
+
+    let canPreview = true;
+    if (bodyType === 'request-other') canPreview = false;
+
+    const showEditor = normalisedViewMode !== 'preview';
+    const showPreview = !showEditor;
+
     return (
       <>
         <div
@@ -117,9 +125,10 @@ export default class BodyTab extends Component<Props> {
             <label style={{ marginLeft: '10px' }}>View as:</label>
 
             <ViewModeDropdown
-              viewMode={this.state.viewMode}
+              viewMode={normalisedViewMode}
               viewContent={normalisedViewContent}
               bodyType={bodyType}
+              canPreview={canPreview}
               selectDropdownItem={this.selectDropdownItem}
             />
 
@@ -139,10 +148,8 @@ export default class BodyTab extends Component<Props> {
           className="pane-remaining"
           style={{ width: `${this.props.codeMirrorWidth}px` }}
         >
-          {this.showPreview() && (
-            <Preview value={code} request={this.props.request} />
-          )}
-          {this.showEditor() && <CodeEditor value={code} mimeType={mimeType} />}
+          {showPreview && <Preview value={code} request={this.props.request} />}
+          {showEditor && <CodeEditor value={code} mimeType={mimeType} />}
         </div>
       </>
     );

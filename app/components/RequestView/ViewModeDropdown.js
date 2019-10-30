@@ -10,6 +10,7 @@ type Props = {
   viewMode: 'string',
   viewContent: 'string',
   bodyType: 'string',
+  canPreview: 'boolean',
   selectDropdownItem: 'function'
 };
 
@@ -44,9 +45,15 @@ export default class ViewModeDropdown extends Component<Props> {
   }
 
   renderDropdownItems(viewContent) {
+    let viewModes = ALL_VIEW_MODES;
+
+    if (this.props.canPreview === false) {
+      viewModes = viewModes.filter(viewMode => viewMode.key !== 'preview');
+    }
+
     return [
       <DropdownDivider>{viewContent.title}</DropdownDivider>,
-      ALL_VIEW_MODES.map(viewMode => (
+      viewModes.map(viewMode => (
         <DropdownItem
           onClick={this.props.selectDropdownItem}
           value={[viewMode.key, viewContent.key]}
