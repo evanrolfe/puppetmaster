@@ -2,10 +2,14 @@ const Request = require('../models/Request');
 const ipc = require('../server-ipc');
 
 /*
- * NOTE: For each page created,
+ * NOTE: For each response intercepted, we save the response and its body to requests table.
+ * If that request is a navigation request (i.e. a page displayed in the browser), then we start
+ * the DOMListener, which saves the page's rendered DOM to request.response_body_rendered every
+ * 100ms.
  *
+ * For every page, we also listen for the framenavigated event, which creates a navigation request
+ * and saves the rendered DOM to that request in the database.
  */
-
 const handleFramenavigated = async (page, frame) => {
   console.log(`BrowserUtils: frameNavigated: ${frame.url()}`);
 
@@ -24,8 +28,7 @@ const handleFramenavigated = async (page, frame) => {
     url: page.url(),
     host: parsedUrl.hostname,
     path: parsedUrl.pathname,
-    response_body: body,
-    response_body_length: body.length,
+    response_body_rendered: body,
     request_type: 'navigation'
   });
 
@@ -60,7 +63,7 @@ const startDOMListener = async page => {
         page.request.id
       }`
     );
-  }, 1000);
+  }, 100);
 };
 
 module.exports = { handleNewPage, handleResponse };
