@@ -26,6 +26,7 @@ export const RESOURCE_TYPES = [
   'image',
   'manifest',
   'media',
+  'navigation',
   'other',
   'stylesheet',
   'script',
@@ -78,9 +79,10 @@ export default class BrowserNetworkPage extends Component<Props> {
         tableColumns: [
           { key: 'id', title: '#', width: 40 },
           { key: 'method', title: 'Method', width: 70 },
-          { key: 'host', title: 'Host', width: 200 },
-          { key: 'path', title: 'Path', width: 250 },
-          { key: 'response_status', title: 'Status', width: 70 }
+          { key: 'host', title: 'Host', width: 150 },
+          { key: 'path', title: 'Path', width: 200 },
+          { key: 'response_status', title: 'Status', width: 70 },
+          { key: 'request_type', title: 'Type', width: 75 }
         ],
 
         // Volatile state(?):

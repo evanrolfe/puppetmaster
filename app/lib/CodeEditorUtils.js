@@ -113,5 +113,12 @@ export const getMimeTypeFromResponse = (body, headers) => {
     return mimeType;
   }
 
+  const isProbablyHTML = body
+    .slice(0, 100)
+    .trim()
+    .match(/^<!doctype html.*>/i);
+
+  if (isProbablyHTML === true) return 'text/html';
+
   return DEFAULT_MIME_TYPE;
 };

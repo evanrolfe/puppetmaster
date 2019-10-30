@@ -25,7 +25,8 @@ const handleFramenavigated = async (page, frame) => {
     host: parsedUrl.hostname,
     path: parsedUrl.pathname,
     response_body: body,
-    response_body_length: body.length
+    response_body_length: body.length,
+    request_type: 'navigation'
   });
 
   request.save();
