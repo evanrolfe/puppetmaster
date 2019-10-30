@@ -54,8 +54,15 @@ const handleResponse = async (page, response) => {
 
 // eslint-disable-next-line arrow-body-style
 const startDOMListener = async page => {
-  return setInterval(async () => {
-    const body = await page.content();
+  const domListenerId = setInterval(async () => {
+    let body;
+    try {
+      body = await page.content();
+    } catch (e) {
+      clearInterval(domListenerId); // This will run if you close the browser.
+      return;
+    }
+
     page.request.response_body_rendered = body;
     page.request.save();
     console.log(
@@ -64,6 +71,8 @@ const startDOMListener = async page => {
       }`
     );
   }, 100);
+
+  return domListenerId;
 };
 
 module.exports = { handleNewPage, handleResponse };
