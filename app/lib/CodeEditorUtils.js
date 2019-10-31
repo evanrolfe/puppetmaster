@@ -1,5 +1,6 @@
 import vkBeautify from 'vkbeautify';
-import jsBeautify from 'js-beautify';
+// eslint-disable-next-line camelcase
+import { js_beautify, html_beautify } from 'js-beautify';
 import formatJson from './JsonLint';
 
 const INDENT_CHARS = '  ';
@@ -30,6 +31,7 @@ export const canPrettify = mimeType =>
   isJSON(mimeType) ||
   isXML(mimeType) ||
   isJavascript(mimeType) ||
+  isHTML(mimeType) ||
   isCSS(mimeType);
 
 export const prettifyCode = (code, mimeType) => {
@@ -41,6 +43,8 @@ export const prettifyCode = (code, mimeType) => {
     return prettifyJavascript(code);
   } else if (isCSS(mimeType)) {
     return prettifyCSS(code);
+  } else if (isHTML(mimeType)) {
+    return prettifyHTML(code);
   }
 
   return code;
@@ -49,13 +53,30 @@ export const prettifyCode = (code, mimeType) => {
 const prettifyJavascript = code => {
   try {
     const start = Date.now();
-    const prettyCode = jsBeautify(code, {
+    const prettyCode = js_beautify(code, {
       indent_size: 2,
       space_in_empty_paren: true
     });
     const end = Date.now();
 
-    console.log(`Beautified the code in ${end - start}ms`);
+    console.log(`Beautified the JS code in ${end - start}ms`);
+
+    return prettyCode;
+  } catch (e) {
+    return code;
+  }
+};
+
+const prettifyHTML = code => {
+  try {
+    const start = Date.now();
+    const prettyCode = html_beautify(code, {
+      indent_size: 2,
+      space_in_empty_paren: true
+    });
+    const end = Date.now();
+
+    console.log(`Beautified the HTML code in ${end - start}ms`);
 
     return prettyCode;
   } catch (e) {
