@@ -8,53 +8,83 @@ const ipc = require('../server-ipc');
  * 100ms.
  *
  * For every page, we also listen for the framenavigated event, which creates a navigation request
- * and saves the rendered DOM to that request in the database.
+ * and saves the rendered DOM to that request in the database, cancels the DOMListener and starts
+ * a new one.
+ *
+ * Race Condition - this happens if you don't check the database inside the DOMListener callback:
+ *
+ * BrowserUtils: DOMListener 16 running...
+ * BrowserUtils: saved content for page: http://localhost/ to request 1, (DOMListener 16)
+ * BrowserUtils: DOMListener 16 running...
+ * BrowserUtils: frameNavigated to http://localhost/posts
+ * BrowserUtils: killed DomListener #16
+ * BrowserUtils: saved content for page: http://localhost/posts to request 1, (DOMListener 16)
+ * BrowserUtils: create new request 9 and starting DOMListener...
+ * BrowserUtils: started domListener id 64
+ * BrowserUtils: DOMListener 64 running...
+ * BrowserUtils: saved content for page: http://localhost/posts to request 9, (DOMListener 64)
  */
 const handleFramenavigated = async (page, frame) => {
-  console.log(`BrowserUtils: frameNavigated: ${frame.url()}`);
+  console.log(`BrowserUtils: frameNavigated to ${frame.url()}`);
+  await clearInterval(page.domListenerId);
+  console.log(`BrowserUtils: killed DomListener #${page.domListenerId}`);
 
-  let body;
+  let pageBody;
   try {
-    body = await page.content();
+    pageBody = await page.content();
   } catch (error) {
     // This happens as the result of "navigation request" i.e. typing a url in browser
     // See: https://github.com/GoogleChrome/puppeteer/issues/2258
-    console.log(`ERRROR Saving the body for frame ${page.url()}`);
+    console.log(`BrowserUtils: ERRROR Saving the body for frame ${page.url()}`);
   }
 
   const parsedUrl = new URL(page.url());
 
-  const request = Request.new({
+  const requestParams = {
     url: page.url(),
     host: parsedUrl.hostname,
     path: parsedUrl.pathname,
-    response_body_rendered: body,
+    response_body_rendered: pageBody,
     request_type: 'navigation'
-  });
+  };
 
-  request.save();
-
-  page.request = request;
-  // clearInterval(page.domListenerId);
+  const result = await global.dbStore
+    .connection('requests')
+    .insert(requestParams);
+  console.log(
+    `BrowserUtils: create new request ${result[0]} and starting DOMListener...`
+  );
+  page.requestId = result[0];
+  page.domListenerId = await startDOMListener(page);
 };
 
 const handleNewPage = async page => {
   page.on('response', async response => handleResponse(page, response));
-  page.on('framenavigated', async frame => handleFramenavigated(page, frame));
 };
 
 const handleResponse = async (page, response) => {
-  const request = await Request.createFromBrowserResponse(page, response);
+  const requestId = await Request.createFromBrowserResponse(page, response);
+
   if (response.request().isNavigationRequest()) {
-    page.request = request;
-    page.domListenerId = startDOMListener(page);
+    console.log(`BrowserUtils: Navigation request for ${page.url()}`);
+    page.requestId = requestId;
+    const domListenerId = await startDOMListener(page);
+    page.domListenerId = domListenerId;
+    console.log(
+      `BrowserUtils: handleResponse() domListenerId = ${domListenerId}`
+    );
+    page.on('framenavigated', frame => handleFramenavigated(page, frame));
   }
+
   ipc.send('requestCreated', {});
 };
 
 // eslint-disable-next-line arrow-body-style
 const startDOMListener = async page => {
-  const domListenerId = setInterval(async () => {
+  const domListenerId = await setInterval(async () => {
+    console.log(`BrowserUtils: DOMListener ${domListenerId} running...`);
+
+    // Fetch the page's current content
     let body;
     try {
       body = await page.content();
@@ -63,15 +93,42 @@ const startDOMListener = async page => {
       return;
     }
 
-    page.request.response_body_rendered = body;
-    page.request.save();
+    // UGLY WORKAROUND: Prevent the race condition described at the top of page:
+    // Check that the page url has not changed while this callback has been running
+    const result = await global.dbStore
+      .connection('requests')
+      .select('url')
+      .where({ id: page.requestId });
+    const request = result[0];
+    if (request.url !== page.url()) {
+      console.log(
+        `BrowserUtils: DOMListener ${domListenerId}: ${
+          request.url
+        } !== ${page.url()}`
+      );
+      clearInterval(domListenerId); // This will run if you close the browser.
+      return;
+    } else {
+      console.log(
+        `BrowserUtils: DOMListener ${domListenerId}: ${
+          request.url
+        } === ${page.url()}`
+      );
+    }
+
+    // Update the request in the database
+    await global.dbStore
+      .connection('requests')
+      .where({ id: page.requestId })
+      .update({ response_body_rendered: body });
+
     console.log(
       `BrowserUtils: saved content for page: ${page.url()} to request ${
-        page.request.id
-      }`
+        page.requestId
+      }, (DOMListener ${domListenerId})`
     );
   }, 100);
-
+  console.log(`BrowserUtils: started domListener id ${domListenerId}`);
   return domListenerId;
 };
 

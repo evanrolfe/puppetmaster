@@ -83,12 +83,10 @@ class Request extends Store.BaseModel {
     );
 
     if (shouldRequestBeCaptured === true) {
-      const request = await global.dbStore
+      const result = await global.dbStore
         .connection('requests')
         .insert(requestParams);
-      return request;
-    } else {
-      return requestParams;
+      return result[0]; // The request ID
     }
   }
 

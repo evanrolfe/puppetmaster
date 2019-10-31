@@ -28,9 +28,11 @@ class RequestsController {
 
   // GET /requests/123
   async show(args) {
-    const request = await Request.find(args.id);
+    const result = await global.dbStore
+      .connection('requests')
+      .where({ id: args.id });
 
-    return { status: 'OK', body: request };
+    return { status: 'OK', body: result[0] };
   }
 }
 
