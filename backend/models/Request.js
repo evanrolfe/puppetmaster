@@ -60,7 +60,7 @@ class Request extends Store.BaseModel {
       ext = splitPath[splitPath.length - 1];
     }
 
-    const request = Request.new({
+    const requestParams = {
       method: response.request().method(),
       url: response.url(),
       host: parsedUrl.hostname,
@@ -76,17 +76,20 @@ class Request extends Store.BaseModel {
       response_remote_address: remoteAddress,
       response_body: responseBody,
       response_body_length: responseBody.length
-    });
+    };
 
     const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
-      request
+      requestParams
     );
 
     if (shouldRequestBeCaptured === true) {
-      await request.save();
+      const request = await global.dbStore
+        .connection('requests')
+        .insert(requestParams);
+      return request;
+    } else {
+      return requestParams;
     }
-
-    return request;
   }
 
   static findByParams(columns, params) {
