@@ -16,6 +16,18 @@ describe('BrowsersUtils', () => {
       'DELETE FROM SQLITE_SEQUENCE WHERE name="requests";'
     );
 
+    const filters = {
+      hostList: [],
+      hostSetting: 'include',
+      pathList: ['/sockjs-node'],
+      pathSetting: 'exclude',
+      extList: ['js', 'css', 'ico'],
+      extSetting: 'exclude'
+    };
+    await global.dbStore
+      .connection('capture_filters')
+      .insert({ id: 1, filters: JSON.stringify(filters) });
+
     browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
@@ -39,7 +51,7 @@ describe('BrowsersUtils', () => {
       // Creates 8 requests
       let result = await global.dbStore.connection('requests').count('*');
       const requestsCount = result[0]['count(*)'];
-      expect(requestsCount).to.eql(8);
+      expect(requestsCount).to.eql(2);
 
       // The first request is GET http://localhost/
       result = await global.dbStore
@@ -67,7 +79,7 @@ describe('BrowsersUtils', () => {
       // Creates 18 requests
       let result = await global.dbStore.connection('requests').count('*');
       const requestsCount = result[0]['count(*)'];
-      expect(requestsCount).to.eql(18);
+      expect(requestsCount).to.eql(2);
 
       // The first request is GET http://localhost/
       result = await global.dbStore
