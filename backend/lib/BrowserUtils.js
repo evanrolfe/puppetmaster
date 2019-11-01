@@ -140,7 +140,7 @@ const startDOMListener = async page => {
         page.requestId
       }, (DOMListener ${domListenerId})`
     );
-  }, 100);
+  }, 200);
   console.log(`BrowserUtils: started domListener id ${domListenerId}`);
   return domListenerId;
 };
