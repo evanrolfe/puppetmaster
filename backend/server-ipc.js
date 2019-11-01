@@ -53,7 +53,13 @@ async function init(socketName, databaseFile) {
 }
 
 function send(name, args) {
-  ipc.server.broadcast('message', JSON.stringify({ type: 'push', name, args }));
+  // HACK: Broadcast is not available in test mode
+  if (typeof ipc.server.broadcast === 'function') {
+    ipc.server.broadcast(
+      'message',
+      JSON.stringify({ type: 'push', name, args })
+    );
+  }
 }
 
 module.exports = { init, send };
