@@ -24,6 +24,19 @@ const ipc = require('../server-ipc');
  * BrowserUtils: DOMListener 64 running...
  * BrowserUtils: saved content for page: http://localhost/posts to request 9, (DOMListener 64)
  */
+const instrumentBrowser = async browser => {
+  const pages = await browser.pages();
+  const page = pages[0];
+
+  handleNewPage(page);
+
+  // Intercept any new tabs created in the browser:
+  browser.on('targetcreated', async target => {
+    const newPage = await target.page();
+    handleNewPage(newPage);
+  });
+};
+
 const handleFramenavigated = async (page, frame) => {
   console.log(`BrowserUtils: frameNavigated to ${frame.url()}`);
   await clearInterval(page.domListenerId);
@@ -106,7 +119,7 @@ const startDOMListener = async page => {
           request.url
         } !== ${page.url()}`
       );
-      clearInterval(domListenerId); // This will run if you close the browser.
+      clearInterval(domListenerId); // Stop this listener because it is out of date
       return;
     } else {
       console.log(
@@ -132,4 +145,4 @@ const startDOMListener = async page => {
   return domListenerId;
 };
 
-module.exports = { handleNewPage, handleResponse };
+module.exports = instrumentBrowser;
