@@ -115,7 +115,7 @@ export default class BodyTab extends Component<Props> {
       code = this.props.request.response_body || '';
     }
 
-    if (this.state.viewMode === 'pretty' && canPrettify(mimeType)) {
+    if (normalisedViewMode === 'pretty' && canPrettify(mimeType)) {
       code = prettifyCode(code, mimeType);
     }
 
@@ -145,7 +145,7 @@ export default class BodyTab extends Component<Props> {
                 style={{ marginLeft: '10px', display: 'inline-block' }}
                 onClick={this.openInBrowser}
               >
-                Open in Browser
+                Show in Browser
               </button>
             )}
           </div>
