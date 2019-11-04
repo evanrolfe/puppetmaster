@@ -36,7 +36,10 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
           setFilters={this.props.setFilters}
         />
 
-        <CaptureFiltersModal ref={registerModal} />
+        <CaptureFiltersModal
+          ref={registerModal}
+          allResourceTypes={this.props.allResourceTypes}
+        />
 
         <div
           className="form-control form-control--outlined"

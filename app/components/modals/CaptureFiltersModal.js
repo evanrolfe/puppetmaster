@@ -10,7 +10,8 @@ const DEFAULT_FILTERS = {
   pathList: [],
   pathSetting: '',
   extList: [],
-  extSetting: ''
+  extSetting: '',
+  resourceTypes: []
 };
 
 export default class CaptureFiltersModal extends Component {
@@ -26,7 +27,9 @@ export default class CaptureFiltersModal extends Component {
     this._handleChangeListInput = this._handleChangeListInput.bind(this);
     this._handleChangeSetting = this._handleChangeSetting.bind(this);
     this._handleApply = this._handleApply.bind(this);
+    this._handleResourceTypeChange = this._handleResourceTypeChange.bind(this);
     this.onHide = this.onHide.bind(this);
+    this.toggleAllResourceTypes = this.toggleAllResourceTypes.bind(this);
   }
 
   componentDidMount() {
@@ -89,6 +92,27 @@ export default class CaptureFiltersModal extends Component {
     });
   }
 
+  _handleResourceTypeChange(event) {
+    const value = event.target.value;
+    const checked = event.target.checked;
+
+    this.setState(prevState => {
+      const newFilters = JSON.parse(JSON.stringify(prevState.filters));
+
+      if (checked) {
+        if (!newFilters.resourceTypes.includes(value)) {
+          newFilters.resourceTypes.push(value);
+        }
+      } else {
+        newFilters.resourceTypes = newFilters.resourceTypes.filter(
+          type => type !== value
+        );
+      }
+
+      return { filters: newFilters };
+    });
+  }
+
   onHide() {
     this.loadFilters(); // Reset to original filters from the database
   }
@@ -100,6 +124,25 @@ export default class CaptureFiltersModal extends Component {
       this.state.filters
     );
     this.modal.hide(true);
+  }
+
+  toggleAllResourceTypes() {
+    this.setState(prevState => {
+      const newFilters = JSON.parse(JSON.stringify(prevState.filters));
+
+      if (
+        prevState.filters.resourceTypes.length ===
+        this.props.allResourceTypes.length
+      ) {
+        // Uncheck all
+        newFilters.resourceTypes = [];
+      } else {
+        // Check all
+        newFilters.resourceTypes = this.props.allResourceTypes;
+      }
+
+      return { filters: newFilters };
+    });
   }
 
   render() {
@@ -205,6 +248,25 @@ export default class CaptureFiltersModal extends Component {
                     disabled={this.state.filters.extSetting === ''}
                   />
                 </label>
+              </div>
+            </div>
+
+            <div className="row-fill row-fill--top">
+              <div className="form-control form-control--thin">
+                <strong>Resource Type: </strong>
+                <span onClick={this.toggleAllResourceTypes}>(toggle all)</span>
+
+                {this.props.allResourceTypes.map(type => (
+                  <label>
+                    {type}
+                    <input
+                      type="checkbox"
+                      value={type}
+                      checked={this.state.filters.resourceTypes.includes(type)}
+                      onChange={this._handleResourceTypeChange}
+                    />
+                  </label>
+                ))}
               </div>
             </div>
           </div>
