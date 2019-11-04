@@ -9,6 +9,7 @@ const RESOURCE_TYPES = [
   'image',
   'manifest',
   'media',
+  'navigation',
   'other',
   'stylesheet',
   'script',
@@ -48,10 +49,6 @@ class Request extends Store.BaseModel {
     const responseHeaders = response.request().headers();
     responseHeaders.cookie = cookiesStr;
 
-    console.log(
-      `Saving request: ${response.request().method()} ${response.url()}`
-    );
-
     const parsedUrl = new URL(response.url());
     const splitPath = parsedUrl.pathname.split('.');
     let ext;
@@ -86,6 +83,10 @@ class Request extends Store.BaseModel {
       const result = await global.dbStore
         .connection('requests')
         .insert(requestParams);
+
+      console.log(
+        `Saved request: ${requestParams.method} ${requestParams.url}`
+      );
       return result[0]; // The request ID
     }
   }
@@ -129,6 +130,11 @@ class Request extends Store.BaseModel {
     }
 
     // ResourceType filter:
+    console.log(
+      `[Backend] resourceTypes length: ${params.resourceTypes.length} vs ${
+        RESOURCE_TYPES.length
+      }`
+    );
     if (
       params.resourceTypes !== undefined &&
       params.resourceTypes.length < RESOURCE_TYPES.length
