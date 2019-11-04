@@ -20,6 +20,8 @@ export default class DisplayFiltersModal extends Component {
     this._handleResourceTypeChange = this._handleResourceTypeChange.bind(this);
     this._handleApply = this._handleApply.bind(this);
     this.onHide = this.onHide.bind(this);
+    this.toggleAllResourceTypes = this.toggleAllResourceTypes.bind(this);
+    this.toggleAllStatusCodes = this.toggleAllStatusCodes.bind(this);
   }
 
   _setModalRef(n) {
@@ -119,6 +121,42 @@ export default class DisplayFiltersModal extends Component {
     this.modal.hide(true);
   }
 
+  toggleAllResourceTypes() {
+    this.setState(prevState => {
+      const newFilters = JSON.parse(JSON.stringify(prevState.filters));
+
+      if (
+        prevState.filters.resourceTypes.length ===
+        this.props.allResourceTypes.length
+      ) {
+        // Uncheck all
+        newFilters.resourceTypes = [];
+      } else {
+        // Check all
+        newFilters.resourceTypes = this.props.allResourceTypes;
+      }
+
+      return { filters: newFilters };
+    });
+  }
+
+  toggleAllStatusCodes() {
+    this.setState(prevState => {
+      const newFilters = JSON.parse(JSON.stringify(prevState.filters));
+      const allStatusCodeKeys = Object.keys(this.props.allStatusCodes);
+
+      if (prevState.filters.statusCodes.length === allStatusCodeKeys.length) {
+        // Uncheck all
+        newFilters.statusCodes = [];
+      } else {
+        // Check all
+        newFilters.statusCodes = allStatusCodeKeys;
+      }
+
+      return { filters: newFilters };
+    });
+  }
+
   render() {
     return (
       <Modal
@@ -197,6 +235,7 @@ export default class DisplayFiltersModal extends Component {
             <div className="row-fill row-fill--top">
               <div className="form-control form-control--thin">
                 <strong>Status Code</strong>
+                <span onClick={this.toggleAllStatusCodes}>(toggle all)</span>
 
                 {Object.keys(this.props.allStatusCodes).map(statusKey => (
                   <label>
@@ -214,7 +253,8 @@ export default class DisplayFiltersModal extends Component {
               </div>
 
               <div className="form-control form-control--thin">
-                <strong>Resource Type</strong>
+                <strong>Resource Type: </strong>
+                <span onClick={this.toggleAllResourceTypes}>(toggle all)</span>
 
                 {this.props.allResourceTypes.map(type => (
                   <label>
