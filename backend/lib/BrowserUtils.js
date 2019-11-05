@@ -29,6 +29,12 @@ const instrumentBrowser = async browser => {
   const page = pages[0];
 
   handleNewPage(page);
+
+  // Intercept any new tabs created in the browser:
+  browser.on('targetcreated', async target => {
+    const newPage = await target.page();
+    handleNewPage(newPage);
+  });
 };
 
 const handleNewPage = async page => {
