@@ -30,7 +30,7 @@ describe('Requests', () => {
   describe('index', () => {
     it('returns the requests', async () => {
       const result = await backendConn.send('RequestsController', 'index', {});
-
+      console.log(result);
       expect(result.result.status).to.eql('OK');
       expect(result.result.body[0].id).to.eql(2);
       expect(result.result.body[1].id).to.eql(1);

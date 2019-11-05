@@ -29,16 +29,74 @@ const instrumentBrowser = async browser => {
   const page = pages[0];
 
   handleNewPage(page);
-
-  // Intercept any new tabs created in the browser:
-  browser.on('targetcreated', async target => {
-    const newPage = await target.page();
-    handleNewPage(newPage);
-  });
 };
 
-const handleFramenavigated = async (page, frame) => {
-  console.log(`BrowserUtils: frameNavigated to ${frame.url()}`);
+const handleNewPage = async page => {
+  page.on('response', async response => handleResponse(page, response));
+};
+
+const handleResponse = async (page, response) => {
+  const requestId = await Request.createFromBrowserResponse(page, response);
+
+  if (
+    response.request().isNavigationRequest() &&
+    page.url() !== 'about:blank'
+  ) {
+    // Prevent navigation requests from iframes
+    // if(response.request().frame() !== null && response.request().frame().url() !== page.url()) return;
+
+    console.log(
+      `BrowserUtils: Navigation request for ${page.url()}, requestID: ${requestId}`
+    );
+
+    if (response.request().frame() !== null) {
+      console.log(
+        `BrowserUtils: request frame: ${response
+          .request()
+          .frame()
+          .url()}`
+      );
+    } else {
+      console.log(`BrowserUtils: request frame: null`);
+    }
+
+    page.requestId = requestId;
+
+    const domListenerId = await startDOMListener(page);
+    page.domListenerId = domListenerId;
+    console.log(
+      `BrowserUtils: handleResponse() domListenerId = ${domListenerId}`
+    );
+
+    const origURL = ` ${page.url()}`.slice(1); // Clone the url string
+    if (page.listenerCount('framenavigated') === 0) {
+      page.on('framenavigated', frame =>
+        handleFramenavigated(page, frame, origURL)
+      );
+    }
+  }
+
+  ipc.send('requestCreated', {});
+};
+
+const handleFramenavigated = async (page, frame, origURL) => {
+  // See: https://stackoverflow.com/questions/49237774/using-devtools-protocol-event-page-framenavigated-to-get-client-side-navigation
+  // See: https://github.com/GoogleChrome/puppeteer/issues/1489
+  if (frame !== page.mainFrame()) return;
+
+  // a framenavigated event gets triggered even if we have already intercepted the requests,
+  // so we don't want to create a new request for these ones
+  if (frame.url() === origURL) return;
+
+  console.log(
+    `BrowserUtils: frameNavigated to ${frame.url()}, origURL: ${origURL}`
+  );
+  if (frame.parentFrame() !== null) {
+    console.log(`BrowserUtils: parentFrame: ${frame.parentFrame().url()}`);
+  } else {
+    console.log(`BrowserUtils: parentFrame: null`);
+  }
+
   await clearInterval(page.domListenerId);
   console.log(`BrowserUtils: killed DomListener #${page.domListenerId}`);
 
@@ -71,27 +129,6 @@ const handleFramenavigated = async (page, frame) => {
   page.domListenerId = await startDOMListener(page);
 };
 
-const handleNewPage = async page => {
-  page.on('response', async response => handleResponse(page, response));
-};
-
-const handleResponse = async (page, response) => {
-  const requestId = await Request.createFromBrowserResponse(page, response);
-
-  if (response.request().isNavigationRequest()) {
-    console.log(`BrowserUtils: Navigation request for ${page.url()}`);
-    page.requestId = requestId;
-    const domListenerId = await startDOMListener(page);
-    page.domListenerId = domListenerId;
-    console.log(
-      `BrowserUtils: handleResponse() domListenerId = ${domListenerId}`
-    );
-    page.on('framenavigated', frame => handleFramenavigated(page, frame));
-  }
-
-  ipc.send('requestCreated', {});
-};
-
 // eslint-disable-next-line arrow-body-style
 const startDOMListener = async page => {
   const domListenerId = await setInterval(async () => {
@@ -121,12 +158,6 @@ const startDOMListener = async page => {
       );
       clearInterval(domListenerId); // Stop this listener because it is out of date
       return;
-    } else {
-      console.log(
-        `BrowserUtils: DOMListener ${domListenerId}: ${
-          request.url
-        } === ${page.url()}`
-      );
     }
 
     // Update the request in the database

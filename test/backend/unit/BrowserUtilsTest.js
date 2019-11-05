@@ -22,7 +22,23 @@ describe('BrowsersUtils', () => {
       pathList: ['/sockjs-node'],
       pathSetting: 'exclude',
       extList: ['js', 'css', 'ico'],
-      extSetting: 'exclude'
+      extSetting: 'exclude',
+      resourceTypes: [
+        'document',
+        'eventsource',
+        'fetch',
+        'font',
+        'image',
+        'manifest',
+        'media',
+        'navigation',
+        'other',
+        'stylesheet',
+        'script',
+        'texttrack',
+        'websocket',
+        'xhr'
+      ]
     };
     await global.dbStore
       .connection('capture_filters')
@@ -41,31 +57,39 @@ describe('BrowsersUtils', () => {
     browser.close();
   });
 
-  describe('navigating to http://localhost', () => {
+  describe('navigating to http://localhost and clicking a link', () => {
     it('works', async () => {
       const pages = await browser.pages();
       const page = pages[0];
       await page.goto('http://localhost');
       await sleep(500);
+      await page.click('#posts_link');
+      await sleep(500);
 
       // Creates 8 requests
       let result = await global.dbStore.connection('requests').count('*');
       const requestsCount = result[0]['count(*)'];
-      expect(requestsCount).to.eql(2);
+      expect(requestsCount).to.eql(4);
 
-      // The first request is GET http://localhost/
+      // The GET http://localhost/ request is saved along with the rendered DOM
       result = await global.dbStore
         .connection('requests')
         .where({ url: 'http://localhost/', method: 'GET' });
-      const request = result[0];
+      let request = result[0];
       expect(request.request_type).to.eql('document');
       expect(request.response_body.includes('<noscript>')).to.eql(true);
-      expect(request.response_body_rendered.includes('<noscript>')).to.eql(
-        false
+      expect(request.response_body_rendered).to.contain('Are you logged in?');
+
+      // The http://localhost/posts request is saved along with the rendered DOM
+      result = await global.dbStore
+        .connection('requests')
+        .where({ url: 'http://localhost/posts', request_type: 'navigation' });
+      request = result[0];
+      expect(request.method).to.eql(null);
+      expect(request.response_body).to.eql(null);
+      expect(request.response_body_rendered).to.contain(
+        'Hey Bob, how are you?'
       );
-      expect(
-        request.response_body_rendered.includes('Are you logged in?')
-      ).to.eql(true);
     });
   });
 
@@ -79,7 +103,7 @@ describe('BrowsersUtils', () => {
       // Creates 18 requests
       let result = await global.dbStore.connection('requests').count('*');
       const requestsCount = result[0]['count(*)'];
-      expect(requestsCount).to.eql(2);
+      expect(requestsCount).to.eql(1);
 
       // The first request is GET http://localhost/
       result = await global.dbStore
@@ -88,9 +112,7 @@ describe('BrowsersUtils', () => {
       const request = result[0];
       expect(request.request_type).to.eql('document');
       expect(request.response_body.includes('<td>Hello</td>')).to.eql(true);
-      expect(request.response_body_rendered.includes('<td>Hello</td>')).to.eql(
-        true
-      );
+      expect(request.response_body_rendered).to.contain('<td>Hello</td>');
     });
   });
 });

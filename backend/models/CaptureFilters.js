@@ -1,10 +1,26 @@
 const DEFAULT_FILTERS = {
   hostList: [],
   hostSetting: 'include',
-  pathList: [],
-  pathSetting: 'include',
-  extList: [],
-  extSetting: 'include'
+  pathList: ['/sockjs-node'],
+  pathSetting: 'exclude',
+  extList: ['js', 'css', 'ico'],
+  extSetting: 'exclude',
+  resourceTypes: [
+    'document',
+    'eventsource',
+    'fetch',
+    'font',
+    'image',
+    'manifest',
+    'media',
+    'navigation',
+    'other',
+    'stylesheet',
+    'script',
+    'texttrack',
+    'websocket',
+    'xhr'
+  ]
 };
 
 class CaptureFilters {
@@ -115,6 +131,14 @@ class CaptureFilters {
       filters.extList.length > 0 &&
       filters.extSetting === 'exclude' &&
       filters.extList.includes(request.ext)
+    ) {
+      return false;
+    }
+
+    // Filter resourceType (include):
+    if (
+      filters.resourceTypes.length > 0 &&
+      !filters.resourceTypes.includes(request.request_type)
     ) {
       return false;
     }
