@@ -9,6 +9,8 @@ import GeneralSettingsTab from '../settings/GeneralSettingsTab';
 import ThemeSettingsTab from '../settings/ThemeSettingsTab';
 import NetworkSettingsTab from '../settings/NetworkSettingsTab';
 
+import ThemedContext from '../../lib/ThemedContext';
+
 export const TAB_INDEX_EXPORT = 1;
 export const TAB_INDEX_SHORTCUTS = 3;
 
@@ -75,10 +77,14 @@ class SettingsModal extends Component {
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel scrollable">
-              <ThemeSettingsTab
-                activeTheme={this.props.activeTheme}
-                handleChangeTheme={this.props.handleChangeTheme}
-              />
+              <ThemedContext.Consumer>
+                {value => (
+                  <ThemeSettingsTab
+                    activeTheme={value.activeTheme}
+                    handleChangeTheme={value.handleChangeTheme}
+                  />
+                )}
+              </ThemedContext.Consumer>
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel scrollable">

@@ -16,7 +16,9 @@ import BrowserInterceptPage from './components/pages/BrowserInterceptPage';
 import CrawlerPage from './components/pages/CrawlerPage';
 import RequestsPage from './components/pages/RequestsPage';
 import ScansPage from './components/pages/ScansPage';
+
 import BackendConnection from './lib/BackendConnection';
+import ThemedContext from './lib/ThemedContext';
 
 export default class App extends Component {
   constructor() {
@@ -32,13 +34,11 @@ export default class App extends Component {
 
     const backendConn = new BackendConnection('pntest1');
     const backendConnected = backendConn.init();
-    // TODO: Refactor this so we don't have to use global vars - maybe use a singleton instead?
+    // TODO: Refactor this so we don't have to use global vars - maybe use context?
     global.backendConn = backendConn;
 
     this.state = {
-      settings: {
-        activeTheme: 'default'
-      },
+      activeTheme: 'default',
       // Ensure that the app gets re-rendered once we connect to the backend
       // eslint-disable-next-line react/no-unused-state
       backendConnected: backendConnected
@@ -50,66 +50,70 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
+    if (this.state.activeTheme !== prevState.activeTheme) {
       this.setTheme();
     }
   }
 
   setTheme() {
-    document.body.setAttribute('theme', this.state.settings.activeTheme);
+    document.body.setAttribute('theme', this.state.activeTheme);
   }
 
   handleChangeTheme(theme) {
-    // TODO: Deep clone the state object
-    this.setState(prevState => {
-      const newsettings = Object.assign({}, prevState.settings);
-      newsettings.activeTheme = theme;
-      return { settings: newsettings };
-    });
+    this.setState({ activeTheme: theme });
   }
 
   render() {
     const history = createHashHistory();
 
+    const themeContextValue = {
+      activeTheme: this.state.activeTheme,
+      handleChangeTheme: this.handleChangeTheme
+    };
+
     return (
-      <HashRouter history={history}>
-        <div key="modals" className="modals">
-          <AlertModal ref={registerModal} />
-          <SettingsModal
-            ref={registerModal}
-            activeTheme={this.state.settings.activeTheme}
-            handleChangeTheme={this.handleChangeTheme}
-          />
-        </div>
-
-        <div className="app-container">
-          <Route path="/" component={Sidebar} />
-
-          <div className="theme--pane app-content">
-            <Route exact path="/" component={BrowserNetworkPage} />
-            <Route
-              exact
-              path="/browser/network"
-              component={BrowserNetworkPage}
+      <ThemedContext.Provider value={themeContextValue}>
+        <HashRouter history={history}>
+          <div key="modals" className="modals">
+            <AlertModal ref={registerModal} />
+            <SettingsModal
+              ref={registerModal}
+              activeTheme={this.state.activeTheme}
+              handleChangeTheme={this.handleChangeTheme}
             />
-
-            <Route
-              exact
-              path="/browser/intercept"
-              component={BrowserInterceptPage}
-            />
-            <Route
-              exact
-              path="/browser/sessions"
-              component={BrowserSessionsPage}
-            />
-
-            <Route exact path="/crawler" component={CrawlerPage} />
-            <Route exact path="/requests" component={RequestsPage} />
-            <Route exact path="/scans" component={ScansPage} />
           </div>
-        </div>
-      </HashRouter>
+
+          <div className="app-container">
+            <Route path="/" component={Sidebar} />
+
+            <div className="theme--pane app-content">
+              <Route exact path="/" component={BrowserNetworkPage} />
+              <Route
+                exact
+                path="/browser/network"
+                component={BrowserNetworkPage}
+              />
+
+              <Route
+                exact
+                path="/browser/intercept"
+                component={BrowserInterceptPage}
+              />
+              <Route
+                exact
+                path="/browser/sessions"
+                component={BrowserSessionsPage}
+              />
+
+              <Route exact path="/crawler" component={CrawlerPage} />
+              <Route exact path="/requests" component={RequestsPage} />
+              <Route exact path="/scans" component={ScansPage} />
+            </div>
+          </div>
+        </HashRouter>
+      </ThemedContext.Provider>
     );
   }
 }
+
+App.contextType = ThemedContext;
