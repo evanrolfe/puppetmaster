@@ -46,9 +46,9 @@ export const STATUS_CODES = {
 export const ALL_TABLE_COLUMNS = [
   { key: 'id', title: '#', width: 40 },
   { key: 'method', title: 'Method', width: 70 },
-  { key: 'host', title: 'Host', width: 200 },
-  { key: 'path', title: 'Path', width: 250 },
-  { key: 'request_type', title: 'Type', width: 75 },
+  { key: 'host', title: 'Host', width: 150 },
+  { key: 'path', title: 'Path', width: 200 },
+  { key: 'request_type', title: 'Type', width: 100 },
   { key: 'ext', title: 'Ext', width: 40 },
   { key: 'response_status', title: 'Status', width: 70 },
   {
@@ -61,7 +61,7 @@ export const ALL_TABLE_COLUMNS = [
     title: 'IP Address',
     width: 130
   },
-  { key: 'created_at', title: 'Time' }
+  { key: 'created_at', title: 'Time', width: 200 }
 ];
 
 export default class BrowserNetworkPage extends Component<Props> {
@@ -77,16 +77,6 @@ export default class BrowserNetworkPage extends Component<Props> {
         // Persistant state:
         paneWidth: this.context.settings.paneWidth,
         paneHeight: this.context.settings.paneHeight,
-
-        // TODO: Seperate width from defaultWidth
-        tableColumns: [
-          { key: 'id', title: '#', width: 40 },
-          { key: 'method', title: 'Method', width: 70 },
-          { key: 'host', title: 'Host', width: 150 },
-          { key: 'path', title: 'Path', width: 200 },
-          { key: 'response_status', title: 'Status', width: 70 },
-          { key: 'request_type', title: 'Type', width: 75 }
-        ],
 
         // Volatile state(?):
         draggingPane: false,
@@ -222,6 +212,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     return this.context.settings.browserNetworkOrientation;
   }
 
+  tableColumns() {
+    return this.context.settings.requestsTableColumns;
+  }
+
   // NOTE: The root div in this component needs to have a css class of
   // pane-container-<inverseOrientation()>.
   inverseOrientation() {
@@ -293,12 +287,9 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   setTableColumnWidth(columnIndex, width) {
-    this.setState(prevState => {
-      const tableColumns = [...prevState.tableColumns];
-      tableColumns[columnIndex].width = width;
-
-      return { tableColumns: tableColumns };
-    });
+    const newTableColumns = [...this.tableColumns()];
+    newTableColumns[columnIndex].width = width;
+    this.context.changeSetting('requestsTableColumns', newTableColumns);
   }
 
   setScrollTop(scrollTop) {
@@ -371,7 +362,7 @@ export default class BrowserNetworkPage extends Component<Props> {
             </div>
 
             <RequestsTable
-              tableColumns={this.state.tableColumns}
+              tableColumns={this.tableColumns()}
               selectedRequestId={this.state.selectedRequestId}
               setSelectedRequestId={this.setSelectedRequestId}
               paneHeight={this.state.browserNetworkPaneHeight}

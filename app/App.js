@@ -11,7 +11,9 @@ import AlertModal from './components/modals/AlertModal';
 import SettingsModal from './components/modals/SettingsModal';
 import Sidebar from './components/Sidebar';
 import BrowserSessionsPage from './components/pages/BrowserSessionsPage';
-import BrowserNetworkPage from './components/pages/BrowserNetworkPage';
+import BrowserNetworkPage, {
+  ALL_TABLE_COLUMNS
+} from './components/pages/BrowserNetworkPage';
 import BrowserInterceptPage from './components/pages/BrowserInterceptPage';
 import CrawlerPage from './components/pages/CrawlerPage';
 import RequestsPage from './components/pages/RequestsPage';
@@ -34,13 +36,25 @@ export default class App extends Component {
 
     const backendConn = new BackendConnection('pntest1');
     const backendConnected = backendConn.init();
-    // TODO: Refactor this so we don't have to use global vars - maybe use context?
     global.backendConn = backendConn;
+
+    const selectedColumns = [
+      'id',
+      'method',
+      'host',
+      'path',
+      'response_status',
+      'request_type'
+    ];
+    const requestsTableColumns = ALL_TABLE_COLUMNS.filter(column =>
+      selectedColumns.includes(column.key)
+    );
 
     this.state = {
       settings: {
         activeTheme: 'default',
         browserNetworkOrientation: 'vertical',
+        requestsTableColumns: requestsTableColumns,
         paneWidth: 700,
         paneHeight: 350
       },

@@ -9,16 +9,12 @@ import GeneralSettingsTab from '../settings/GeneralSettingsTab';
 import ThemeSettingsTab from '../settings/ThemeSettingsTab';
 import NetworkSettingsTab from '../settings/NetworkSettingsTab';
 
-import SettingsContext from '../../lib/SettingsContext';
-
 export const TAB_INDEX_EXPORT = 1;
 export const TAB_INDEX_SHORTCUTS = 3;
 
 export default class SettingsModal extends Component {
-  constructor(props, context) {
-    super(props, context);
-
-    this.context = context;
+  constructor(props) {
+    super(props);
 
     this.state = { tabIndex: 0 };
 
@@ -80,20 +76,11 @@ export default class SettingsModal extends Component {
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel scrollable">
-              <ThemeSettingsTab
-                activeTheme={this.context.settings.activeTheme}
-                changeTheme={this.context.changeSetting.bind(
-                  null,
-                  'activeTheme'
-                )}
-              />
+              <ThemeSettingsTab />
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel scrollable">
-              <NetworkSettingsTab
-                orientation={this.context.settings.browserNetworkOrientation}
-                changeSetting={this.context.changeSetting}
-              />
+              <NetworkSettingsTab />
             </TabPanel>
 
             <TabPanel className="react-tabs__tab-panel pad scrollable">
@@ -105,5 +92,3 @@ export default class SettingsModal extends Component {
     );
   }
 }
-
-SettingsModal.contextType = SettingsContext;

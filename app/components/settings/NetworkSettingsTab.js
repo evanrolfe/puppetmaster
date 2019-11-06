@@ -1,23 +1,86 @@
 import React, { Component } from 'react';
 import { ALL_TABLE_COLUMNS } from '../pages/BrowserNetworkPage';
-
-type Props = {
-  changeSetting: 'function',
-  orientation: 'string'
-};
+import SettingsContext from '../../lib/SettingsContext';
 
 export default class NetworkSettingsTab extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+    this.context = context;
+
+    this.state = {
+      tableColumnKeys: this.context.settings.requestsTableColumns.map(
+        col => col.key
+      )
+    };
+
     this.changeOrientation = this.changeOrientation.bind(this);
+    this._handleTableColumnChange = this._handleTableColumnChange.bind(this);
+    this.tableColumnIsChecked = this.tableColumnIsChecked.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.tableColumnKeys !== prevState.tableColumnKeys) {
+      // Save the state to settings:
+      const newTableColumns = [];
+      const currentTableColumnKeys = this.context.settings.requestsTableColumns.map(
+        col => col.key
+      );
+
+      ALL_TABLE_COLUMNS.forEach(col => {
+        const isChecked = this.state.tableColumnKeys.includes(col.key);
+        const isDisplayedCurrently = currentTableColumnKeys.includes(col.key);
+        console.log(
+          `Col: ${
+            col.key
+          }, isChecked: ${isChecked}, isDisplayedCurrently: ${isDisplayedCurrently}`
+        );
+
+        if (isChecked && isDisplayedCurrently) {
+          const currentCol = this.context.settings.requestsTableColumns.find(
+            curCol => curCol.key === col.key
+          );
+          newTableColumns.push(currentCol);
+        } else if (isChecked && !isDisplayedCurrently) {
+          newTableColumns.push(col);
+        }
+      });
+      this.context.changeSetting('requestsTableColumns', newTableColumns);
+    }
   }
 
   changeOrientation(event) {
     const value = event.target.value;
 
-    this.props.changeSetting('browserNetworkOrientation', value);
+    this.context.changeSetting('browserNetworkOrientation', value);
+  }
+
+  tableColumnIsChecked(columnKey) {
+    return this.state.tableColumnKeys.includes(columnKey);
+  }
+
+  _handleTableColumnChange(event) {
+    const value = event.target.value;
+    const checked = event.target.checked;
+
+    // Update the tableColumnKeys state:
+    if (checked === true) {
+      this.setState(prevState => {
+        const newKeys = [...prevState.tableColumnKeys];
+        newKeys.push(value);
+        console.log(`NewKeys: ${newKeys}`);
+        return { tableColumnKeys: newKeys };
+      });
+    } else {
+      this.setState(prevState => {
+        const newKeys = [...prevState.tableColumnKeys].filter(
+          colKey => colKey !== value
+        );
+        console.log(`NewKeys: ${newKeys}`);
+        return { tableColumnKeys: newKeys };
+      });
+    }
   }
 
   render() {
@@ -29,7 +92,7 @@ export default class NetworkSettingsTab extends Component<Props> {
               Layout Orientation
               <select
                 name="orientation"
-                value={this.props.orientation}
+                value={this.context.settings.browserNetworkOrientation}
                 onChange={this.changeOrientation}
               >
                 <option value="vertical">Vertical</option>
@@ -44,7 +107,12 @@ export default class NetworkSettingsTab extends Component<Props> {
             {ALL_TABLE_COLUMNS.map(column => (
               <label>
                 {column.title}
-                <input type="checkbox" value={column.key} />
+                <input
+                  type="checkbox"
+                  value={column.key}
+                  checked={this.tableColumnIsChecked(column.key)}
+                  onChange={this._handleTableColumnChange}
+                />
               </label>
             ))}
           </div>
@@ -53,3 +121,5 @@ export default class NetworkSettingsTab extends Component<Props> {
     );
   }
 }
+
+NetworkSettingsTab.contextType = SettingsContext;
