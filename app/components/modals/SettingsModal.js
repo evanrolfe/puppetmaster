@@ -9,7 +9,7 @@ import GeneralSettingsTab from '../settings/GeneralSettingsTab';
 import ThemeSettingsTab from '../settings/ThemeSettingsTab';
 import NetworkSettingsTab from '../settings/NetworkSettingsTab';
 
-import ThemedContext from '../../lib/ThemedContext';
+import SettingsContext from '../../lib/SettingsContext';
 
 export const TAB_INDEX_EXPORT = 1;
 export const TAB_INDEX_SHORTCUTS = 3;
@@ -46,57 +46,65 @@ class SettingsModal extends Component {
 
   render() {
     return (
-      <Modal ref={this._setModalRef} tall freshState {...this.props}>
-        <ModalHeader>Preferences</ModalHeader>
-        <ModalBody noScroll>
-          <Tabs
-            className="react-tabs"
-            selectedIndex={this.state.tabIndex}
-            onSelect={tabIndex => this.goTo(tabIndex)}
-          >
-            <TabList>
-              <Tab>
-                <button>General</button>
-              </Tab>
+      <SettingsContext.Consumer>
+        {settingsContext => (
+          <Modal ref={this._setModalRef} tall freshState {...this.props}>
+            <ModalHeader>Preferences</ModalHeader>
+            <ModalBody noScroll>
+              <Tabs
+                className="react-tabs"
+                selectedIndex={this.state.tabIndex}
+                onSelect={tabIndex => this.goTo(tabIndex)}
+              >
+                <TabList>
+                  <Tab>
+                    <button>General</button>
+                  </Tab>
 
-              <Tab>
-                <button>Themes</button>
-              </Tab>
+                  <Tab>
+                    <button>Themes</button>
+                  </Tab>
 
-              <Tab>
-                <button>Network</button>
-              </Tab>
+                  <Tab>
+                    <button>Network</button>
+                  </Tab>
 
-              <Tab>
-                <button>About</button>
-              </Tab>
-            </TabList>
+                  <Tab>
+                    <button>About</button>
+                  </Tab>
+                </TabList>
 
-            <TabPanel className="react-tabs__tab-panel pad scrollable">
-              <GeneralSettingsTab />
-            </TabPanel>
+                <TabPanel className="react-tabs__tab-panel pad scrollable">
+                  <GeneralSettingsTab />
+                </TabPanel>
 
-            <TabPanel className="react-tabs__tab-panel scrollable">
-              <ThemedContext.Consumer>
-                {value => (
+                <TabPanel className="react-tabs__tab-panel scrollable">
                   <ThemeSettingsTab
-                    activeTheme={value.activeTheme}
-                    handleChangeTheme={value.handleChangeTheme}
+                    activeTheme={settingsContext.settings.activeTheme}
+                    changeTheme={settingsContext.changeSetting.bind(
+                      null,
+                      'activeTheme'
+                    )}
                   />
-                )}
-              </ThemedContext.Consumer>
-            </TabPanel>
+                </TabPanel>
 
-            <TabPanel className="react-tabs__tab-panel scrollable">
-              <NetworkSettingsTab />
-            </TabPanel>
+                <TabPanel className="react-tabs__tab-panel scrollable">
+                  <NetworkSettingsTab
+                    orientation={
+                      settingsContext.settings.browserNetworkOrientation
+                    }
+                    changeSetting={settingsContext.changeSetting}
+                  />
+                </TabPanel>
 
-            <TabPanel className="react-tabs__tab-panel pad scrollable">
-              <AboutSettingsTab />
-            </TabPanel>
-          </Tabs>
-        </ModalBody>
-      </Modal>
+                <TabPanel className="react-tabs__tab-panel pad scrollable">
+                  <AboutSettingsTab />
+                </TabPanel>
+              </Tabs>
+            </ModalBody>
+          </Modal>
+        )}
+      </SettingsContext.Consumer>
     );
   }
 }

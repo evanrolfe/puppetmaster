@@ -1,7 +1,25 @@
 import React, { Component } from 'react';
 import { ALL_TABLE_COLUMNS } from '../pages/BrowserNetworkPage';
 
-export default class NetworkSettingsTab extends Component {
+type Props = {
+  changeSetting: 'function',
+  orientation: 'string'
+};
+
+export default class NetworkSettingsTab extends Component<Props> {
+  props: Props;
+
+  constructor(props) {
+    super(props);
+    this.changeOrientation = this.changeOrientation.bind(this);
+  }
+
+  changeOrientation(event) {
+    const value = event.target.value;
+
+    this.props.changeSetting('browserNetworkOrientation', value);
+  }
+
   render() {
     return (
       <div className="pad">
@@ -9,7 +27,11 @@ export default class NetworkSettingsTab extends Component {
           <div className="form-control form-control--outlined">
             <label>
               Layout Orientation
-              <select name="orientation">
+              <select
+                name="orientation"
+                value={this.props.orientation}
+                onChange={this.changeOrientation}
+              >
                 <option value="horizontal">Horizontal</option>
                 <option value="vertical">Vertical</option>
               </select>

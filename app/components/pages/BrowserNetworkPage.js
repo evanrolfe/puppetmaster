@@ -8,6 +8,7 @@ import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
 import RequestView from '../RequestView';
 
+import SettingsContext from '../../lib/SettingsContext';
 import RequestsFilterForm from '../RequestsFilterForm';
 
 type Props = {
@@ -66,8 +67,10 @@ export const ALL_TABLE_COLUMNS = [
 export default class BrowserNetworkPage extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+
+    this.context = context;
 
     if (global.browserNetworkPageState === undefined) {
       this.state = {
@@ -222,9 +225,11 @@ export default class BrowserNetworkPage extends Component<Props> {
 
         let diff;
 
-        if (prevState.orientation === 'horizontal') {
+        if (this.context.settings.browserNetworkOrientation === 'horizontal') {
           diff = e.clientX - requestTable.offsetLeft - requestTable.offsetWidth;
-        } else if (prevState.orientation === 'vertical') {
+        } else if (
+          this.context.settings.browserNetworkOrientation === 'vertical'
+        ) {
           diff = e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
         }
 
@@ -232,14 +237,11 @@ export default class BrowserNetworkPage extends Component<Props> {
 
         // Check minimum lengths
         if (
-          prevState.orientation === 'horizontal' &&
+          this.context.settings.browserNetworkOrientation === 'horizontal' &&
           paneLength < MIN_PANE_WIDTH
         )
           return;
-        if (
-          prevState.orientation === 'vertical' &&
-          paneLength < MIN_PANE_HEIGHT
-        )
+        if (this.orientation === 'vertical' && paneLength < MIN_PANE_HEIGHT)
           return;
 
         return { paneLength: paneLength };
@@ -303,9 +305,9 @@ export default class BrowserNetworkPage extends Component<Props> {
     const windowWidth = this.state.windowSize[0];
     const sideBarWidth = 53;
 
-    if (this.state.orientation === 'horizontal') {
+    if (this.context.settings.browserNetworkOrientation === 'horizontal') {
       codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneLength;
-    } else if (this.state.orientation === 'vertical') {
+    } else if (this.context.settings.browserNetworkOrientation === 'vertical') {
       codeMirrorWidth = windowWidth - sideBarWidth;
     }
 
@@ -321,15 +323,19 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     const paneStyle = {};
 
-    if (this.state.orientation === 'horizontal') {
+    if (this.context.settings.browserNetworkOrientation === 'horizontal') {
       paneStyle.width = this.state.paneLength;
-    } else if (this.state.orientation === 'vertical') {
+    } else if (this.context.settings.browserNetworkOrientation === 'vertical') {
       paneStyle.height = this.state.paneLength;
     }
 
     return (
       <>
-        <div className={`pane-container-${this.state.orientation}`}>
+        <div
+          className={`pane-container-${
+            this.context.settings.browserNetworkOrientation
+          }`}
+        >
           <div className="pane-fixed pane-container-vertical" style={paneStyle}>
             <div className="pane-fixed">
               <BrowserTabs
@@ -387,3 +393,5 @@ export default class BrowserNetworkPage extends Component<Props> {
     );
   }
 }
+
+BrowserNetworkPage.contextType = SettingsContext;

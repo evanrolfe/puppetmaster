@@ -18,7 +18,7 @@ import RequestsPage from './components/pages/RequestsPage';
 import ScansPage from './components/pages/ScansPage';
 
 import BackendConnection from './lib/BackendConnection';
-import ThemedContext from './lib/ThemedContext';
+import SettingsContext from './lib/SettingsContext';
 
 export default class App extends Component {
   constructor() {
@@ -26,7 +26,7 @@ export default class App extends Component {
 
     log.warn('Inside react constructor!');
 
-    this.handleChangeTheme = this.handleChangeTheme.bind(this);
+    this.changeSetting = this.changeSetting.bind(this);
 
     ipcRenderer.on('toggle-preferences', () => {
       showModal(SettingsModal);
@@ -38,7 +38,10 @@ export default class App extends Component {
     global.backendConn = backendConn;
 
     this.state = {
-      activeTheme: 'default',
+      settings: {
+        activeTheme: 'default',
+        browserNetworkOrientation: 'vertical'
+      },
       // Ensure that the app gets re-rendered once we connect to the backend
       // eslint-disable-next-line react/no-unused-state
       backendConnected: backendConnected
@@ -50,37 +53,37 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.activeTheme !== prevState.activeTheme) {
+    if (this.state.settings.activeTheme !== prevState.settings.activeTheme) {
       this.setTheme();
     }
   }
 
   setTheme() {
-    document.body.setAttribute('theme', this.state.activeTheme);
+    document.body.setAttribute('theme', this.state.settings.activeTheme);
   }
 
-  handleChangeTheme(theme) {
-    this.setState({ activeTheme: theme });
+  changeSetting(key, value) {
+    this.setState(prevState => {
+      const newSettings = Object.assign({}, prevState.settings);
+      newSettings[key] = value;
+      return { settings: newSettings };
+    });
   }
 
   render() {
     const history = createHashHistory();
 
-    const themeContextValue = {
-      activeTheme: this.state.activeTheme,
-      handleChangeTheme: this.handleChangeTheme
+    const settingsContextValue = {
+      settings: this.state.settings,
+      changeSetting: this.changeSetting
     };
 
     return (
-      <ThemedContext.Provider value={themeContextValue}>
+      <SettingsContext.Provider value={settingsContextValue}>
         <HashRouter history={history}>
           <div key="modals" className="modals">
             <AlertModal ref={registerModal} />
-            <SettingsModal
-              ref={registerModal}
-              activeTheme={this.state.activeTheme}
-              handleChangeTheme={this.handleChangeTheme}
-            />
+            <SettingsModal ref={registerModal} />
           </div>
 
           <div className="app-container">
@@ -111,9 +114,9 @@ export default class App extends Component {
             </div>
           </div>
         </HashRouter>
-      </ThemedContext.Provider>
+      </SettingsContext.Provider>
     );
   }
 }
 
-App.contextType = ThemedContext;
+App.contextType = SettingsContext;

@@ -25,7 +25,7 @@ export default class ThemeSettingsTab extends Component {
       >
         <h2 className="txt-lg">{themeDisplayName}</h2>
         <button
-          onClick={() => this.props.handleChangeTheme(themeName)}
+          onClick={() => this.props.changeTheme(themeName)}
           value={themeName}
           className={isActive ? 'active' : ''}
         >
@@ -199,6 +199,6 @@ export default class ThemeSettingsTab extends Component {
 }
 
 ThemeSettingsTab.propTypes = {
-  handleChangeTheme: PropTypes.func.isRequired,
+  changeTheme: PropTypes.func.isRequired,
   activeTheme: PropTypes.string.isRequired
 };
