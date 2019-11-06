@@ -32,8 +32,8 @@ export default class NetworkSettingsTab extends Component<Props> {
                 value={this.props.orientation}
                 onChange={this.changeOrientation}
               >
-                <option value="horizontal">Horizontal</option>
                 <option value="vertical">Vertical</option>
+                <option value="horizontal">Horizontal</option>
               </select>
             </label>
           </div>

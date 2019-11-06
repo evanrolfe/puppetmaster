@@ -75,7 +75,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     if (global.browserNetworkPageState === undefined) {
       this.state = {
         // Persistant state:
-        orientation: 'horizontal', // 'vertical' or 'horizontal'
         paneLength: 700,
 
         // TODO: Seperate width from defaultWidth
@@ -218,6 +217,16 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState(newState);
   }
 
+  orientation() {
+    return this.context.settings.browserNetworkOrientation;
+  }
+
+  // NOTE: The root div in this component needs to have a css class of
+  // pane-container-<inverseOrientation()>.
+  inverseOrientation() {
+    return this.orientation() === 'vertical' ? 'horizontal' : 'vertical';
+  }
+
   handleMouseMove(e) {
     if (this.state.draggingPane) {
       this.setState(prevState => {
@@ -225,23 +234,19 @@ export default class BrowserNetworkPage extends Component<Props> {
 
         let diff;
 
-        if (this.context.settings.browserNetworkOrientation === 'horizontal') {
-          diff = e.clientX - requestTable.offsetLeft - requestTable.offsetWidth;
-        } else if (
-          this.context.settings.browserNetworkOrientation === 'vertical'
-        ) {
+        if (this.orientation() === 'horizontal') {
           diff = e.clientY - requestTable.offsetTop - requestTable.offsetHeight;
+        } else if (this.orientation() === 'vertical') {
+          diff = e.clientX - requestTable.offsetLeft - requestTable.offsetWidth;
         }
 
         const paneLength = prevState.paneLength + diff;
 
         // Check minimum lengths
-        if (
-          this.context.settings.browserNetworkOrientation === 'horizontal' &&
-          paneLength < MIN_PANE_WIDTH
-        )
+        if (this.orientation() === 'horizontal' && paneLength < MIN_PANE_HEIGHT)
           return;
-        if (this.orientation === 'vertical' && paneLength < MIN_PANE_HEIGHT)
+
+        if (this.orientation() === 'vertical' && paneLength < MIN_PANE_WIDTH)
           return;
 
         return { paneLength: paneLength };
@@ -305,10 +310,10 @@ export default class BrowserNetworkPage extends Component<Props> {
     const windowWidth = this.state.windowSize[0];
     const sideBarWidth = 53;
 
-    if (this.context.settings.browserNetworkOrientation === 'horizontal') {
-      codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneLength;
-    } else if (this.context.settings.browserNetworkOrientation === 'vertical') {
+    if (this.orientation() === 'horizontal') {
       codeMirrorWidth = windowWidth - sideBarWidth;
+    } else if (this.orientation() === 'vertical') {
+      codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneLength;
     }
 
     return codeMirrorWidth;
@@ -323,19 +328,15 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     const paneStyle = {};
 
-    if (this.context.settings.browserNetworkOrientation === 'horizontal') {
-      paneStyle.width = this.state.paneLength;
-    } else if (this.context.settings.browserNetworkOrientation === 'vertical') {
+    if (this.orientation() === 'horizontal') {
       paneStyle.height = this.state.paneLength;
+    } else if (this.orientation() === 'vertical') {
+      paneStyle.width = this.state.paneLength;
     }
 
     return (
       <>
-        <div
-          className={`pane-container-${
-            this.context.settings.browserNetworkOrientation
-          }`}
-        >
+        <div className={`pane-container-${this.inverseOrientation()}`}>
           <div className="pane-fixed pane-container-vertical" style={paneStyle}>
             <div className="pane-fixed">
               <BrowserTabs
