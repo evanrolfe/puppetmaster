@@ -75,7 +75,8 @@ export default class BrowserNetworkPage extends Component<Props> {
     if (global.browserNetworkPageState === undefined) {
       this.state = {
         // Persistant state:
-        paneLength: 700,
+        paneWidth: this.context.settings.paneWidth,
+        paneHeight: this.context.settings.paneHeight,
 
         // TODO: Seperate width from defaultWidth
         tableColumns: [
@@ -240,16 +241,21 @@ export default class BrowserNetworkPage extends Component<Props> {
           diff = e.clientX - requestTable.offsetLeft - requestTable.offsetWidth;
         }
 
-        const paneLength = prevState.paneLength + diff;
+        if (this.orientation() === 'horizontal') {
+          const paneHeight = prevState.paneHeight + diff;
 
-        // Check minimum lengths
-        if (this.orientation() === 'horizontal' && paneLength < MIN_PANE_HEIGHT)
-          return;
+          if (paneHeight < MIN_PANE_HEIGHT) return;
 
-        if (this.orientation() === 'vertical' && paneLength < MIN_PANE_WIDTH)
-          return;
+          return { paneHeight: paneHeight };
+        }
 
-        return { paneLength: paneLength };
+        if (this.orientation() === 'vertical') {
+          const paneWidth = prevState.paneWidth + diff;
+
+          if (paneWidth < MIN_PANE_WIDTH) return;
+
+          return { paneWidth: paneWidth };
+        }
       });
     }
   }
@@ -257,6 +263,12 @@ export default class BrowserNetworkPage extends Component<Props> {
   _handleMouseUp() {
     if (this.state.draggingPane) {
       this.setState({ draggingPane: false });
+      // Save the pane to the settings
+      if (this.orientation() === 'vertical') {
+        this.context.changeSetting('paneWidth', this.state.paneWidth);
+      } else if (this.orientation() === 'horizontal') {
+        this.context.changeSetting('paneHeight', this.state.paneHeight);
+      }
     }
   }
 
@@ -313,7 +325,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     if (this.orientation() === 'horizontal') {
       codeMirrorWidth = windowWidth - sideBarWidth;
     } else if (this.orientation() === 'vertical') {
-      codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneLength;
+      codeMirrorWidth = windowWidth - sideBarWidth - this.state.paneWidth;
     }
 
     return codeMirrorWidth;
@@ -329,9 +341,9 @@ export default class BrowserNetworkPage extends Component<Props> {
     const paneStyle = {};
 
     if (this.orientation() === 'horizontal') {
-      paneStyle.height = this.state.paneLength;
+      paneStyle.height = this.state.paneHeight;
     } else if (this.orientation() === 'vertical') {
-      paneStyle.width = this.state.paneLength;
+      paneStyle.width = this.state.paneWidth;
     }
 
     return (

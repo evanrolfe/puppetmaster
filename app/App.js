@@ -40,7 +40,9 @@ export default class App extends Component {
     this.state = {
       settings: {
         activeTheme: 'default',
-        browserNetworkOrientation: 'vertical'
+        browserNetworkOrientation: 'vertical',
+        paneWidth: 700,
+        paneHeight: 350
       },
       // Ensure that the app gets re-rendered once we connect to the backend
       // eslint-disable-next-line react/no-unused-state
@@ -66,6 +68,8 @@ export default class App extends Component {
     this.setState(prevState => {
       const newSettings = Object.assign({}, prevState.settings);
       newSettings[key] = value;
+
+      console.log(`Saving settings: ${key}: ${value}`);
       return { settings: newSettings };
     });
   }
