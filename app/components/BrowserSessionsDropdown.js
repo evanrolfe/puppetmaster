@@ -34,7 +34,7 @@ export default class BrowserSessionsDropdown extends Component<Props> {
   }
 
   openBrowser(browserId) {
-    global.backendConn.send('BrowsersController', 'bringToForeground', {
+    global.backendConn.send('BrowsersController', 'open', {
       browserId: browserId
     });
   }
@@ -50,7 +50,7 @@ export default class BrowserSessionsDropdown extends Component<Props> {
           Browser Sessions ({this.state.browsers.length})
         </DropdownButton>
 
-        <DropdownDivider>Open Sessions:</DropdownDivider>
+        <DropdownDivider>Browser Sessions:</DropdownDivider>
         {this.state.browsers.map(browser => (
           <DropdownItem onClick={this.openBrowser} value={browser.id}>
             {browser.title}

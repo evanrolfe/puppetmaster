@@ -44,7 +44,7 @@ const handleBrowserClosed = async browser => {
   await global.dbStore
     .connection('browsers')
     .where({ id: browser.id })
-    .del();
+    .update({ open: 0 });
 
   global.puppeteer_browsers = global.puppeteer_browsers.filter(
     globalBrowser => globalBrowser !== browser
@@ -133,6 +133,7 @@ const handleFramenavigated = async (page, frame, origURL) => {
   const parsedUrl = new URL(page.url());
 
   const requestParams = {
+    browser_id: page.browser().id,
     url: page.url(),
     host: parsedUrl.hostname,
     path: parsedUrl.pathname,

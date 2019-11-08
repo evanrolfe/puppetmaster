@@ -38,6 +38,20 @@ class BrowsersController {
     return { status: 'OK' };
   }
 
+  async open(args) {
+    // args.browserId
+    const result = await global.dbStore
+      .connection('browsers')
+      .where({ id: args.browserId });
+    const browser = result[0];
+
+    if (browser.open === 1) {
+      this.bringToForeground(args);
+    } else {
+      // TODO
+    }
+  }
+
   async index() {
     const browsers = await global.dbStore.connection('browsers');
 

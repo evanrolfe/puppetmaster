@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const instrumentBrowser = require('../../../backend/lib/BrowserUtils');
+const { instrumentBrowser } = require('../../../backend/lib/BrowserUtils');
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
