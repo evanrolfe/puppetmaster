@@ -58,6 +58,7 @@ class Request extends Store.BaseModel {
     }
 
     const requestParams = {
+      browser_id: page.browser().id,
       method: response.request().method(),
       url: response.url(),
       host: parsedUrl.hostname,

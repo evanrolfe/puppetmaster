@@ -7,6 +7,7 @@ class RequestsController {
 
     const columns = [
       'id',
+      'browser_id',
       'method',
       'url',
       'host',

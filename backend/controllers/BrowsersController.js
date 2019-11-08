@@ -29,7 +29,6 @@ class BrowsersController {
       .where({ id: browserId })
       .update({ title: `Session #${browserId}` });
     browser.id = browserId;
-    browser.title = 'Broser';
     global.puppeteer_browsers.push(browser);
 
     await instrumentBrowser(browser);

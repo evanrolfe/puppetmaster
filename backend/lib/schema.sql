@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS requests(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  browser_id INTEGER NOT NULL,
   method TEXT,
   url TEXT NOT NULL,
   host TEXT,
