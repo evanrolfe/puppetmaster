@@ -93,7 +93,17 @@ class Request extends Store.BaseModel {
   }
 
   static findByParams(columns, params) {
-    let query = global.dbStore.connection('requests').select(columns);
+    let query = global.dbStore
+      .connection('requests')
+      .select(columns)
+      .from('requests');
+
+    query = query.leftJoin(
+      'browsers',
+      'requests.browser_id',
+      '=',
+      'browsers.id'
+    );
 
     // Host filter:
     if (['include', 'exclude'].includes(params.hostSetting)) {
@@ -160,6 +170,7 @@ class Request extends Store.BaseModel {
       // eslint-disable-next-line func-names
       query = query.where(function() {
         SEARCHABLE_COLUMNS.forEach(column => {
+          if (column === 'id') column = 'requests.id';
           this.orWhere(column, 'like', `%${params.search}%`);
         });
       });
@@ -167,9 +178,10 @@ class Request extends Store.BaseModel {
 
     // Order
     if (params.order_by !== undefined && params.dir !== undefined) {
+      if (params.order_by === 'id') params.order_by = 'requests.id';
       query = query.orderBy(params.order_by, params.dir);
     } else {
-      query = query.orderBy('id', 'desc');
+      query = query.orderBy('requests.id', 'desc');
     }
 
     console.log(`[Backend] SQL Query: ${query.toSQL().sql}`);

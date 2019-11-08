@@ -52,7 +52,7 @@ export default class App extends Component {
     } else {
       const selectedColumns = [
         'id',
-        'browser_id',
+        'title',
         'method',
         'host',
         'path',

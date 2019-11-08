@@ -45,9 +45,9 @@ export const STATUS_CODES = {
 
 export const ALL_TABLE_COLUMNS = [
   { key: 'id', title: '#', width: 40 },
-  { key: 'browser_id', title: 'Browser', width: 70 },
+  { key: 'title', title: 'Browser', width: 100 },
   { key: 'method', title: 'Method', width: 70 },
-  { key: 'host', title: 'Host', width: 150 },
+  { key: 'host', title: 'Host', width: 100 },
   { key: 'path', title: 'Path', width: 200 },
   { key: 'request_type', title: 'Type', width: 100 },
   { key: 'ext', title: 'Ext', width: 40 },

@@ -6,14 +6,15 @@ class RequestsController {
     console.log(`[Backend] args: ${JSON.stringify(args)}`);
 
     const columns = [
-      'id',
+      'requests.id',
       'browser_id',
+      'browsers.title',
       'method',
       'url',
       'host',
       'path',
       'ext',
-      'created_at',
+      'requests.created_at',
       'request_type',
       'request_payload',
       'response_status',
@@ -23,7 +24,7 @@ class RequestsController {
     ];
 
     const requests = await Request.findByParams(columns, args);
-
+    console.log(requests);
     return { status: 'OK', body: requests };
   }
 
