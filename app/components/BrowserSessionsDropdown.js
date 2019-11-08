@@ -14,29 +14,28 @@ export default class BrowserSessionsDropdown extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.state = { sessionTitles: [] };
+    this.state = { browsers: [] };
 
-    this.loadSessions();
+    this.loadBrowsers();
 
     global.backendConn.listen('browsersChanged', () => {
-      this.loadSessions();
+      this.loadBrowsers();
     });
   }
 
-  async loadSessions() {
+  async loadBrowsers() {
     const result = await global.backendConn.send(
       'BrowsersController',
       'index',
       {}
     );
-    const sessionTitles = result.result.body;
-
-    this.setState({ sessionTitles: sessionTitles });
+    const browsers = result.result.body;
+    this.setState({ browsers: browsers });
   }
 
-  openBrowser(browserIndex) {
+  openBrowser(browserId) {
     global.backendConn.send('BrowsersController', 'bringToForeground', {
-      browserIndex: browserIndex
+      browserId: browserId
     });
   }
 
@@ -48,13 +47,13 @@ export default class BrowserSessionsDropdown extends Component<Props> {
     return (
       <Dropdown className="browser-sessions pull-right">
         <DropdownButton className="browser-sessions">
-          Browser Sessions ({this.state.sessionTitles.length})
+          Browser Sessions ({this.state.browsers.length})
         </DropdownButton>
 
         <DropdownDivider>Open Sessions:</DropdownDivider>
-        {this.state.sessionTitles.map((title, index) => (
-          <DropdownItem onClick={this.openBrowser} value={index}>
-            {title}
+        {this.state.browsers.map(browser => (
+          <DropdownItem onClick={this.openBrowser} value={browser.id}>
+            {browser.title}
           </DropdownItem>
         ))}
         <DropdownDivider>Actions</DropdownDivider>

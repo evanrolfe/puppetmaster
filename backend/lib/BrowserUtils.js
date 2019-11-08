@@ -36,12 +36,20 @@ const instrumentBrowser = async browser => {
     handleNewPage(newPage);
   });
 
-  browser.on('disconnected', () => {
-    global.puppeteer_browsers = global.puppeteer_browsers.filter(
-      globalBrowser => globalBrowser !== browser
-    );
-    ipc.send('browsersChanged', {});
-  });
+  browser.on('disconnected', () => handleBrowserClosed(browser));
+};
+
+const handleBrowserClosed = async browser => {
+  console.log(`handleBrowserClosed for browser #${browser.id}`);
+  await global.dbStore
+    .connection('browsers')
+    .where({ id: browser.id })
+    .del();
+
+  global.puppeteer_browsers = global.puppeteer_browsers.filter(
+    globalBrowser => globalBrowser !== browser
+  );
+  ipc.send('browsersChanged', {});
 };
 
 const handleNewPage = async page => {
@@ -190,4 +198,5 @@ const startDOMListener = async page => {
   return domListenerId;
 };
 
-module.exports = instrumentBrowser;
+module.exports.instrumentBrowser = instrumentBrowser;
+module.exports.handleBrowserClosed = handleBrowserClosed;

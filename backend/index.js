@@ -1,4 +1,5 @@
 const ipc = require('./server-ipc');
+const { handleBrowserClosed } = require('./lib/BrowserUtils');
 
 console.log('Starting backend server...');
 
@@ -17,22 +18,30 @@ if (process.argv[2] === '--subprocess') {
   });
 }
 
-[
+const events = [
   `SIGINT`,
   `SIGUSR1`,
   `SIGUSR2`,
   `uncaughtException`,
   `SIGTERM`,
   `SIGHUP`
-].forEach(eventType => {
-  process.on(eventType, () => {
+];
+
+for (let i = 0; i < events.length; i++) {
+  const eventType = events[i];
+
+  process.on(eventType, async () => {
     console.log('Exiting the backend server...');
     console.log(`Closing ${global.puppeteer_browsers.length} browsers...`);
 
-    global.puppeteer_browsers.forEach(browser => {
+    // eslint
+    for (let j = 0; j < global.puppeteer_browsers.length; j++) {
+      const browser = global.puppeteer_browsers[j];
       browser.close();
-    });
+      // eslint-disable-next-line no-await-in-loop
+      await handleBrowserClosed(browser);
+    }
 
     return process.exit(0);
   });
-});
+}

@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const instrumentBrowser = require('../lib/BrowserUtils');
+const { instrumentBrowser } = require('../lib/BrowserUtils');
 const ipc = require('../server-ipc');
 
 class BrowsersController {
@@ -19,8 +19,17 @@ class BrowsersController {
       args: []
     });
 
-    browser.title = `Session #${global.puppeteer_browsers.length + 1}`;
-
+    const result = await global.dbStore
+      .connection('browsers')
+      .insert({ open: 1, created_at: Date.now() });
+    const browserId = result[0];
+    // Set the default title:
+    await global.dbStore
+      .connection('browsers')
+      .where({ id: browserId })
+      .update({ title: `Session #${browserId}` });
+    browser.id = browserId;
+    browser.title = 'Broser';
     global.puppeteer_browsers.push(browser);
 
     await instrumentBrowser(browser);
@@ -31,13 +40,15 @@ class BrowsersController {
   }
 
   async index() {
-    const titles = global.puppeteer_browsers.map(browser => browser.title);
+    const browsers = await global.dbStore.connection('browsers');
 
-    return { status: 'OK', body: titles };
+    return { status: 'OK', body: browsers };
   }
 
   async bringToForeground(args) {
-    const browser = global.puppeteer_browsers[args.browserIndex];
+    const browser = global.puppeteer_browsers.find(
+      browserEnum => browserEnum.id === args.browserId
+    );
     const target = browser
       .targets()
       .find(targetEnum => targetEnum._targetInfo.type === 'page');
