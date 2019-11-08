@@ -19,6 +19,7 @@ import BrowserInterceptPage from './components/pages/BrowserInterceptPage';
 import CrawlerPage from './components/pages/CrawlerPage';
 import RequestsPage from './components/pages/RequestsPage';
 import ScansPage from './components/pages/ScansPage';
+import BrowserSessionsDropdown from './components/BrowserSessionsDropdown';
 
 import BackendConnection from './lib/BackendConnection';
 import SettingsContext from './lib/SettingsContext';
@@ -126,6 +127,24 @@ export default class App extends Component {
       changeSetting: this.changeSetting
     };
 
+    const content = (
+      <>
+        <Route exact path="/" component={BrowserNetworkPage} />
+        <Route exact path="/browser/network" component={BrowserNetworkPage} />
+
+        <Route
+          exact
+          path="/browser/intercept"
+          component={BrowserInterceptPage}
+        />
+        <Route exact path="/browser/sessions" component={BrowserSessionsPage} />
+
+        <Route exact path="/crawler" component={CrawlerPage} />
+        <Route exact path="/requests" component={RequestsPage} />
+        <Route exact path="/scans" component={ScansPage} />
+      </>
+    );
+
     return (
       <SettingsContext.Provider value={settingsContextValue}>
         <HashRouter history={history}>
@@ -138,27 +157,13 @@ export default class App extends Component {
             <Route path="/" component={Sidebar} />
 
             <div className="theme--pane app-content">
-              <Route exact path="/" component={BrowserNetworkPage} />
-              <Route
-                exact
-                path="/browser/network"
-                component={BrowserNetworkPage}
-              />
+              <div className="pane-container-vertical">
+                <div className="pane-remaining">{content}</div>
 
-              <Route
-                exact
-                path="/browser/intercept"
-                component={BrowserInterceptPage}
-              />
-              <Route
-                exact
-                path="/browser/sessions"
-                component={BrowserSessionsPage}
-              />
-
-              <Route exact path="/crawler" component={CrawlerPage} />
-              <Route exact path="/requests" component={RequestsPage} />
-              <Route exact path="/scans" component={ScansPage} />
+                <div className="pane-fixed status-bar">
+                  <BrowserSessionsDropdown />
+                </div>
+              </div>
             </div>
           </div>
         </HashRouter>

@@ -35,6 +35,13 @@ const instrumentBrowser = async browser => {
     const newPage = await target.page();
     handleNewPage(newPage);
   });
+
+  browser.on('disconnected', () => {
+    global.puppeteer_browsers = global.puppeteer_browsers.filter(
+      globalBrowser => globalBrowser !== browser
+    );
+    ipc.send('browsersChanged', {});
+  });
 };
 
 const handleNewPage = async page => {
@@ -122,7 +129,8 @@ const handleFramenavigated = async (page, frame, origURL) => {
     host: parsedUrl.hostname,
     path: parsedUrl.pathname,
     response_body_rendered: pageBody,
-    request_type: 'navigation'
+    request_type: 'navigation',
+    created_at: Date.now()
   };
 
   const result = await global.dbStore
