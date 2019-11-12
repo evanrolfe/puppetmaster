@@ -1,39 +1,9 @@
-const puppeteer = require('puppeteer');
-const { instrumentBrowser } = require('../lib/BrowserUtils');
-const ipc = require('../server-ipc');
+const { createBrowser, openBrowser } = require('../lib/BrowserUtils');
 
 class BrowsersController {
   // POST /browsers
   async create() {
-    // See: https://github.com/GoogleChrome/puppeteer/issues/2134
-
-    // TODO: Move this logic to BrowserUtils:
-    const puppeteerExec = puppeteer
-      .executablePath()
-      .replace('app.asar', 'app.asar.unpacked');
-
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      executablePath: puppeteerExec,
-      args: []
-    });
-
-    const result = await global.dbStore
-      .connection('browsers')
-      .insert({ open: 1, created_at: Date.now() });
-    const browserId = result[0];
-    // Set the default title:
-    await global.dbStore
-      .connection('browsers')
-      .where({ id: browserId })
-      .update({ title: `Session #${browserId}` });
-    browser.id = browserId;
-    global.puppeteer_browsers.push(browser);
-
-    await instrumentBrowser(browser);
-
-    ipc.send('browsersChanged', {});
+    await createBrowser();
 
     return { status: 'OK' };
   }
@@ -44,12 +14,13 @@ class BrowsersController {
       .connection('browsers')
       .where({ id: args.browserId });
     const browser = result[0];
-
     if (browser.open === 1) {
-      this.bringToForeground(args);
+      await this.bringToForeground(args);
     } else {
-      // TODO
+      await openBrowser(args.browserId);
     }
+
+    return { status: 'OK', body: {} };
   }
 
   async index() {

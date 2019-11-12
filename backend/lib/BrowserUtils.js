@@ -1,3 +1,4 @@
+const puppeteer = require('puppeteer');
 const Request = require('../models/Request');
 const ipc = require('../server-ipc');
 
@@ -24,6 +25,71 @@ const ipc = require('../server-ipc');
  * BrowserUtils: DOMListener 64 running...
  * BrowserUtils: saved content for page: http://localhost/posts to request 9, (DOMListener 64)
  */
+
+const createBrowserDb = async () => {
+  const result = await global.dbStore
+    .connection('browsers')
+    .insert({ open: 1, created_at: Date.now() });
+
+  const browserId = result[0];
+
+  await global.dbStore
+    .connection('browsers')
+    .where({ id: browserId })
+    .update({ title: `Session #${browserId}` });
+
+  return browserId;
+};
+
+const createBrowser = async () => {
+  const browserId = await createBrowserDb();
+
+  const puppeteerExec = puppeteer
+    .executablePath()
+    .replace('app.asar', 'app.asar.unpacked');
+
+  const browser = await puppeteer.launch({
+    headless: false,
+    defaultViewport: null,
+    executablePath: puppeteerExec,
+    userDataDir: `./tmp/browser${browserId}`,
+    args: []
+  });
+
+  browser.id = browserId;
+  global.puppeteer_browsers.push(browser);
+
+  await instrumentBrowser(browser);
+
+  ipc.send('browsersChanged', {});
+
+  return browser;
+};
+
+// NOTE: Sessions are not preserved in usersdatadir, see:
+// https://github.com/GoogleChrome/puppeteer/issues/1316
+// https://stackoverflow.com/questions/57987585/puppeteer-how-to-store-a-session-including-cookies-page-state-local-storage
+const openBrowser = async browserId => {
+  const puppeteerExec = puppeteer
+    .executablePath()
+    .replace('app.asar', 'app.asar.unpacked');
+
+  const browser = await puppeteer.launch({
+    headless: false,
+    defaultViewport: null,
+    executablePath: puppeteerExec,
+    userDataDir: `./tmp/browser${browserId}`,
+    args: []
+  });
+
+  browser.id = browserId;
+  global.puppeteer_browsers.push(browser);
+
+  await instrumentBrowser(browser);
+
+  ipc.send('browsersChanged', {});
+};
+
 const instrumentBrowser = async browser => {
   const pages = await browser.pages();
   const page = pages[0];
@@ -199,5 +265,7 @@ const startDOMListener = async page => {
   return domListenerId;
 };
 
+module.exports.openBrowser = openBrowser;
+module.exports.createBrowser = createBrowser;
 module.exports.instrumentBrowser = instrumentBrowser;
 module.exports.handleBrowserClosed = handleBrowserClosed;

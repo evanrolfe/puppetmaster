@@ -1,5 +1,4 @@
-const puppeteer = require('puppeteer');
-const { instrumentBrowser } = require('../../../backend/lib/BrowserUtils');
+const { createBrowser } = require('../../../backend/lib/BrowserUtils');
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
@@ -7,6 +6,10 @@ describe('BrowsersUtils', () => {
   let browser;
 
   beforeEach(async () => {
+    await global.dbStore.connection.raw('Delete FROM browsers;');
+    await global.dbStore.connection.raw(
+      'DELETE FROM SQLITE_SEQUENCE WHERE name="browsers";'
+    );
     await global.dbStore.connection.raw('Delete FROM capture_filters;');
     await global.dbStore.connection.raw(
       'DELETE FROM SQLITE_SEQUENCE WHERE name="capture_filters";'
@@ -40,17 +43,15 @@ describe('BrowsersUtils', () => {
         'xhr'
       ]
     };
+
+    // HACK: Yes we shouldn't be using global vars like this..
+    global.puppeteer_browsers = [];
+
     await global.dbStore
       .connection('capture_filters')
       .insert({ id: 1, filters: JSON.stringify(filters) });
 
-    browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      args: []
-    });
-
-    await instrumentBrowser(browser);
+    browser = await createBrowser();
   });
 
   afterEach(async () => {
