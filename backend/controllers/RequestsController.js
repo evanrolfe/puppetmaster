@@ -24,7 +24,7 @@ class RequestsController {
     ];
 
     const requests = await Request.findByParams(columns, args);
-    console.log(requests);
+
     return { status: 'OK', body: requests };
   }
 

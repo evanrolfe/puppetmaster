@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS browsers(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT,
   open INTEGER NOT NULL,
+  cookies TEXT,
+  pages TEXT,
   created_at INTEGER
 );
 

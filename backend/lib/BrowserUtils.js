@@ -82,6 +82,44 @@ const openBrowser = async browserId => {
     args: []
   });
 
+  // Load the cookies:
+  const result = await global.dbStore
+    .connection('browsers')
+    .where({ id: browserId });
+  const browserRecord = result[0];
+  const cookiesObj = JSON.parse(browserRecord.cookies);
+  console.log('loaded cookies:');
+  console.log(cookiesObj);
+
+  // const target = browser.target();
+  const target = browser
+    .targets()
+    .find(targetEnum => targetEnum._targetInfo.type === 'page');
+
+  const cdpSession = await target.createCDPSession();
+  await cdpSession.send('Network.setCookies', {
+    cookies: cookiesObj
+  });
+
+  // Load the pages
+  const pageUrls = JSON.parse(browserRecord.pages);
+  for (let i = 0; i < pageUrls.length; i++) {
+    const pageUrl = pageUrls[i];
+
+    // Chromium starts with an about:blank page open so use that for the first one:
+    let page;
+    if (i === 0) {
+      // eslint-disable-next-line no-await-in-loop
+      const pages = await browser.pages();
+      page = pages[0];
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      page = await browser.newPage();
+    }
+    page.goto(pageUrl);
+  }
+
+  // Store in global vars
   browser.id = browserId;
   global.puppeteer_browsers.push(browser);
 
@@ -107,6 +145,7 @@ const instrumentBrowser = async browser => {
 
 const handleBrowserClosed = async browser => {
   console.log(`handleBrowserClosed for browser #${browser.id}`);
+
   await global.dbStore
     .connection('browsers')
     .where({ id: browser.id })
@@ -125,6 +164,18 @@ const handleNewPage = async page => {
 const handleResponse = async (page, response) => {
   const requestId = await Request.createFromBrowserResponse(page, response);
 
+  // Save the cookies & pages:
+  const { cookies } = await page._client.send('Network.getAllCookies');
+  const pages = await page.browser().pages();
+  const pageUrls = pages.map(pageEnum => pageEnum.url());
+  await global.dbStore
+    .connection('browsers')
+    .where({ id: page.browser().id })
+    .update({
+      cookies: JSON.stringify(cookies),
+      pages: JSON.stringify(pageUrls)
+    });
+
   if (
     response.request().isNavigationRequest() &&
     page.url() !== 'about:blank'
@@ -135,6 +186,11 @@ const handleResponse = async (page, response) => {
     console.log(
       `BrowserUtils: Navigation request for ${page.url()}, requestID: ${requestId}`
     );
+
+    await global.dbStore
+      .connection('browsers')
+      .where({ id: page.browser().id })
+      .update({ pages: JSON.stringify(pageUrls) });
 
     if (response.request().frame() !== null) {
       console.log(
@@ -178,11 +234,6 @@ const handleFramenavigated = async (page, frame, origURL) => {
   console.log(
     `BrowserUtils: frameNavigated to ${frame.url()}, origURL: ${origURL}`
   );
-  if (frame.parentFrame() !== null) {
-    console.log(`BrowserUtils: parentFrame: ${frame.parentFrame().url()}`);
-  } else {
-    console.log(`BrowserUtils: parentFrame: null`);
-  }
 
   await clearInterval(page.domListenerId);
   console.log(`BrowserUtils: killed DomListener #${page.domListenerId}`);
@@ -211,9 +262,9 @@ const handleFramenavigated = async (page, frame, origURL) => {
   const result = await global.dbStore
     .connection('requests')
     .insert(requestParams);
-  console.log(
-    `BrowserUtils: create new request ${result[0]} and starting DOMListener...`
-  );
+  //  console.log(
+  //    `BrowserUtils: create new request ${result[0]} and starting DOMListener...`
+  //  );
   page.requestId = result[0];
   page.domListenerId = await startDOMListener(page);
 };
@@ -221,7 +272,7 @@ const handleFramenavigated = async (page, frame, origURL) => {
 // eslint-disable-next-line arrow-body-style
 const startDOMListener = async page => {
   const domListenerId = await setInterval(async () => {
-    console.log(`BrowserUtils: DOMListener ${domListenerId} running...`);
+    // console.log(`BrowserUtils: DOMListener ${domListenerId} running...`);
 
     // Fetch the page's current content
     let body;
@@ -240,11 +291,6 @@ const startDOMListener = async page => {
       .where({ id: page.requestId });
     const request = result[0];
     if (request.url !== page.url()) {
-      console.log(
-        `BrowserUtils: DOMListener ${domListenerId}: ${
-          request.url
-        } !== ${page.url()}`
-      );
       clearInterval(domListenerId); // Stop this listener because it is out of date
       return;
     }
@@ -255,13 +301,13 @@ const startDOMListener = async page => {
       .where({ id: page.requestId })
       .update({ response_body_rendered: body });
 
-    console.log(
-      `BrowserUtils: saved content for page: ${page.url()} to request ${
-        page.requestId
-      }, (DOMListener ${domListenerId})`
-    );
+    //    console.log(
+    //      `BrowserUtils: saved content for page: ${page.url()} to request ${
+    //        page.requestId
+    //      }, (DOMListener ${domListenerId})`
+    //    );
   }, 200);
-  console.log(`BrowserUtils: started domListener id ${domListenerId}`);
+
   return domListenerId;
 };
 
