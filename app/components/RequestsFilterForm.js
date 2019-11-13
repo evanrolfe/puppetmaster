@@ -8,6 +8,7 @@ import CaptureFiltersModal from './modals/CaptureFiltersModal';
 type Props = {
   allStatusCodes: 'array',
   allResourceTypes: 'array',
+  allBrowsers: 'array',
   filters: 'object',
   setFilters: 'function',
   setSearch: 'function'
@@ -31,6 +32,7 @@ export default class RequestsFilterForm extends React.PureComponent<Props> {
           ref={registerModal}
           allStatusCodes={this.props.allStatusCodes}
           allResourceTypes={this.props.allResourceTypes}
+          allBrowsers={this.props.allBrowsers}
           origFilters={this.props.filters}
           setFilters={this.props.setFilters}
         />

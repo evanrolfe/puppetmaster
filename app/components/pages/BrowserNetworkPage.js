@@ -94,10 +94,12 @@ export default class BrowserNetworkPage extends Component<Props> {
           resourceTypes: RESOURCE_TYPES,
           extSetting: '', // ''|'include'|'exclude'
           extList: [],
-          search: ''
+          search: '',
+          browserId: null
         },
         windowSize: remote.getCurrentWindow().getSize(),
-        requestViewTabIndex: 0
+        requestViewTabIndex: 0,
+        browsers: []
       };
     } else {
       this.state = global.browserNetworkPageState;
@@ -129,6 +131,7 @@ export default class BrowserNetworkPage extends Component<Props> {
     });
     global.backendConn.listen('browsersChanged', () => {
       this.loadRequests();
+      this.loadBrowsers();
     });
   }
 
@@ -140,6 +143,8 @@ export default class BrowserNetworkPage extends Component<Props> {
     if (this.state.requests.length === 0) {
       this.loadRequests();
     }
+
+    this.loadBrowsers();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -158,6 +163,7 @@ export default class BrowserNetworkPage extends Component<Props> {
       this.state.order_by !== prevState.order_by ||
       this.state.dir !== prevState.dir ||
       this.state.filters.search !== prevState.filters.search ||
+      this.state.filters.browserId !== prevState.filters.browserId ||
       this.state.filters.hostSetting !== prevState.filters.hostSetting ||
       this.state.filters.pathSetting !== prevState.filters.pathSetting ||
       this.state.filters.extSetting !== prevState.filters.extSetting ||
@@ -196,12 +202,23 @@ export default class BrowserNetworkPage extends Component<Props> {
         extList: this.state.filters.extList,
         resourceTypes: this.state.filters.resourceTypes,
         statusCodes: this.state.filters.statusCodes,
-        search: this.state.filters.search
+        search: this.state.filters.search,
+        browserId: this.state.filters.browserId
       }
     );
 
     this.setState({ requests: response.result.body });
     /* eslint-enable */
+  }
+
+  async loadBrowsers() {
+    const response = await global.backendConn.send(
+      'BrowsersController',
+      'index',
+      {}
+    );
+
+    this.setState({ browsers: response.result.body });
   }
 
   setSelectedRequestId(id) {
@@ -357,6 +374,7 @@ export default class BrowserNetworkPage extends Component<Props> {
               <RequestsFilterForm
                 allStatusCodes={STATUS_CODES}
                 allResourceTypes={RESOURCE_TYPES}
+                allBrowsers={this.state.browsers}
                 filters={filters}
                 setFilters={this.setFilters}
                 setSearch={this.setSearch}

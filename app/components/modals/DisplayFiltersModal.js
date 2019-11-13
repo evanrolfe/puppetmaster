@@ -157,6 +157,20 @@ export default class DisplayFiltersModal extends Component {
     });
   }
 
+  displayResourceTypeCheckbox(type) {
+    return (
+      <label style={{ verticalAlign: 'top' }}>
+        {type}
+        <input
+          type="checkbox"
+          value={type}
+          checked={this.state.filters.resourceTypes.includes(type)}
+          onChange={this._handleResourceTypeChange}
+        />
+      </label>
+    );
+  }
+
   render() {
     return (
       <Modal
@@ -171,68 +185,27 @@ export default class DisplayFiltersModal extends Component {
         <ModalBody>
           <div className="pad">
             <div className="row-fill row-fill--top">
-              <div className="form-control form-control--outlined">
+              <div
+                className="form-control form-control--outlined"
+                style={{ width: '50%', paddingRight: '6px' }}
+              >
                 <label>
-                  Host
+                  Browser Session:
                   <select
-                    name="hostSetting"
-                    value={this.state.filters.hostSetting}
+                    name="browserId"
+                    value={this.state.filters.browserId}
                     onChange={this._handleChangeSetting}
                   >
-                    <option value="">No filter</option>
-                    <option value="include">Includes:</option>
-                    <option value="exclude">Does not include:</option>
+                    <option value="">All</option>
+                    {this.props.allBrowsers.map(browser => (
+                      <option value={browser.id}>{browser.title}</option>
+                    ))}
                   </select>
-                </label>
-              </div>
-
-              <div className="form-control form-control--outlined">
-                <label>
-                  Values:
-                  <textarea
-                    className="filterList"
-                    name="hostList"
-                    placeholder="example.com"
-                    value={this.state.filters.hostList.join('\n')}
-                    onChange={this._handleChangeListTextArea}
-                    disabled={this.state.filters.hostSetting === ''}
-                  />
                 </label>
               </div>
             </div>
 
-            <div className="row-fill row-fill--top">
-              <div className="form-control form-control--outlined">
-                <label>
-                  Path
-                  <select
-                    name="pathSetting"
-                    value={this.state.filters.pathSetting}
-                    onChange={this._handleChangeSetting}
-                  >
-                    <option value="">No filter</option>
-                    <option value="include">Includes segment:</option>
-                    <option value="exclude">Does not include segment:</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="form-control form-control--outlined">
-                <label>
-                  Values:
-                  <textarea
-                    className="filterList"
-                    name="pathList"
-                    placeholder="/api/v2/"
-                    value={this.state.filters.pathList.join('\n')}
-                    onChange={this._handleChangeListTextArea}
-                    disabled={this.state.filters.pathSetting === ''}
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="row-fill row-fill--top">
+            <div className="row-fill row-fill--top modal-form-row">
               <div className="form-control form-control--thin">
                 <strong>Status Code</strong>
                 <span onClick={this.toggleAllStatusCodes}>(toggle all)</span>
@@ -256,21 +229,29 @@ export default class DisplayFiltersModal extends Component {
                 <strong>Resource Type: </strong>
                 <span onClick={this.toggleAllResourceTypes}>(toggle all)</span>
 
-                {this.props.allResourceTypes.map(type => (
-                  <label>
-                    {type}
-                    <input
-                      type="checkbox"
-                      value={type}
-                      checked={this.state.filters.resourceTypes.includes(type)}
-                      onChange={this._handleResourceTypeChange}
-                    />
-                  </label>
-                ))}
+                <div className="row-fill">
+                  <div>
+                    {this.props.allResourceTypes
+                      .slice(0, 5)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                  <div>
+                    {this.props.allResourceTypes
+                      .slice(5, 10)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                  <div
+                    style={{ display: 'inline-block', verticalAlign: 'top' }}
+                  >
+                    {this.props.allResourceTypes
+                      .slice(10, this.props.allResourceTypes.length)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="row-fill row-fill--top">
+            <div className="row-fill row-fill--top modal-form-row">
               <div className="form-control form-control--outlined">
                 <label>
                   File Extension
@@ -296,6 +277,68 @@ export default class DisplayFiltersModal extends Component {
                     value={this.state.filters.extList.join(',')}
                     onChange={this._handleChangeListInput}
                     disabled={this.state.filters.extSetting === ''}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="row-fill row-fill--top modal-form-row">
+              <div className="form-control form-control--outlined">
+                <label>
+                  Host
+                  <select
+                    name="hostSetting"
+                    value={this.state.filters.hostSetting}
+                    onChange={this._handleChangeSetting}
+                  >
+                    <option value="">No filter</option>
+                    <option value="include">Includes:</option>
+                    <option value="exclude">Excludes:</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="form-control form-control--outlined">
+                <label>
+                  Values:
+                  <textarea
+                    className="filterList"
+                    name="hostList"
+                    placeholder="example.com"
+                    value={this.state.filters.hostList.join('\n')}
+                    onChange={this._handleChangeListTextArea}
+                    disabled={this.state.filters.hostSetting === ''}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="row-fill row-fill--top modal-form-row">
+              <div className="form-control form-control--outlined">
+                <label>
+                  Path
+                  <select
+                    name="pathSetting"
+                    value={this.state.filters.pathSetting}
+                    onChange={this._handleChangeSetting}
+                  >
+                    <option value="">No filter</option>
+                    <option value="include">Includes segment:</option>
+                    <option value="exclude">Does not include segment:</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="form-control form-control--outlined">
+                <label>
+                  Values:
+                  <textarea
+                    className="filterList"
+                    name="pathList"
+                    placeholder="/api/v2/"
+                    value={this.state.filters.pathList.join('\n')}
+                    onChange={this._handleChangeListTextArea}
+                    disabled={this.state.filters.pathSetting === ''}
                   />
                 </label>
               </div>

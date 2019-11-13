@@ -176,6 +176,15 @@ class Request extends Store.BaseModel {
       });
     }
 
+    // BrowserId filter:
+    if (
+      params.browserId !== '' &&
+      params.browserId !== undefined &&
+      params.browserId !== null
+    ) {
+      query = query.where({ browser_id: parseInt(params.browserId) });
+    }
+
     // Order
     if (params.order_by !== undefined && params.dir !== undefined) {
       if (params.order_by === 'id') params.order_by = 'requests.id';

@@ -145,6 +145,20 @@ export default class CaptureFiltersModal extends Component {
     });
   }
 
+  displayResourceTypeCheckbox(type) {
+    return (
+      <label style={{ verticalAlign: 'top' }}>
+        {type}
+        <input
+          type="checkbox"
+          value={type}
+          checked={this.state.filters.resourceTypes.includes(type)}
+          onChange={this._handleResourceTypeChange}
+        />
+      </label>
+    );
+  }
+
   render() {
     return (
       <Modal
@@ -252,21 +266,32 @@ export default class CaptureFiltersModal extends Component {
             </div>
 
             <div className="row-fill row-fill--top">
-              <div className="form-control form-control--thin">
+              <div
+                className="form-control form-control--thin"
+                style={{ width: '50%', paddingRight: '6px' }}
+              >
                 <strong>Resource Type: </strong>
                 <span onClick={this.toggleAllResourceTypes}>(toggle all)</span>
 
-                {this.props.allResourceTypes.map(type => (
-                  <label>
-                    {type}
-                    <input
-                      type="checkbox"
-                      value={type}
-                      checked={this.state.filters.resourceTypes.includes(type)}
-                      onChange={this._handleResourceTypeChange}
-                    />
-                  </label>
-                ))}
+                <div className="row-fill">
+                  <div>
+                    {this.props.allResourceTypes
+                      .slice(0, 5)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                  <div>
+                    {this.props.allResourceTypes
+                      .slice(5, 10)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                  <div
+                    style={{ display: 'inline-block', verticalAlign: 'top' }}
+                  >
+                    {this.props.allResourceTypes
+                      .slice(10, this.props.allResourceTypes.length)
+                      .map(type => this.displayResourceTypeCheckbox(type))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
