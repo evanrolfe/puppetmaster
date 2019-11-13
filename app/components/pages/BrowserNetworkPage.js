@@ -127,6 +127,9 @@ export default class BrowserNetworkPage extends Component<Props> {
     global.backendConn.listen('requestCreated', () => {
       this.loadRequests();
     });
+    global.backendConn.listen('browsersChanged', () => {
+      this.loadRequests();
+    });
   }
 
   componentDidMount() {

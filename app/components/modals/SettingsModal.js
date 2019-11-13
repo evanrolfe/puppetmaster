@@ -47,7 +47,7 @@ export default class SettingsModal extends Component {
     return (
       <Modal ref={this._setModalRef} tall freshState {...this.props}>
         <ModalHeader>Preferences</ModalHeader>
-        <ModalBody noScroll>
+        <ModalBody>
           <Tabs
             className="react-tabs"
             selectedIndex={this.state.tabIndex}

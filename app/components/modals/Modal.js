@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import KeydownBinder from '../KeydownBinder';
 
@@ -10,7 +9,24 @@ import { pressedHotKey } from '../../utils/hotkeys-listener';
 // appear over top of an existing one.
 let globalZIndex = 1000;
 
-class Modal extends Component {
+type Props = {
+  wide: 'boolean',
+  thin: 'boolean',
+  noEscape: 'boolean',
+  dontFocus: 'boolean',
+  closeOnKeyCodes: 'array',
+  onHide: 'function',
+  onShow: 'function',
+  onCancel: 'function',
+  onKeyDown: 'function',
+  freshState: 'boolean',
+  children: 'object',
+  className: 'string'
+};
+
+class Modal extends Component<Props> {
+  props: Props;
+
   constructor(props) {
     super(props);
 
@@ -27,6 +43,16 @@ class Modal extends Component {
     this.toggle = this.toggle.bind(this);
     this.isOpen = this.isOpen.bind(this);
     this.hide = this.hide.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.open === false &&
+      this.state.open === true &&
+      this.props.onShow
+    ) {
+      this.props.onShow();
+    }
   }
 
   async _handleKeyDown(e) {
@@ -140,7 +166,7 @@ class Modal extends Component {
   }
 
   render() {
-    const { wide, noEscape, className, children } = this.props;
+    const { thin, wide, noEscape, className, children } = this.props;
     const { open, zIndex, forceRefreshCounter } = this.state;
 
     if (!open) {
@@ -152,7 +178,8 @@ class Modal extends Component {
       'theme--pane',
       className,
       { 'modal--noescape': noEscape },
-      { 'modal--wide': wide }
+      { 'modal--wide': wide },
+      { 'modal--thin': thin }
     );
 
     const styles = {};
@@ -184,18 +211,5 @@ class Modal extends Component {
     );
   }
 }
-
-Modal.propTypes = {
-  wide: PropTypes.bool,
-  noEscape: PropTypes.bool,
-  dontFocus: PropTypes.bool,
-  closeOnKeyCodes: PropTypes.array,
-  onHide: PropTypes.func,
-  onCancel: PropTypes.func,
-  onKeyDown: PropTypes.func,
-  freshState: PropTypes.bool,
-  children: PropTypes.node,
-  className: PropTypes.string
-};
 
 export default Modal;

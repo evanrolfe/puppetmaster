@@ -5,6 +5,7 @@ import {
   DropdownItem,
   DropdownDivider
 } from './dropdown';
+import EditBrowserModal from './modals/EditBrowserModal';
 
 type Props = {};
 
@@ -21,6 +22,11 @@ export default class BrowserSessionsDropdown extends Component<Props> {
     global.backendConn.listen('browsersChanged', () => {
       this.loadBrowsers();
     });
+    this.browserModals = {};
+
+    this.registerModal = this.registerModal.bind(this);
+    this._setDropdownRef = this._setDropdownRef.bind(this);
+    this.saveBrowserTitle = this.saveBrowserTitle.bind(this);
   }
 
   async loadBrowsers() {
@@ -30,6 +36,7 @@ export default class BrowserSessionsDropdown extends Component<Props> {
       {}
     );
     const browsers = result.result.body;
+
     this.setState({ browsers: browsers });
   }
 
@@ -43,23 +50,72 @@ export default class BrowserSessionsDropdown extends Component<Props> {
     global.backendConn.send('BrowsersController', 'create', {});
   }
 
+  editBrowser(event, browserId) {
+    event.stopPropagation();
+
+    this.dropdownRef.toggle();
+    this.browserModals[browserId].show();
+  }
+
+  saveBrowserTitle(browserId, title) {
+    console.log(`Saving browser id: ${browserId} with title: ${title}`);
+    global.backendConn.send('BrowsersController', 'update', {
+      browserId: browserId,
+      title: title
+    });
+  }
+
+  displayBrowserTitle(browser) {
+    return (
+      <>
+        {browser.title}
+        <span
+          className="pull-right"
+          onClick={event => this.editBrowser(event, browser.id)}
+        >
+          <i className="fas fa-pen edit-icon" />
+        </span>
+      </>
+    );
+  }
+
+  registerModal(instance) {
+    this.browserModals[instance.props.browser.id] = instance;
+  }
+
+  _setDropdownRef(ref) {
+    this.dropdownRef = ref;
+  }
+
   render() {
     return (
-      <Dropdown className="browser-sessions pull-right">
-        <DropdownButton className="browser-sessions">
-          Browser Sessions ({this.state.browsers.length})
-        </DropdownButton>
-
-        <DropdownDivider>Browser Sessions:</DropdownDivider>
+      <>
         {this.state.browsers.map(browser => (
-          <DropdownItem onClick={this.openBrowser} value={browser.id}>
-            {browser.title}
-          </DropdownItem>
+          <EditBrowserModal
+            ref={this.registerModal}
+            browser={browser}
+            saveBrowserTitle={this.saveBrowserTitle}
+          />
         ))}
-        <DropdownDivider>Actions</DropdownDivider>
-        <DropdownItem onClick={this.selectDropdownItem}>View All</DropdownItem>
-        <DropdownItem onClick={this.createSession}>New Session</DropdownItem>
-      </Dropdown>
+
+        <Dropdown
+          ref={this._setDropdownRef}
+          className="browser-sessions pull-right"
+        >
+          <DropdownButton className="browser-sessions">
+            Browser Sessions ({this.state.browsers.length})
+          </DropdownButton>
+
+          <DropdownDivider>Browser Sessions:</DropdownDivider>
+          {this.state.browsers.map(browser => (
+            <DropdownItem onClick={this.openBrowser} value={browser.id}>
+              {this.displayBrowserTitle(browser)}
+            </DropdownItem>
+          ))}
+          <DropdownDivider>Actions:</DropdownDivider>
+          <DropdownItem onClick={this.createSession}>New Session</DropdownItem>
+        </Dropdown>
+      </>
     );
   }
 }

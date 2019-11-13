@@ -66,6 +66,15 @@ const createBrowser = async () => {
   return browser;
 };
 
+const updateBrowser = async (browserId, title) => {
+  await global.dbStore
+    .connection('browsers')
+    .where({ id: browserId })
+    .update({ title: title });
+
+  ipc.send('browsersChanged', {});
+};
+
 // NOTE: Sessions are not preserved in usersdatadir, see:
 // https://github.com/GoogleChrome/puppeteer/issues/1316
 // https://stackoverflow.com/questions/57987585/puppeteer-how-to-store-a-session-including-cookies-page-state-local-storage
@@ -313,5 +322,6 @@ const startDOMListener = async page => {
 
 module.exports.openBrowser = openBrowser;
 module.exports.createBrowser = createBrowser;
+module.exports.updateBrowser = updateBrowser;
 module.exports.instrumentBrowser = instrumentBrowser;
 module.exports.handleBrowserClosed = handleBrowserClosed;

@@ -1,4 +1,8 @@
-const { createBrowser, openBrowser } = require('../lib/BrowserUtils');
+const {
+  createBrowser,
+  updateBrowser,
+  openBrowser
+} = require('../lib/BrowserUtils');
 
 class BrowsersController {
   // POST /browsers
@@ -6,6 +10,18 @@ class BrowsersController {
     await createBrowser();
 
     return { status: 'OK' };
+  }
+
+  async index() {
+    const browsers = await global.dbStore.connection('browsers');
+
+    return { status: 'OK', body: browsers };
+  }
+
+  async update(args) {
+    await updateBrowser(args.browserId, args.title);
+
+    return { status: 'OK', body: {} };
   }
 
   async open(args) {
@@ -21,12 +37,6 @@ class BrowsersController {
     }
 
     return { status: 'OK', body: {} };
-  }
-
-  async index() {
-    const browsers = await global.dbStore.connection('browsers');
-
-    return { status: 'OK', body: browsers };
   }
 
   async bringToForeground(args) {

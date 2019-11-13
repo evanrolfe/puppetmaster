@@ -91,7 +91,6 @@
 
     .dropdown__text {
       white-space: nowrap;
-      display: flex;
       flex-direction: row;
       align-items: center;
 
@@ -104,6 +103,15 @@
         color: @hl-xl;
         margin-left: auto;
         padding-left: @padding-lg;
+      }
+
+      .edit-icon {
+        opacity: 0.5;
+      }
+
+      .edit-icon:hover {
+        cursor: pointer;
+        opacity: 1.0;
       }
     }
 
@@ -130,6 +138,7 @@
     li > button:hover:not(:disabled),
     li.active > button:not(:disabled) {
       background: @hl-sm;
+      cursor: pointer;
     }
 
     li > button:active:not(:disabled) {
