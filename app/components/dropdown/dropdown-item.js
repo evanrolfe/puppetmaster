@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import autobind from 'autobind-decorator';
-import classnames from 'classnames';
 
 @autobind
 class DropdownItem extends PureComponent {
@@ -34,23 +33,39 @@ class DropdownItem extends PureComponent {
       ...props
     } = this.props;
 
-    const styles = color ? { color } : {};
+    if (this.props.browserLink) {
+      return (
+        <div className="dropdown__button" {...props}>
+          <div className="pane-container-horizontal">
+            <div
+              className="pane-remaining first-button"
+              onClick={this._handleClick}
+            >
+              {this.props.browserTitle}
+            </div>
 
-    const inner = (
-      <div className={classnames('dropdown__inner', className)}>
-        <div className="dropdown__text" style={styles}>
-          {children}
+            <div
+              className="pane-fixed  second-button"
+              onClick={this.props.editBrowser}
+            >
+              <i className="fas fa-pen edit-icon" />
+            </div>
+          </div>
         </div>
-      </div>
-    );
-
-    const buttonProps = {
-      type: 'button',
-      onClick: this._handleClick,
-      ...props
-    };
-
-    return React.createElement(buttonClass || 'button', buttonProps, inner);
+      );
+    } else {
+      return (
+        <button
+          className="dropdown__button"
+          onClick={this._handleClick}
+          {...props}
+        >
+          <div className="dropdown__inner">
+            <div className="dropdown__text">{children}</div>
+          </div>
+        </button>
+      );
+    }
   }
 }
 

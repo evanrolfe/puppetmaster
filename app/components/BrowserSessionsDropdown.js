@@ -50,7 +50,7 @@ export default class BrowserSessionsDropdown extends Component<Props> {
     global.backendConn.send('BrowsersController', 'create', {});
   }
 
-  editBrowser(event, browserId) {
+  editBrowser(browserId, event) {
     event.stopPropagation();
 
     this.dropdownRef.toggle();
@@ -108,12 +108,17 @@ export default class BrowserSessionsDropdown extends Component<Props> {
 
           <DropdownDivider>Browser Sessions:</DropdownDivider>
           {this.state.browsers.map(browser => (
-            <DropdownItem onClick={this.openBrowser} value={browser.id}>
-              {this.displayBrowserTitle(browser)}
-            </DropdownItem>
+            <DropdownItem
+              browserLink
+              browserTitle={browser.title}
+              onClick={() => this.openBrowser(browser.id)}
+              editBrowser={this.editBrowser.bind(this, browser.id)}
+            />
           ))}
           <DropdownDivider>Actions:</DropdownDivider>
-          <DropdownItem onClick={this.createSession}>New Session</DropdownItem>
+          <DropdownItem onClick={this.createSession}>
+            <span style={{ paddingLeft: '8px' }}>New Session</span>
+          </DropdownItem>
         </Dropdown>
       </>
     );

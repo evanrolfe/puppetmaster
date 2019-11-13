@@ -115,18 +115,31 @@
       }
     }
 
-    li > button {
+    // Single button config:
+    li > .main-button {
+      padding-left: @padding-sm;
+    }
+
+    li > .dropdown__button {
       min-width: 15rem;
       font-size: @font-size-md;
       text-align: left;
-      padding-right: @padding-md;
-      padding-left: @padding-sm;
       height: @line-height-xs;
-      width: 100%;
-      display: block;
       color: var(--color-font) !important;
       white-space: nowrap;
       margin: 0;
+
+      // Multi buttons config:
+      .first-button {
+        padding-left: @padding-sm;
+        padding-top: 8px;
+      }
+
+      .second-button {
+        padding-left: @padding-sm;
+        padding-right: @padding-md;
+        padding-top: 8px;
+      }
 
       i.fa:first-child {
         display: inline-block;
@@ -135,13 +148,13 @@
       }
     }
 
-    li > button:hover:not(:disabled),
-    li.active > button:not(:disabled) {
+    li > .dropdown__button:hover:not(:disabled),
+    li.active > div:not(:disabled) {
       background: @hl-sm;
       cursor: pointer;
     }
 
-    li > button:active:not(:disabled) {
+    li > .dropdown__button:active:not(:disabled) {
       background: @hl-md;
     }
 
