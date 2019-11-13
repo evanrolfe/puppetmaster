@@ -3,7 +3,6 @@ import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
 import RequestTab from './RequestView/RequestTab';
 import ResponseTab from './RequestView/ResponseTab';
 import BodyTab from './RequestView/BodyTab';
-import CookiesTab from './RequestView/CookiesTab';
 
 type Props = {
   selectedRequestId: 'number',
@@ -83,10 +82,6 @@ export default class RequestView extends Component<Props> {
               <Tab>
                 <button type="button">Body</button>
               </Tab>
-
-              <Tab>
-                <button type="button">Cookies</button>
-              </Tab>
             </TabList>
 
             {/* Stupid Hack to avoid a warning from react-tabs: */}
@@ -112,11 +107,6 @@ export default class RequestView extends Component<Props> {
             request={request}
             codeMirrorWidth={this.props.codeMirrorWidth}
           />
-        )}
-        {this.props.tabIndex === 3 && (
-          <div className="pane-remaining">
-            <CookiesTab request={request} />
-          </div>
         )}
       </div>
     );
