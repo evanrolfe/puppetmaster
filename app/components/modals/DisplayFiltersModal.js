@@ -159,7 +159,7 @@ export default class DisplayFiltersModal extends Component {
 
   displayResourceTypeCheckbox(type) {
     return (
-      <label style={{ verticalAlign: 'top' }}>
+      <label style={{ verticalAlign: 'top' }} key={`resourceType${type}`}>
         {type}
         <input
           type="checkbox"
@@ -198,7 +198,9 @@ export default class DisplayFiltersModal extends Component {
                   >
                     <option value="">All</option>
                     {this.props.allBrowsers.map(browser => (
-                      <option value={browser.id}>{browser.title}</option>
+                      <option value={browser.id} key={`browser${browser.id}`}>
+                        {browser.title}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -211,7 +213,7 @@ export default class DisplayFiltersModal extends Component {
                 <span onClick={this.toggleAllStatusCodes}>(toggle all)</span>
 
                 {Object.keys(this.props.allStatusCodes).map(statusKey => (
-                  <label>
+                  <label key={`statusCode${statusKey}`}>
                     {this.props.allStatusCodes[statusKey]}
                     <input
                       type="checkbox"

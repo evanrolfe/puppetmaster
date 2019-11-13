@@ -147,7 +147,7 @@ export default class CaptureFiltersModal extends Component {
 
   displayResourceTypeCheckbox(type) {
     return (
-      <label style={{ verticalAlign: 'top' }}>
+      <label style={{ verticalAlign: 'top' }} key={`resourceType${type}`}>
         {type}
         <input
           type="checkbox"

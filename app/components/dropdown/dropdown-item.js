@@ -35,7 +35,7 @@ class DropdownItem extends PureComponent {
 
     if (this.props.browserLink) {
       return (
-        <div className="dropdown__button" {...props}>
+        <div className="dropdown__button">
           <div className="pane-container-horizontal">
             <div
               className="pane-remaining first-button"
