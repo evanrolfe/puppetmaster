@@ -1,4 +1,5 @@
 const Request = require('../models/Request');
+const ipc = require('../server-ipc');
 
 class RequestsController {
   // GET /requests
@@ -28,13 +29,24 @@ class RequestsController {
     return { status: 'OK', body: requests };
   }
 
-  // GET /requests/123
   async show(args) {
     const result = await global.dbStore
       .connection('requests')
       .where({ id: args.id });
 
     return { status: 'OK', body: result[0] };
+  }
+
+  async delete(args) {
+    await global.dbStore
+      .connection('requests')
+      .where({ id: args.id })
+      .del();
+
+    // TODO: Change this to requestsChanged
+    ipc.send('requestCreated', {});
+
+    return { status: 'OK', body: {} };
   }
 }
 

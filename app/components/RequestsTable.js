@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { remote } from 'electron';
 
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
@@ -30,6 +31,8 @@ export default class RequestsTable extends Component<Props> {
     this.selectPrevRequest = this.selectPrevRequest.bind(this);
     this.selectNextRequest = this.selectNextRequest.bind(this);
     this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
+
+    this.requestContextMenus = {};
   }
 
   componentDidMount() {
@@ -40,6 +43,23 @@ export default class RequestsTable extends Component<Props> {
     requestPanel.addEventListener('scroll', () => {
       this.props.setScrollTop(requestPanel.scrollTop);
     });
+  }
+
+  componentWillUpdate(prevProps) {
+    if (
+      prevProps.requests.map(request => request.id) !==
+      this.props.requests.map(request => request.id)
+    ) {
+      this.props.requests.forEach(request => {
+        const menu = new remote.Menu();
+        const menuItem = new remote.MenuItem({
+          label: 'Delete',
+          click: this.deleteRequest.bind(this, request.id)
+        });
+        menu.append(menuItem);
+        this.requestContextMenus[request.id] = menu;
+      });
+    }
   }
 
   getRowClassName(requestId) {
@@ -99,6 +119,20 @@ export default class RequestsTable extends Component<Props> {
 
   _setRequestsPanelRef(element) {
     this._requestPanel = element;
+  }
+
+  _handleRightClick(requestId, event) {
+    event.preventDefault();
+    this.requestContextMenus[requestId].popup({
+      window: remote.getCurrentWindow()
+    });
+  }
+
+  async deleteRequest(requestId) {
+    console.log(`Deleteing request ${requestId}`);
+    await global.backendConn.send('RequestsController', 'delete', {
+      id: requestId
+    });
   }
 
   renderTableCell(column, request) {
@@ -179,6 +213,7 @@ export default class RequestsTable extends Component<Props> {
                   key={request.id}
                   id={`requestRow${request.id}`}
                   onClick={() => this.props.setSelectedRequestId(request.id)}
+                  onContextMenu={this._handleRightClick.bind(this, request.id)}
                   className={this.getRowClassName(request.id)}
                 >
                   {this.props.tableColumns.map(column =>
