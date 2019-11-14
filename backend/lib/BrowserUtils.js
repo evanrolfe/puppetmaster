@@ -126,6 +126,10 @@ const openBrowser = async browserId => {
       page = await browser.newPage();
     }
     page.goto(pageUrl);
+
+    // NOTE: the targetcreated event does not seem to be triggered for these
+    // pages so we have to instrument the page manually:
+    handleNewPage(page);
   }
 
   // Store in global vars
