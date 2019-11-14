@@ -184,12 +184,13 @@ export default class BrowserNetworkPage extends Component<Props> {
         JSON.stringify(prevState.filters.statusCodes)
     ) {
       this.loadRequests();
+      this.clearMultipleRequestsSelection();
     }
 
     // If multiple requests have been selected:
     if (
       this.state.selectedRequestId2 !== null &&
-      this.state.selectedRequestId2 !== prevState.selectedRequestId2
+      this.state.selectedRequestId !== prevState.selectedRequestId
     ) {
       ipcRenderer.send('requestsSelected', {
         requestIds: this.getSelectedRequestIds()
@@ -223,8 +224,29 @@ export default class BrowserNetworkPage extends Component<Props> {
     );
     const requests = response.result.body;
 
-    this.setState({ requests: requests, selectedRequestId: requests[0].id });
+    const selectedRequestIds = requests.map(request => request.id);
+    const selectedRequestExists = selectedRequestIds.includes(
+      this.state.selectedRequestId
+    );
+
+    // If there is no selectedRequest
+    //    or the selected request does not exist
+    // And there are requests
+    // Then pick the first request available
+    if (
+      (this.state.selectedRequestId === null || !selectedRequestExists) &&
+      requests.length > 0
+    ) {
+      this.setState({ requests: requests, selectedRequestId: requests[0].id });
+    } else {
+      this.setState({ requests: requests });
+    }
+
     /* eslint-enable */
+  }
+
+  clearMultipleRequestsSelection() {
+    this.setState({ selectedRequestId2: null });
   }
 
   async loadBrowsers() {
@@ -238,16 +260,31 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   setSelectedRequestId(id, shiftPressed) {
-    const newState = Object.assign({}, this.state);
-
-    if (shiftPressed === true) {
-      newState.selectedRequestId2 = id;
-    } else {
-      newState.selectedRequestId = id;
-      newState.selectedRequestId2 = null;
-    }
-
-    this.setState(newState);
+    this.setState(prevState => {
+      if (shiftPressed === true) {
+        if (prevState.selectedRequestId2 === null) {
+          return {
+            selectedRequestId: id,
+            selectedRequestId2: prevState.selectedRequestId
+          };
+        } else {
+          console.log(
+            `selectedRequestId: ${id}, selectedRequestId2: ${
+              prevState.selectedRequestId2
+            }`
+          );
+          return {
+            selectedRequestId: id,
+            selectedRequestId2: prevState.selectedRequestId2
+          };
+        }
+      } else {
+        return {
+          selectedRequestId: id,
+          selectedRequestId2: null
+        };
+      }
+    });
   }
 
   getSelectedRequestIds() {
@@ -264,6 +301,8 @@ export default class BrowserNetworkPage extends Component<Props> {
     } else {
       selectedRequestIds = requestIds.slice(i2, i1 + 1);
     }
+
+    console.log(`Selected request ids: ${JSON.stringify(selectedRequestIds)}`);
 
     return selectedRequestIds;
   }

@@ -162,7 +162,7 @@ ipcMain.on('requestsChanged', (event, args) => {
   args.requests.forEach(request => {
     const menu = new Menu();
     const menuItem = new MenuItem({
-      label: 'Delete',
+      label: 'Delete request',
       click: deleteClicked.bind(null, request.id)
     });
     menu.append(menuItem);

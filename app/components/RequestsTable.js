@@ -87,7 +87,7 @@ export default class RequestsTable extends Component<Props> {
       inline: 'start'
     });
 
-    this.props.setSelectedRequestId(prevRequest.id);
+    this.props.setSelectedRequestId(prevRequest.id, this.state.shiftPressed);
   }
 
   selectNextRequest() {
@@ -104,7 +104,7 @@ export default class RequestsTable extends Component<Props> {
       inline: 'start'
     });
 
-    this.props.setSelectedRequestId(nextRequest.id);
+    this.props.setSelectedRequestId(nextRequest.id, this.state.shiftPressed);
   }
 
   async _handleKeyDown(e) {
