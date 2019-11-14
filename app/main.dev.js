@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
@@ -135,8 +135,24 @@ app.on('ready', async () => {
 const requestContextMenus = {};
 
 const deleteClicked = requestId => {
-  console.log(`[Main] deleting request ${requestId}!`);
-  mainWindow.webContents.send('deleteRequest', { requestId: requestId });
+  const promise = dialog.showMessageBox(mainWindow, {
+    type: 'warning',
+    title: 'Delete request',
+    message: `Are you sure you want to delete request ID ${requestId}?`,
+    buttons: ['Cancel', 'Delete']
+  });
+
+  promise
+    .then(result => {
+      const buttonClicked = result.response;
+      if (buttonClicked === 1) {
+        console.log(`[Main] deleting request ${requestId}!`);
+        mainWindow.webContents.send('deleteRequest', { requestId: requestId });
+      }
+
+      return true;
+    })
+    .catch(console.log);
 };
 
 // NOTE: This logic was moved from the renderer proc to here because calling
