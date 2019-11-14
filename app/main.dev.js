@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
@@ -127,4 +127,37 @@ app.on('ready', async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+});
+
+/* -----------------------------------------------------------------------------*
+ * IPC Communication with the renderer process
+ * -----------------------------------------------------------------------------*/
+const requestContextMenus = {};
+
+const deleteClicked = requestId => {
+  console.log(`[Main] deleting request ${requestId}!`);
+  mainWindow.webContents.send('deleteRequest', { requestId: requestId });
+};
+
+// NOTE: This logic was moved from the renderer proc to here because calling
+// creating the menu items was much slowerer in the render than in the main.
+ipcMain.on('requestsChanged', (event, args) => {
+  const start = Date.now();
+  args.requests.forEach(request => {
+    const menu = new Menu();
+    const menuItem = new MenuItem({
+      label: 'Delete',
+      click: deleteClicked.bind(null, request.id)
+    });
+    menu.append(menuItem);
+    requestContextMenus[request.id] = menu;
+  });
+  const end = Date.now();
+  const diff = (end - start) / 1000;
+
+  console.log(`[Main] Finished creating all context menus in ${diff}s`);
+});
+
+ipcMain.on('showRequestContextMenu', (event, args) => {
+  requestContextMenus[args.requestId].popup({ window: mainWindow });
 });

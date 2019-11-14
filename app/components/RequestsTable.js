@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { remote } from 'electron';
+import { ipcRenderer } from 'electron';
 
 import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
@@ -43,22 +43,22 @@ export default class RequestsTable extends Component<Props> {
     requestPanel.addEventListener('scroll', () => {
       this.props.setScrollTop(requestPanel.scrollTop);
     });
+
+    ipcRenderer.on('deleteRequest', (event, args) => {
+      this.deleteRequest(args.requestId);
+    });
   }
 
-  componentWillUpdate(prevProps) {
-    if (
-      prevProps.requests.map(request => request.id) !==
-      this.props.requests.map(request => request.id)
-    ) {
-      this.props.requests.forEach(request => {
-        const menu = new remote.Menu();
-        const menuItem = new remote.MenuItem({
-          label: 'Delete',
-          click: this.deleteRequest.bind(this, request.id)
-        });
-        menu.append(menuItem);
-        this.requestContextMenus[request.id] = menu;
-      });
+  componentDidUpdate(prevProps) {
+    const prevRequestIds = JSON.stringify(
+      prevProps.requests.map(request => request.id).sort()
+    );
+    const requestIds = JSON.stringify(
+      this.props.requests.map(request => request.id).sort()
+    );
+
+    if (prevRequestIds !== requestIds) {
+      ipcRenderer.send('requestsChanged', { requests: this.props.requests });
     }
   }
 
@@ -123,9 +123,7 @@ export default class RequestsTable extends Component<Props> {
 
   _handleRightClick(requestId, event) {
     event.preventDefault();
-    this.requestContextMenus[requestId].popup({
-      window: remote.getCurrentWindow()
-    });
+    ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
   }
 
   async deleteRequest(requestId) {
