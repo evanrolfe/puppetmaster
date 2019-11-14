@@ -133,6 +133,7 @@ app.on('ready', async () => {
  * IPC Communication with the renderer process
  * -----------------------------------------------------------------------------*/
 const requestContextMenus = {};
+let multipleRequestsMenu;
 
 const deleteClicked = requestId => {
   const promise = dialog.showMessageBox(mainWindow, {
@@ -158,7 +159,6 @@ const deleteClicked = requestId => {
 // NOTE: This logic was moved from the renderer proc to here because calling
 // creating the menu items was much slowerer in the render than in the main.
 ipcMain.on('requestsChanged', (event, args) => {
-  const start = Date.now();
   args.requests.forEach(request => {
     const menu = new Menu();
     const menuItem = new MenuItem({
@@ -168,12 +168,49 @@ ipcMain.on('requestsChanged', (event, args) => {
     menu.append(menuItem);
     requestContextMenus[request.id] = menu;
   });
-  const end = Date.now();
-  const diff = (end - start) / 1000;
-
-  console.log(`[Main] Finished creating all context menus in ${diff}s`);
 });
 
+const deleteMultipleClicked = requestIds => {
+  const promise = dialog.showMessageBox(mainWindow, {
+    type: 'warning',
+    title: 'Delete requests',
+    message: `Are you sure you want to delete ${
+      requestIds.length
+    } selected requests?`,
+    buttons: ['Cancel', 'Delete']
+  });
+
+  promise
+    .then(result => {
+      const buttonClicked = result.response;
+      if (buttonClicked === 1) {
+        mainWindow.webContents.send('deleteRequest', { requestId: requestIds });
+      }
+
+      return true;
+    })
+    .catch(console.log);
+};
+
+// When a request is right-clicked:
 ipcMain.on('showRequestContextMenu', (event, args) => {
   requestContextMenus[args.requestId].popup({ window: mainWindow });
+});
+
+// When multiple requests are selected, create a context menu for them:
+ipcMain.on('requestsSelected', (event, args) => {
+  console.log(`[Main] requestsSelected`);
+
+  const menu = new Menu();
+  const menuItem = new MenuItem({
+    label: `Delete selected requests`,
+    click: deleteMultipleClicked.bind(null, args.requestIds)
+  });
+  menu.append(menuItem);
+  multipleRequestsMenu = menu;
+});
+
+// When multiple selected requests are right-clicked:
+ipcMain.on('showMultipleRequestContextMenu', () => {
+  multipleRequestsMenu.popup({ window: mainWindow });
 });

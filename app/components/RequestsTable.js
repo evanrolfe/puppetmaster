@@ -16,7 +16,9 @@ type Props = {
   setTableColumnWidth: 'function',
   setScrollTop: 'function',
   scrollTop: 'number',
-  tableColumns: 'array'
+  tableColumns: 'array',
+  isRequestSelected: 'function',
+  multipleRequestsSelected: 'function'
 };
 
 export default class RequestsTable extends Component<Props> {
@@ -25,9 +27,12 @@ export default class RequestsTable extends Component<Props> {
   constructor(props) {
     super(props);
 
+    this.state = { shiftPressed: false };
+
     this.tableHeaderRefs = {};
 
     this._handleKeyDown = this._handleKeyDown.bind(this);
+    this._handleKeyUp = this._handleKeyUp.bind(this);
     this.selectPrevRequest = this.selectPrevRequest.bind(this);
     this.selectNextRequest = this.selectNextRequest.bind(this);
     this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
@@ -63,7 +68,7 @@ export default class RequestsTable extends Component<Props> {
   }
 
   getRowClassName(requestId) {
-    if (parseInt(this.props.selectedRequestId) === parseInt(requestId)) {
+    if (this.props.isRequestSelected(parseInt(requestId)) === true) {
       return 'selected';
     }
   }
@@ -103,12 +108,16 @@ export default class RequestsTable extends Component<Props> {
   }
 
   async _handleKeyDown(e) {
-    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    if (!['ArrowUp', 'ArrowDown', 'Shift'].includes(e.key)) return;
 
     e.preventDefault();
 
     if (e.key === 'ArrowUp') this.selectPrevRequest();
     if (e.key === 'ArrowDown') this.selectNextRequest();
+    if (e.key === 'Shift') {
+      console.log(`RequestTable: shift pressed`);
+      this.setState({ shiftPressed: true });
+    }
   }
 
   classNameForTableHeader(columnName) {
@@ -117,17 +126,31 @@ export default class RequestsTable extends Component<Props> {
     return '';
   }
 
+  async _handleKeyUp(e) {
+    if (e.key === 'Shift') {
+      this.setState({ shiftPressed: false });
+    }
+  }
+
   _setRequestsPanelRef(element) {
     this._requestPanel = element;
   }
 
   _handleRightClick(requestId, event) {
     event.preventDefault();
-    ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
+    //  && this.props.isRequestSelected(requestId)
+    if (this.props.multipleRequestsSelected()) {
+      ipcRenderer.send('showMultipleRequestContextMenu', {
+        requestId: requestId
+      });
+    } else {
+      ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
+    }
   }
 
   async deleteRequest(requestId) {
     console.log(`Deleteing request ${requestId}`);
+
     await global.backendConn.send('RequestsController', 'delete', {
       id: requestId
     });
@@ -175,7 +198,11 @@ export default class RequestsTable extends Component<Props> {
     const requests = this.props.requests;
 
     return (
-      <KeydownBinder stopMetaPropagation onKeydown={this._handleKeyDown}>
+      <KeydownBinder
+        stopMetaPropagation
+        onKeydown={this._handleKeyDown}
+        onKeyup={this._handleKeyUp}
+      >
         <div
           className="pane-remaining"
           style={{ overflowX: 'auto' }}
@@ -210,7 +237,12 @@ export default class RequestsTable extends Component<Props> {
                 <tr
                   key={request.id}
                   id={`requestRow${request.id}`}
-                  onClick={() => this.props.setSelectedRequestId(request.id)}
+                  onClick={() =>
+                    this.props.setSelectedRequestId(
+                      request.id,
+                      this.state.shiftPressed
+                    )
+                  }
                   onContextMenu={this._handleRightClick.bind(this, request.id)}
                   className={this.getRowClassName(request.id)}
                 >

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 
 import BrowserTabs from '../BrowserTabs';
 import RequestsTable from '../RequestsTable';
@@ -99,13 +99,17 @@ export default class BrowserNetworkPage extends Component<Props> {
         },
         windowSize: remote.getCurrentWindow().getSize(),
         requestViewTabIndex: 0,
+        selectedRequestId: null,
+        selectedRequestId2: null,
         browsers: []
       };
     } else {
       this.state = global.browserNetworkPageState;
     }
 
+    this.isRequestSelected = this.isRequestSelected.bind(this);
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
+    this.multipleRequestsSelected = this.multipleRequestsSelected.bind(this);
     this.handleStartDragPane = this.handleStartDragPane.bind(this);
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
@@ -159,6 +163,7 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // If the filters have changed:
     if (
       this.state.order_by !== prevState.order_by ||
       this.state.dir !== prevState.dir ||
@@ -179,6 +184,16 @@ export default class BrowserNetworkPage extends Component<Props> {
         JSON.stringify(prevState.filters.statusCodes)
     ) {
       this.loadRequests();
+    }
+
+    // If multiple requests have been selected:
+    if (
+      this.state.selectedRequestId2 !== null &&
+      this.state.selectedRequestId2 !== prevState.selectedRequestId2
+    ) {
+      ipcRenderer.send('requestsSelected', {
+        requestIds: this.getSelectedRequestIds()
+      });
     }
   }
 
@@ -206,8 +221,9 @@ export default class BrowserNetworkPage extends Component<Props> {
         browserId: this.state.filters.browserId
       }
     );
+    const requests = response.result.body;
 
-    this.setState({ requests: response.result.body });
+    this.setState({ requests: requests, selectedRequestId: requests[0].id });
     /* eslint-enable */
   }
 
@@ -221,10 +237,50 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState({ browsers: response.result.body });
   }
 
-  setSelectedRequestId(id) {
+  setSelectedRequestId(id, shiftPressed) {
     const newState = Object.assign({}, this.state);
-    newState.selectedRequestId = id;
+
+    if (shiftPressed === true) {
+      newState.selectedRequestId2 = id;
+    } else {
+      newState.selectedRequestId = id;
+      newState.selectedRequestId2 = null;
+    }
+
     this.setState(newState);
+  }
+
+  getSelectedRequestIds() {
+    const selectedId1 = this.state.selectedRequestId;
+    const selectedId2 = this.state.selectedRequestId2;
+    const requestIds = this.state.requests.map(request => request.id);
+
+    const i1 = requestIds.indexOf(selectedId1);
+    const i2 = requestIds.indexOf(selectedId2);
+    let selectedRequestIds;
+
+    if (i2 > i1) {
+      selectedRequestIds = requestIds.slice(i1, i2 + 1);
+    } else {
+      selectedRequestIds = requestIds.slice(i2, i1 + 1);
+    }
+
+    return selectedRequestIds;
+  }
+
+  isRequestSelected(requestId) {
+    const selectedId1 = this.state.selectedRequestId;
+    const selectedId2 = this.state.selectedRequestId2;
+
+    if (selectedId2 === null) {
+      return requestId === selectedId1;
+    } else {
+      return this.getSelectedRequestIds().includes(requestId);
+    }
+  }
+
+  multipleRequestsSelected() {
+    return this.state.selectedRequestId2 !== null;
   }
 
   orientation() {
@@ -383,6 +439,8 @@ export default class BrowserNetworkPage extends Component<Props> {
 
             <RequestsTable
               tableColumns={this.tableColumns()}
+              isRequestSelected={this.isRequestSelected}
+              multipleRequestsSelected={this.multipleRequestsSelected}
               selectedRequestId={this.state.selectedRequestId}
               setSelectedRequestId={this.setSelectedRequestId}
               paneHeight={this.state.browserNetworkPaneHeight}

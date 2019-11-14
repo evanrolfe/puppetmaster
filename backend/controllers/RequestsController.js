@@ -38,10 +38,20 @@ class RequestsController {
   }
 
   async delete(args) {
-    await global.dbStore
-      .connection('requests')
-      .where({ id: args.id })
-      .del();
+    console.log(`RequestsController.delete()`);
+    console.log(args);
+
+    if (Array.isArray(args.id)) {
+      await global.dbStore
+        .connection('requests')
+        .whereIn('id', args.id)
+        .del();
+    } else {
+      await global.dbStore
+        .connection('requests')
+        .where({ id: args.id })
+        .del();
+    }
 
     // TODO: Change this to requestsChanged
     ipc.send('requestCreated', {});
