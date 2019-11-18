@@ -6,6 +6,8 @@ import StatusTag from './StatusTag';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
 
+import SettingsContext from '../lib/SettingsContext';
+
 type Props = {
   requests: 'array',
   selectedRequestId: 'number',
@@ -13,10 +15,8 @@ type Props = {
   order_by: 'string',
   dir: 'string',
   toggleColumnOrder: 'function',
-  setTableColumnWidth: 'function',
   setScrollTop: 'function',
   scrollTop: 'number',
-  tableColumns: 'array',
   isRequestSelected: 'function',
   multipleRequestsSelected: 'function'
 };
@@ -24,8 +24,10 @@ type Props = {
 export default class RequestsTable extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+
+    this.context = context;
 
     this.state = { shiftPressed: false };
 
@@ -71,6 +73,12 @@ export default class RequestsTable extends Component<Props> {
     if (this.props.isRequestSelected(parseInt(requestId)) === true) {
       return 'selected';
     }
+  }
+
+  setTableColumnWidth(columnIndex, width) {
+    const newTableColumns = [...this.context.requestsTableColumns];
+    newTableColumns[columnIndex].width = width;
+    this.context.changeSetting('requestsTableColumns', newTableColumns);
   }
 
   selectPrevRequest() {
@@ -195,6 +203,8 @@ export default class RequestsTable extends Component<Props> {
   }
 
   render() {
+    console.log(`Rendering RequestsTable`);
+
     const requests = this.props.requests;
 
     return (
@@ -211,7 +221,7 @@ export default class RequestsTable extends Component<Props> {
           <table className="requests-table">
             <thead>
               <tr>
-                {this.props.tableColumns.map((column, i) => (
+                {this.context.requestsTableColumns.map((column, i) => (
                   <RequestsTableHeader
                     key={`RequestsTableHeader${i}`}
                     onClick={this.props.toggleColumnOrder.bind(
@@ -221,9 +231,7 @@ export default class RequestsTable extends Component<Props> {
                     className={this.classNameForTableHeader(column.key)}
                     orderDir={this.props.dir}
                     width={column.width}
-                    setTableColumnWidth={this.props.setTableColumnWidth.bind(
-                      this
-                    )}
+                    setTableColumnWidth={this.setTableColumnWidth.bind(this)}
                     columnIndex={i}
                     minWidth={column.minWidth}
                   >
@@ -246,7 +254,7 @@ export default class RequestsTable extends Component<Props> {
                   onContextMenu={this._handleRightClick.bind(this, request.id)}
                   className={this.getRowClassName(request.id)}
                 >
-                  {this.props.tableColumns.map(column =>
+                  {this.context.requestsTableColumns.map(column =>
                     this.renderTableCell(column, request)
                   )}
                 </tr>
@@ -258,3 +266,5 @@ export default class RequestsTable extends Component<Props> {
     );
   }
 }
+
+RequestsTable.contextType = SettingsContext;

@@ -270,6 +270,7 @@
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-tabs": "^3.0.0",
+    "react-tracked": "latest",
     "source-map-support": "^0.5.9",
     "sqlite3": "^4.1.0",
     "vkbeautify": "^0.99.3"

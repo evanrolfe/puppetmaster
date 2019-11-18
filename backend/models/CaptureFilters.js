@@ -1,10 +1,10 @@
 const DEFAULT_FILTERS = {
   hostList: [],
-  hostSetting: 'include',
-  pathList: ['/sockjs-node'],
-  pathSetting: 'exclude',
-  extList: ['js', 'css', 'ico'],
-  extSetting: 'exclude',
+  hostSetting: '',
+  pathList: [],
+  pathSetting: '',
+  extList: [],
+  extSetting: '',
   resourceTypes: [
     'document',
     'eventsource',

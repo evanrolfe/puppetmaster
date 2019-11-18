@@ -197,6 +197,20 @@ class Request extends Store.BaseModel {
 
     return query;
   }
+
+  // Remove the whole response_body and response_body_rendered fields from the
+  // requests but keep a shortened preview of the body fields.
+  static stripWholeBody(requests) {
+    requests = requests.map(request => {
+      if (typeof request.response_body === 'string') {
+        request.response_body = request.response_body.substring(0, 5000);
+      }
+
+      return request;
+    });
+
+    return requests;
+  }
 }
 
 module.exports = Request;

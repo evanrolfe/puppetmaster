@@ -73,39 +73,39 @@ export default class BrowserNetworkPage extends Component<Props> {
 
     this.context = context;
 
-    if (global.browserNetworkPageState === undefined) {
-      this.state = {
-        // Persistant state:
-        paneWidth: this.context.settings.paneWidth,
-        paneHeight: this.context.settings.paneHeight,
+    this.state = {
+      // BrowserNetworkPage State:
+      paneWidth: this.context.paneWidth,
+      paneHeight: this.context.paneHeight,
+      draggingPane: false,
+      windowSize: remote.getCurrentWindow().getSize(),
+      browsers: [],
 
-        // Volatile state(?):
-        draggingPane: false,
-        order_by: 'id',
-        dir: 'desc',
-        requestsTableScrollTop: 0,
-        requests: [],
-        filters: {
-          hostList: [],
-          hostSetting: '', // ''|'include'|'exclude'
-          pathList: [],
-          pathSetting: '', // ''|'include'|'exclude'
-          statusCodes: Object.keys(STATUS_CODES),
-          resourceTypes: RESOURCE_TYPES,
-          extSetting: '', // ''|'include'|'exclude'
-          extList: [],
-          search: '',
-          browserId: null
-        },
-        windowSize: remote.getCurrentWindow().getSize(),
-        requestViewTabIndex: 0,
-        selectedRequestId: null,
-        selectedRequestId2: null,
-        browsers: []
-      };
-    } else {
-      this.state = global.browserNetworkPageState;
-    }
+      // RequestTable State:
+      requestsTableScrollTop: 0,
+      requests: [],
+      order_by: 'id',
+      dir: 'desc',
+
+      // DisplayFilters State:
+      filters: {
+        hostList: [],
+        hostSetting: '', // ''|'include'|'exclude'
+        pathList: [],
+        pathSetting: '', // ''|'include'|'exclude'
+        statusCodes: Object.keys(STATUS_CODES),
+        resourceTypes: RESOURCE_TYPES,
+        extSetting: '', // ''|'include'|'exclude'
+        extList: [],
+        search: '',
+        browserId: null
+      },
+
+      // RequestView State:
+      requestViewTabIndex: 0,
+      selectedRequestId: null,
+      selectedRequestId2: null
+    };
 
     this.isRequestSelected = this.isRequestSelected.bind(this);
     this.setSelectedRequestId = this.setSelectedRequestId.bind(this);
@@ -114,7 +114,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     this._handleMouseUp = this._handleMouseUp.bind(this);
     this._setRequestTableRef = this._setRequestTableRef.bind(this);
     this.toggleColumnOrder = this.toggleColumnOrder.bind(this);
-    this.setTableColumnWidth = this.setTableColumnWidth.bind(this);
     this.setScrollTop = this.setScrollTop.bind(this);
     this.setFilters = this.setFilters.bind(this);
     this.getCodeMirrorWidth = this.getCodeMirrorWidth.bind(this);
@@ -323,11 +322,7 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   orientation() {
-    return this.context.settings.browserNetworkOrientation;
-  }
-
-  tableColumns() {
-    return this.context.settings.requestsTableColumns;
+    return this.context.browserNetworkOrientation;
   }
 
   // NOTE: The root div in this component needs to have a css class of
@@ -400,12 +395,6 @@ export default class BrowserNetworkPage extends Component<Props> {
     this.setState(newState);
   }
 
-  setTableColumnWidth(columnIndex, width) {
-    const newTableColumns = [...this.tableColumns()];
-    newTableColumns[columnIndex].width = width;
-    this.context.changeSetting('requestsTableColumns', newTableColumns);
-  }
-
   setScrollTop(scrollTop) {
     this.setState({ requestsTableScrollTop: scrollTop });
   }
@@ -441,6 +430,8 @@ export default class BrowserNetworkPage extends Component<Props> {
   }
 
   render() {
+    console.log(`Rendering BrowserNetworkPage`);
+
     const filters = JSON.parse(JSON.stringify(this.state.filters));
 
     const paneStyle = {};
@@ -477,7 +468,6 @@ export default class BrowserNetworkPage extends Component<Props> {
             </div>
 
             <RequestsTable
-              tableColumns={this.tableColumns()}
               isRequestSelected={this.isRequestSelected}
               multipleRequestsSelected={this.multipleRequestsSelected}
               selectedRequestId={this.state.selectedRequestId}
@@ -488,7 +478,6 @@ export default class BrowserNetworkPage extends Component<Props> {
               order_by={this.state.order_by}
               dir={this.state.dir}
               toggleColumnOrder={this.toggleColumnOrder}
-              setTableColumnWidth={this.setTableColumnWidth}
               scrollTop={this.state.requestsTableScrollTop}
               setScrollTop={this.setScrollTop}
               requests={this.state.requests}

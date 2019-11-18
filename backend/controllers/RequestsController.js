@@ -24,7 +24,8 @@ class RequestsController {
       'response_body_length'
     ];
 
-    const requests = await Request.findByParams(columns, args);
+    let requests = await Request.findByParams(columns, args);
+    requests = Request.stripWholeBody(requests);
 
     return { status: 'OK', body: requests };
   }

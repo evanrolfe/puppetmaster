@@ -10,9 +10,7 @@ export default class NetworkSettingsTab extends Component<Props> {
     this.context = context;
 
     this.state = {
-      tableColumnKeys: this.context.settings.requestsTableColumns.map(
-        col => col.key
-      )
+      tableColumnKeys: this.context.requestsTableColumns.map(col => col.key)
     };
 
     this.changeOrientation = this.changeOrientation.bind(this);
@@ -24,21 +22,16 @@ export default class NetworkSettingsTab extends Component<Props> {
     if (this.state.tableColumnKeys !== prevState.tableColumnKeys) {
       // Save the state to settings:
       const newTableColumns = [];
-      const currentTableColumnKeys = this.context.settings.requestsTableColumns.map(
+      const currentTableColumnKeys = this.context.requestsTableColumns.map(
         col => col.key
       );
 
       ALL_TABLE_COLUMNS.forEach(col => {
         const isChecked = this.state.tableColumnKeys.includes(col.key);
         const isDisplayedCurrently = currentTableColumnKeys.includes(col.key);
-        console.log(
-          `Col: ${
-            col.key
-          }, isChecked: ${isChecked}, isDisplayedCurrently: ${isDisplayedCurrently}`
-        );
 
         if (isChecked && isDisplayedCurrently) {
-          const currentCol = this.context.settings.requestsTableColumns.find(
+          const currentCol = this.context.requestsTableColumns.find(
             curCol => curCol.key === col.key
           );
           newTableColumns.push(currentCol);
@@ -69,7 +62,6 @@ export default class NetworkSettingsTab extends Component<Props> {
       this.setState(prevState => {
         const newKeys = [...prevState.tableColumnKeys];
         newKeys.push(value);
-        console.log(`NewKeys: ${newKeys}`);
         return { tableColumnKeys: newKeys };
       });
     } else {
@@ -77,7 +69,6 @@ export default class NetworkSettingsTab extends Component<Props> {
         const newKeys = [...prevState.tableColumnKeys].filter(
           colKey => colKey !== value
         );
-        console.log(`NewKeys: ${newKeys}`);
         return { tableColumnKeys: newKeys };
       });
     }
@@ -92,7 +83,7 @@ export default class NetworkSettingsTab extends Component<Props> {
               Layout Orientation
               <select
                 name="orientation"
-                value={this.context.settings.browserNetworkOrientation}
+                value={this.context.browserNetworkOrientation}
                 onChange={this.changeOrientation}
               >
                 <option value="vertical">Vertical</option>

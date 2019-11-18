@@ -17,7 +17,7 @@ export default class ThemeSettingsTab extends Component {
     const themeName = theme;
     const themeDisplayName = theme;
 
-    const isActive = themeName === this.context.settings.activeTheme;
+    const isActive = themeName === this.context.activeTheme;
 
     return (
       <div
