@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useTrackedState, useDispatch } from '../state/state';
 import {
   Dropdown,
   DropdownButton,
@@ -7,120 +8,82 @@ import {
 } from './dropdown';
 import EditBrowserModal from './modals/EditBrowserModal';
 
-type Props = {};
+export default () => {
+  console.log(`[RENDER] BrowserSessionsDropdown`);
 
-export default class BrowserSessionsDropdown extends Component<Props> {
-  props: Props;
+  const state = useTrackedState();
+  const dispatch = useDispatch();
+  const { browsers } = state;
 
-  constructor(props) {
-    super(props);
+  console.log(
+    `[RENDER] BrowserSessionsDropdown with ${browsers.length} browsers`
+  );
 
-    this.state = { browsers: [] };
+  const dropdownRef = React.createRef();
 
-    this.loadBrowsers();
+  global.backendConn.listen('browsersChanged', () => {
+    dispatch({ type: 'LOAD_BROWSERS' });
+  });
 
-    global.backendConn.listen('browsersChanged', () => {
-      this.loadBrowsers();
-    });
-    this.browserModals = {};
+  const browserModals = {};
+  browsers.forEach(browser => {
+    browserModals[browser.id] = React.createRef();
+  });
 
-    this.registerModal = this.registerModal.bind(this);
-    this._setDropdownRef = this._setDropdownRef.bind(this);
-    this.saveBrowserTitle = this.saveBrowserTitle.bind(this);
-  }
-
-  async loadBrowsers() {
-    const result = await global.backendConn.send(
-      'BrowsersController',
-      'index',
-      {}
-    );
-    const browsers = result.result.body;
-
-    this.setState({ browsers: browsers });
-  }
-
-  openBrowser(browserId) {
-    global.backendConn.send('BrowsersController', 'open', {
-      browserId: browserId
-    });
-  }
-
-  createSession() {
-    global.backendConn.send('BrowsersController', 'create', {});
-  }
-
-  editBrowser(browserId, event) {
-    event.stopPropagation();
-
-    this.dropdownRef.toggle();
-    this.browserModals[browserId].show();
-  }
-
-  saveBrowserTitle(browserId, title) {
+  const saveBrowserTitle = (browserId, title) => {
     console.log(`Saving browser id: ${browserId} with title: ${title}`);
     global.backendConn.send('BrowsersController', 'update', {
       browserId: browserId,
       title: title
     });
-  }
+  };
 
-  displayBrowserTitle(browser) {
-    return (
-      <>
-        {browser.title}
-        <span
-          className="pull-right"
-          onClick={event => this.editBrowser(event, browser.id)}
-        >
-          <i className="fas fa-pen edit-icon" />
-        </span>
-      </>
-    );
-  }
+  const openBrowser = browserId => {
+    global.backendConn.send('BrowsersController', 'open', {
+      browserId: browserId
+    });
+  };
 
-  registerModal(instance) {
-    this.browserModals[instance.props.browser.id] = instance;
-  }
+  const editBrowser = (event, browserId) => {
+    event.stopPropagation();
 
-  _setDropdownRef(ref) {
-    this.dropdownRef = ref;
-  }
+    dropdownRef.current.toggle();
+    browserModals[browserId].current.show();
+  };
 
-  render() {
-    return (
-      <>
-        {this.state.browsers.map(browser => (
-          <EditBrowserModal
-            ref={this.registerModal}
-            browser={browser}
-            saveBrowserTitle={this.saveBrowserTitle}
+  const createSession = () => {
+    global.backendConn.send('BrowsersController', 'create', {});
+  };
+
+  return (
+    <>
+      {browsers.map(browser => (
+        <EditBrowserModal
+          ref={browserModals[browser.id]}
+          browser={browser}
+          saveBrowserTitle={saveBrowserTitle}
+        />
+      ))}
+
+      <Dropdown ref={dropdownRef} className="browser-sessions pull-right">
+        <DropdownButton className="browser-sessions">
+          Browser Sessions ({browsers.length})
+        </DropdownButton>
+
+        <DropdownDivider>Browser Sessions:</DropdownDivider>
+        {browsers.map(browser => (
+          <DropdownItem
+            browserLink
+            browserTitle={browser.title}
+            onClick={() => openBrowser(browser.id)}
+            editBrowser={e => editBrowser(e, browser.id)}
           />
         ))}
-
-        <Dropdown
-          ref={this._setDropdownRef}
-          className="browser-sessions pull-right"
-        >
-          <DropdownButton className="browser-sessions">
-            Browser Sessions ({this.state.browsers.length})
-          </DropdownButton>
-
-          <DropdownDivider>Browser Sessions:</DropdownDivider>
-          {this.state.browsers.map(browser => (
-            <DropdownItem
-              browserLink
-              browserTitle={browser.title}
-              onClick={() => this.openBrowser(browser.id)}
-              editBrowser={this.editBrowser.bind(this, browser.id)}
-            />
-          ))}
-          <DropdownDivider>Actions:</DropdownDivider>
-          <DropdownItem onClick={this.createSession}>
-            <span style={{ paddingLeft: '8px' }}>New Session</span>
-          </DropdownItem>
-        </Dropdown>
-      </>
-    );
-  }
-}
+        <DropdownDivider>Actions:</DropdownDivider>
+        <DropdownItem onClick={createSession}>
+          <span style={{ paddingLeft: '8px' }}>New Session</span>
+        </DropdownItem>
+      </Dropdown>
+    </>
+  );
+};

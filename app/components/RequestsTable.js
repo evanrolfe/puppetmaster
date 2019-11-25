@@ -1,270 +1,195 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import { ipcRenderer } from 'electron';
+// import { getUntrackedObject } from 'react-tracked';
 
-import StatusTag from './StatusTag';
+import { useTrackedState, useDispatch } from '../state/state';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
+import RequestTableCell from './RequestTableCell';
 
-import SettingsContext from '../lib/SettingsContext';
+const getSelectedRequestIds = (selectedId1, selectedId2, requests) => {
+  const requestIds = requests.map(request => request.id);
 
-type Props = {
-  requests: 'array',
-  selectedRequestId: 'number',
-  setSelectedRequestId: 'function',
-  order_by: 'string',
-  dir: 'string',
-  toggleColumnOrder: 'function',
-  setScrollTop: 'function',
-  scrollTop: 'number',
-  isRequestSelected: 'function',
-  multipleRequestsSelected: 'function'
+  const i1 = requestIds.indexOf(selectedId1);
+  const i2 = requestIds.indexOf(selectedId2);
+  let selectedRequestIds;
+
+  if (i2 > i1) {
+    selectedRequestIds = requestIds.slice(i1, i2 + 1);
+  } else {
+    selectedRequestIds = requestIds.slice(i2, i1 + 1);
+  }
+
+  return selectedRequestIds;
 };
 
-export default class RequestsTable extends Component<Props> {
-  props: Props;
+export default () => {
+  console.log(`[RENDER] RequestsTable`);
 
-  constructor(props, context) {
-    super(props, context);
+  const state = useTrackedState();
+  // const untrackedState = getUntrackedObject(state);
+  const dispatch = useDispatch();
+  const {
+    requests,
+    requestsTableColumns,
+    selectedRequestId,
+    selectedRequestId2,
+    orderBy,
+    dir
+  } = state;
+  // const { requestsTableScrollTop } = untrackedState;
 
-    this.context = context;
+  const requestDivRef = React.createRef();
 
-    this.state = { shiftPressed: false };
+  const selectedRequestIds = getSelectedRequestIds(
+    selectedRequestId,
+    selectedRequestId2,
+    requests
+  );
 
-    this.tableHeaderRefs = {};
+  const _getRowClassName = requestId => {
+    let isSelected = false;
 
-    this._handleKeyDown = this._handleKeyDown.bind(this);
-    this._handleKeyUp = this._handleKeyUp.bind(this);
-    this.selectPrevRequest = this.selectPrevRequest.bind(this);
-    this.selectNextRequest = this.selectNextRequest.bind(this);
-    this._setRequestsPanelRef = this._setRequestsPanelRef.bind(this);
-
-    this.requestContextMenus = {};
-  }
-
-  componentDidMount() {
-    // Restore the scroll state
-    const requestPanel = ReactDOM.findDOMNode(this._requestPanel);
-    requestPanel.scrollTop = this.props.scrollTop;
-
-    requestPanel.addEventListener('scroll', () => {
-      this.props.setScrollTop(requestPanel.scrollTop);
-    });
-
-    ipcRenderer.on('deleteRequest', (event, args) => {
-      this.deleteRequest(args.requestId);
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    const prevRequestIds = JSON.stringify(
-      prevProps.requests.map(request => request.id).sort()
-    );
-    const requestIds = JSON.stringify(
-      this.props.requests.map(request => request.id).sort()
-    );
-
-    if (prevRequestIds !== requestIds) {
-      ipcRenderer.send('requestsChanged', { requests: this.props.requests });
+    if (selectedRequestId2 === null) {
+      isSelected = parseInt(requestId) === selectedRequestId;
+    } else {
+      isSelected = selectedRequestIds.includes(requestId);
     }
-  }
 
-  getRowClassName(requestId) {
-    if (this.props.isRequestSelected(parseInt(requestId)) === true) {
+    if (isSelected) {
       return 'selected';
     }
-  }
+  };
 
-  setTableColumnWidth(columnIndex, width) {
-    const newTableColumns = [...this.context.requestsTableColumns];
-    newTableColumns[columnIndex].width = width;
-    this.context.changeSetting('requestsTableColumns', newTableColumns);
-  }
-
-  selectPrevRequest() {
-    const currentI = this.props.requests.findIndex(
-      request => request.id === this.props.selectedRequestId
-    );
-    const prevRequest = this.props.requests[currentI - 1];
-    if (prevRequest === undefined) return;
-
-    const requestRow = document.getElementById(`requestRow${prevRequest.id}`);
-    requestRow.scrollIntoView({
-      behavior: 'auto',
-      block: 'nearest',
-      inline: 'start'
-    });
-
-    this.props.setSelectedRequestId(prevRequest.id, this.state.shiftPressed);
-  }
-
-  selectNextRequest() {
-    const currentI = this.props.requests.findIndex(
-      request => request.id === this.props.selectedRequestId
-    );
-    const nextRequest = this.props.requests[currentI + 1];
-    if (nextRequest === undefined) return;
-
-    const requestRow = document.getElementById(`requestRow${nextRequest.id}`);
-    requestRow.scrollIntoView({
-      behavior: 'auto',
-      block: 'nearest',
-      inline: 'start'
-    });
-
-    this.props.setSelectedRequestId(nextRequest.id, this.state.shiftPressed);
-  }
-
-  async _handleKeyDown(e) {
-    if (!['ArrowUp', 'ArrowDown', 'Shift'].includes(e.key)) return;
-
-    e.preventDefault();
-
-    if (e.key === 'ArrowUp') this.selectPrevRequest();
-    if (e.key === 'ArrowDown') this.selectNextRequest();
-    if (e.key === 'Shift') {
-      console.log(`RequestTable: shift pressed`);
-      this.setState({ shiftPressed: true });
-    }
-  }
-
-  classNameForTableHeader(columnName) {
-    if (columnName === this.props.order_by) return 'ordered';
-
-    return '';
-  }
-
-  async _handleKeyUp(e) {
-    if (e.key === 'Shift') {
-      this.setState({ shiftPressed: false });
-    }
-  }
-
-  _setRequestsPanelRef(element) {
-    this._requestPanel = element;
-  }
-
-  _handleRightClick(requestId, event) {
+  const _handleRightClick = (requestId, event) => {
     event.preventDefault();
-    //  && this.props.isRequestSelected(requestId)
-    if (this.props.multipleRequestsSelected()) {
+
+    if (selectedRequestId2 !== null) {
       ipcRenderer.send('showMultipleRequestContextMenu', {
         requestId: requestId
       });
     } else {
       ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
     }
-  }
+  };
 
-  async deleteRequest(requestId) {
-    console.log(`Deleteing request ${requestId}`);
+  const _handleKeyUp = e => {
+    if (e.key === 'Shift') dispatch({ type: 'SHIFT_RELEASED' });
+  };
 
-    await global.backendConn.send('RequestsController', 'delete', {
-      id: requestId
+  const _handleKeyDown = e => {
+    if (!['ArrowUp', 'ArrowDown', 'Shift'].includes(e.key)) return;
+
+    e.preventDefault();
+    // const requestDiv = requestDivRef.current;
+
+    if (e.key === 'ArrowUp') {
+      // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+      dispatch({ type: 'SELECT_PREV_REQUEST_LOAD' });
+    }
+    if (e.key === 'ArrowDown') {
+      // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+      dispatch({ type: 'SELECT_NEXT_REQUEST_LOAD' });
+    }
+    if (e.key === 'Shift') dispatch({ type: 'SHIFT_PRESSED' });
+  };
+
+  // NOTE: This fires twice when the event is received for some reason
+  ipcRenderer.on('deleteRequest', (event, args) => {
+    dispatch({ type: 'DELETE_REQUEST', requestId: args.requestId });
+  });
+
+  // This will create the context menus for the multiple requests selection
+  if (selectedRequestIds.length > 1) {
+    console.log(`[Frontend] Create context menu for multiple requests`);
+    ipcRenderer.send('requestsSelected', {
+      requestIds: selectedRequestIds
     });
   }
 
-  renderTableCell(column, request) {
-    switch (column.key) {
-      case 'id':
-        return <td>{request.id}</td>;
+  const classNameForTableHeader = columnName => {
+    if (columnName === orderBy) return 'ordered';
 
-      case 'method':
-        return (
-          <td>
-            <span className={`http-method-${request.method}`}>
-              {request.method}
-            </span>
-          </td>
-        );
+    return '';
+  };
 
-      case 'host':
-        return <td>{request.host}</td>;
+  const setTableColumnWidth = (columnIndex, width) => {
+    dispatch({
+      type: 'SET_COLUMN_WIDTH',
+      width: width,
+      columnIndex: columnIndex
+    });
+  };
 
-      case 'response_status':
-        if (request.response_status === null) {
-          return <td>&nbsp;</td>;
-        } else {
-          return (
-            <td>
-              <StatusTag statusCode={request.response_status} small />
-            </td>
-          );
-        }
+  const selectRequest = request => {
+    // const requestDiv = requestDivRef.current;
+    // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+    dispatch({ type: 'SELECT_REQUEST_LOAD', request: request });
+  };
+  /*
+  useEffect(() => {
+    console.log(`Setting scrollTop to: ${requestsTableScrollTop}`)
+    const requestDiv = requestDivRef.current;
+    requestDiv.scrollTop = requestsTableScrollTop;
 
-      case 'created_at': {
-        const time = new Date(request.created_at);
-        return <td>{time.toUTCString()}</td>;
-      }
-
-      default:
-        return <td>{request[column.key]}</td>;
-    }
-  }
-
-  render() {
-    console.log(`Rendering RequestsTable`);
-
-    const requests = this.props.requests;
-
-    return (
-      <KeydownBinder
-        stopMetaPropagation
-        onKeydown={this._handleKeyDown}
-        onKeyup={this._handleKeyUp}
+    return () => {
+      console.log(`Leaving RequestsTable - saving scrollTop to: ${requestDiv.scrollTop}`)
+      dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+    };
+  }, [requestDivRef, requestsTableScrollTop]);
+*/
+  return (
+    <KeydownBinder
+      stopMetaPropagation
+      onKeydown={_handleKeyDown}
+      onKeyup={_handleKeyUp}
+    >
+      <div
+        className="pane-remaining"
+        style={{ overflowX: 'auto' }}
+        ref={requestDivRef}
       >
-        <div
-          className="pane-remaining"
-          style={{ overflowX: 'auto' }}
-          ref={this._setRequestsPanelRef}
-        >
-          <table className="requests-table">
-            <thead>
-              <tr>
-                {this.context.requestsTableColumns.map((column, i) => (
-                  <RequestsTableHeader
-                    key={`RequestsTableHeader${i}`}
-                    onClick={this.props.toggleColumnOrder.bind(
-                      this,
-                      column.key
-                    )}
-                    className={this.classNameForTableHeader(column.key)}
-                    orderDir={this.props.dir}
-                    width={column.width}
-                    setTableColumnWidth={this.setTableColumnWidth.bind(this)}
-                    columnIndex={i}
-                    minWidth={column.minWidth}
-                  >
-                    {column.title}
-                  </RequestsTableHeader>
+        <table className="requests-table">
+          <thead>
+            <tr>
+              {requestsTableColumns.map((column, i) => (
+                <RequestsTableHeader
+                  key={`RequestsTableHeader${i}`}
+                  onClick={() =>
+                    dispatch({
+                      type: 'TOGGLE_COLUMN_ORDER_REQUESTS',
+                      columnKey: column.key
+                    })
+                  }
+                  className={classNameForTableHeader(column.key)}
+                  orderDir={dir}
+                  width={column.width}
+                  setTableColumnWidth={setTableColumnWidth}
+                  columnIndex={i}
+                  minWidth={column.minWidth}
+                >
+                  {column.title}
+                </RequestsTableHeader>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {requests.map(request => (
+              <tr
+                key={request.id}
+                id={`requestRow${request.id}`}
+                onClick={() => selectRequest(request)}
+                onContextMenu={_handleRightClick.bind(this, request.id)}
+                className={_getRowClassName(request.id)}
+              >
+                {requestsTableColumns.map(column => (
+                  <RequestTableCell request={request} column={column} />
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {requests.map(request => (
-                <tr
-                  key={request.id}
-                  id={`requestRow${request.id}`}
-                  onClick={() =>
-                    this.props.setSelectedRequestId(
-                      request.id,
-                      this.state.shiftPressed
-                    )
-                  }
-                  onContextMenu={this._handleRightClick.bind(this, request.id)}
-                  className={this.getRowClassName(request.id)}
-                >
-                  {this.context.requestsTableColumns.map(column =>
-                    this.renderTableCell(column, request)
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </KeydownBinder>
-    );
-  }
-}
-
-RequestsTable.contextType = SettingsContext;
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </KeydownBinder>
+  );
+};

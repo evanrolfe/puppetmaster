@@ -1,23 +1,19 @@
-import React, { Component } from 'react';
-import SettingsContext from '../../lib/SettingsContext';
+import React from 'react';
+import { useTrackedState, useDispatch } from '../../state/state';
 import ThemeGraphic from './ThemeGraphic';
 
 const THEMES_PER_ROW = 5;
 
-export default class ThemeSettingsTab extends Component {
-  constructor(props, context) {
-    super(props, context);
-    this.context = context;
+export default () => {
+  const state = useTrackedState();
+  const dispatch = useDispatch();
+  const { activeTheme } = state;
 
-    this.renderTheme = this.renderTheme.bind(this);
-    this.renderThemeRows = this.renderThemeRows.bind(this);
-  }
-
-  renderTheme(theme) {
+  const renderTheme = theme => {
     const themeName = theme;
     const themeDisplayName = theme;
 
-    const isActive = themeName === this.context.activeTheme;
+    const isActive = themeName === activeTheme;
 
     return (
       <div
@@ -27,7 +23,9 @@ export default class ThemeSettingsTab extends Component {
       >
         <h2 className="txt-lg">{themeDisplayName}</h2>
         <button
-          onClick={() => this.context.changeSetting('activeTheme', themeName)}
+          onClick={() =>
+            dispatch({ type: 'SET_THEME_STORAGE', theme: themeName })
+          }
           value={themeName}
           className={isActive ? 'active' : ''}
         >
@@ -35,9 +33,9 @@ export default class ThemeSettingsTab extends Component {
         </button>
       </div>
     );
-  }
+  };
 
-  renderThemeRows(): React.Node {
+  const renderThemeRows = () => {
     const themes = [
       'default',
       'high-contrast-light',
@@ -71,14 +69,10 @@ export default class ThemeSettingsTab extends Component {
 
     return rows.map((currentRow, i) => (
       <div key={i} className="themes__row">
-        {currentRow.map(this.renderTheme)}
+        {currentRow.map(renderTheme)}
       </div>
     ));
-  }
+  };
 
-  render() {
-    return <div className="themes pad-top">{this.renderThemeRows()}</div>;
-  }
-}
-
-ThemeSettingsTab.contextType = SettingsContext;
+  return <div className="themes pad-top">{renderThemeRows()}</div>;
+};

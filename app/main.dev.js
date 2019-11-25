@@ -136,6 +136,7 @@ const requestContextMenus = {};
 let multipleRequestsMenu;
 
 const deleteClicked = requestId => {
+  console.log(`[Main] Delete clicked.`);
   const promise = dialog.showMessageBox(mainWindow, {
     type: 'warning',
     title: 'Delete request',
@@ -170,6 +171,11 @@ ipcMain.on('requestsChanged', (event, args) => {
   });
 });
 
+// When a request is right-clicked:
+ipcMain.on('showRequestContextMenu', (event, args) => {
+  requestContextMenus[args.requestId].popup({ window: mainWindow });
+});
+
 const deleteMultipleClicked = requestIds => {
   const promise = dialog.showMessageBox(mainWindow, {
     type: 'warning',
@@ -191,11 +197,6 @@ const deleteMultipleClicked = requestIds => {
     })
     .catch(console.log);
 };
-
-// When a request is right-clicked:
-ipcMain.on('showRequestContextMenu', (event, args) => {
-  requestContextMenus[args.requestId].popup({ window: mainWindow });
-});
 
 // When multiple requests are selected, create a context menu for them:
 ipcMain.on('requestsSelected', (event, args) => {

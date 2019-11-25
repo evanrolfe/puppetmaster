@@ -1,114 +1,85 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
+
+import { useTrackedState, useDispatch } from '../state/state';
 import RequestTab from './RequestView/RequestTab';
 import ResponseTab from './RequestView/ResponseTab';
 import BodyTab from './RequestView/BodyTab';
 
-type Props = {
-  selectedRequestId: 'number',
-  panelHeight: 'number',
-  draggingPane: 'boolean',
-  codeMirrorWidth: 'number',
-  tabIndex: 'number',
-  setRequestViewTabIndex: 'function'
-};
+export default () => {
+  console.log(`[RENDER] RequestView`);
 
-export default class RequestView extends Component<Props> {
-  props: Props;
+  const state = useTrackedState();
+  const dispatch = useDispatch();
 
-  constructor(props) {
-    super(props);
-    this.state = { request: {}, tabIndex: 0 };
-    this.loadRequest();
-  }
+  const {
+    request,
+    requestViewTabIndex,
+    windowSizeThrottel,
+    orientation,
+    paneWidth
+  } = state;
 
-  componentDidMount() {
-    this.loadRequest();
-  }
+  const setRequestViewTabIndex = i =>
+    dispatch({ type: 'SET_TABINDEX', requestViewTabIndex: i });
 
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.draggingPane === true) {
-      return false;
+  const getCodeMirrorWidth = () => {
+    let codeMirrorWidth;
+    const windowWidth = windowSizeThrottel[0];
+    const sideBarWidth = 53;
+
+    if (orientation === 'horizontal') {
+      codeMirrorWidth = windowWidth - sideBarWidth;
+    } else if (orientation === 'vertical') {
+      codeMirrorWidth = windowWidth - sideBarWidth - paneWidth;
     }
 
-    return true;
-  }
+    return codeMirrorWidth;
+  };
 
-  componentDidUpdate(previousProps) {
-    if (this.props.selectedRequestId !== previousProps.selectedRequestId) {
-      this.loadRequest();
-    }
-  }
+  return (
+    <div className="pane-remaining pane-container-vertical ">
+      <div className="pane-fixed">
+        <Tabs
+          className="theme--pane__body react-tabs"
+          selectedIndex={requestViewTabIndex}
+          onSelect={i => setRequestViewTabIndex(i)}
+        >
+          <TabList>
+            <Tab>
+              <button type="button">Request</button>
+            </Tab>
 
-  async loadRequest() {
-    if (this.props === undefined || this.props.selectedRequestId === undefined)
-      return;
+            <Tab>
+              <button type="button">Response</button>
+            </Tab>
 
-    const id = this.props.selectedRequestId;
-    const response = await global.backendConn.send(
-      'RequestsController',
-      `show`,
-      { id: id }
-    );
-    const request = response.result.body;
+            <Tab>
+              <button type="button">Body</button>
+            </Tab>
+          </TabList>
 
-    if (request !== undefined && request.id !== this.state.request.id) {
-      const newState = Object.assign({}, this.state);
-      newState.request = request;
-      this.setState(newState);
-    }
-  }
-
-  render() {
-    const request = this.state.request;
-
-    return (
-      <div className="pane-remaining pane-container-vertical ">
-        <div className="pane-fixed">
-          <Tabs
-            className="theme--pane__body react-tabs"
-            selectedIndex={this.props.tabIndex}
-            onSelect={tabIndex => this.props.setRequestViewTabIndex(tabIndex)}
-          >
-            <TabList>
-              <Tab>
-                <button type="button">Request</button>
-              </Tab>
-
-              <Tab>
-                <button type="button">Response</button>
-              </Tab>
-
-              <Tab>
-                <button type="button">Body</button>
-              </Tab>
-            </TabList>
-
-            {/* Stupid Hack to avoid a warning from react-tabs: */}
-            <TabPanel />
-            <TabPanel />
-            <TabPanel />
-            <TabPanel />
-          </Tabs>
-        </div>
-
-        {this.props.tabIndex === 0 && (
-          <div className="pane-remaining">
-            <RequestTab height={this.props.panelHeight} request={request} />
-          </div>
-        )}
-        {this.props.tabIndex === 1 && (
-          <div className="pane-remaining">
-            <ResponseTab height={this.props.panelHeight} request={request} />
-          </div>
-        )}
-        {this.props.tabIndex === 2 && (
-          <BodyTab
-            request={request}
-            codeMirrorWidth={this.props.codeMirrorWidth}
-          />
-        )}
+          {/* Stupid Hack to avoid a warning from react-tabs: */}
+          <TabPanel />
+          <TabPanel />
+          <TabPanel />
+          <TabPanel />
+        </Tabs>
       </div>
-    );
-  }
-}
+
+      {requestViewTabIndex === 0 && (
+        <div className="pane-remaining">
+          <RequestTab request={request} />
+        </div>
+      )}
+      {requestViewTabIndex === 1 && (
+        <div className="pane-remaining">
+          <ResponseTab request={request} />
+        </div>
+      )}
+      {requestViewTabIndex === 2 && (
+        <BodyTab request={request} codeMirrorWidth={getCodeMirrorWidth()} />
+      )}
+    </div>
+  );
+};
