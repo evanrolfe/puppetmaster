@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import { useTrackedState, useDispatch } from '../state/state';
 import { registerModal, showModal } from './modals/index';
 import DisplayFiltersModal from './modals/DisplayFiltersModal';
 import CaptureFiltersModal from './modals/CaptureFiltersModal';
@@ -9,23 +8,21 @@ import CaptureFiltersModal from './modals/CaptureFiltersModal';
 type Props = {
   allStatusCodes: 'array',
   allResourceTypes: 'array',
-  allBrowsers: 'array'
+  allBrowsers: 'array',
+  filters: 'object',
+  handleSearch: 'function',
+  setFilters: 'function'
 };
 
-export default ({ allStatusCodes, allResourceTypes, allBrowsers }: Props) => {
-  const state = useTrackedState();
-  const dispatch = useDispatch();
-  const { filters } = state;
-
+export default ({
+  allStatusCodes,
+  allResourceTypes,
+  allBrowsers,
+  filters,
+  handleSearch,
+  setFilters
+}: Props) => {
   console.log(`Rendering RequestsFilterForm:`);
-
-  const handleSearch = e => {
-    dispatch({ type: 'SEARCH_REQUESTS', value: e.target.value });
-  };
-
-  const setFilters = filters1 => {
-    dispatch({ type: 'FILTER_REQUESTS', filters: filters1 });
-  };
 
   return (
     <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>

@@ -4,9 +4,9 @@ import _ from 'lodash';
 
 import { useTrackedState, useDispatch } from '../../state/state';
 import BrowserTabs from '../BrowserTabs';
-import RequestsTable from '../RequestsTable';
-import RequestView from '../RequestView';
-import RequestsFilterForm from '../RequestsFilterForm';
+import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
+import RequestViewState from '../BrowserNetworkPage/RequestViewState';
+import RequestsFilterFormState from '../BrowserNetworkPage/RequestsFilterFormState';
 
 const MIN_PANE_WIDTH = 300;
 const MIN_PANE_HEIGHT = 175;
@@ -159,14 +159,10 @@ export default ({ history, location }) => {
             className="pane-fixed"
             style={{ marginLeft: '10px', padding: '6px' }}
           >
-            <RequestsFilterForm
-              allStatusCodes={STATUS_CODES}
-              allResourceTypes={RESOURCE_TYPES}
-              allBrowsers={[]}
-            />
+            <RequestsFilterFormState />
           </div>
 
-          <RequestsTable />
+          <RequestsTableState />
         </div>
 
         <div
@@ -177,7 +173,7 @@ export default ({ history, location }) => {
           <div className="pane-border-transparent" />
         </div>
 
-        <RequestView />
+        <RequestViewState />
       </div>
     </>
   );

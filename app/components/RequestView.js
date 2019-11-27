@@ -1,27 +1,28 @@
 import React from 'react';
 import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
 
-import { useTrackedState, useDispatch } from '../state/state';
 import RequestTab from './RequestView/RequestTab';
 import ResponseTab from './RequestView/ResponseTab';
 import BodyTab from './RequestView/BodyTab';
 
-export default () => {
+type Props = {
+  request: 'array',
+  requestViewTabIndex: 'number',
+  windowSizeThrottel: 'array',
+  orientation: 'string',
+  paneWidth: 'number',
+  setRequestViewTabIndex: 'number'
+};
+
+export default ({
+  request,
+  requestViewTabIndex,
+  windowSizeThrottel,
+  orientation,
+  paneWidth,
+  setRequestViewTabIndex
+}: Props) => {
   console.log(`[RENDER] RequestView`);
-
-  const state = useTrackedState();
-  const dispatch = useDispatch();
-
-  const {
-    request,
-    requestViewTabIndex,
-    windowSizeThrottel,
-    orientation,
-    paneWidth
-  } = state;
-
-  const setRequestViewTabIndex = i =>
-    dispatch({ type: 'SET_TABINDEX', requestViewTabIndex: i });
 
   const getCodeMirrorWidth = () => {
     let codeMirrorWidth;

@@ -1,8 +1,7 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
-// import { getUntrackedObject } from 'react-tracked';
 
-import { useTrackedState, useDispatch } from '../state/state';
+import { useDispatch } from '../state/state';
 import KeydownBinder from './KeydownBinder';
 import RequestsTableHeader from './RequestsTableHeader';
 import RequestTableCell from './RequestTableCell';
@@ -23,21 +22,25 @@ const getSelectedRequestIds = (selectedId1, selectedId2, requests) => {
   return selectedRequestIds;
 };
 
-export default () => {
-  console.log(`[RENDER] RequestsTable`);
+type Props = {
+  requests: 'array',
+  requestsTableColumns: 'array',
+  selectedRequestId: 'number',
+  selectedRequestId2: 'number',
+  orderBy: 'string',
+  dir: 'string'
+};
 
-  const state = useTrackedState();
-  // const untrackedState = getUntrackedObject(state);
+export default ({
+  requests,
+  requestsTableColumns,
+  selectedRequestId,
+  selectedRequestId2,
+  orderBy,
+  dir
+}: Props) => {
   const dispatch = useDispatch();
-  const {
-    requests,
-    requestsTableColumns,
-    selectedRequestId,
-    selectedRequestId2,
-    orderBy,
-    dir
-  } = state;
-  // const { requestsTableScrollTop } = untrackedState;
+  console.log(`[RENDER] RequestsTable`);
 
   const requestDivRef = React.createRef();
 
