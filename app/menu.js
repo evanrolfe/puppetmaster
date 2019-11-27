@@ -1,5 +1,5 @@
 // @flow
-import { app, Menu, shell, BrowserWindow } from 'electron';
+import { app, Menu, shell, BrowserWindow, dialog } from 'electron';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -192,8 +192,21 @@ export default class MenuBuilder {
             }
           },
           {
-            label: '&Open',
-            accelerator: 'Ctrl+O'
+            label: '&Open Project',
+            accelerator: 'Ctrl+O',
+            click: async () => {
+              console.log('Opening...');
+              const openResult = await dialog.showOpenDialog({
+                title: 'Open a Project',
+                filters: [{ name: 'PM Projects', extensions: ['db'] }],
+                properties: ['openFile']
+              });
+
+              console.log(openResult.filePaths);
+              this.mainWindow.send('open-project', {
+                filePath: openResult.filePaths[0]
+              });
+            }
           },
           {
             label: '&Close',

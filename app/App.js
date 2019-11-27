@@ -16,13 +16,19 @@ export default class App extends Component {
 
     log.warn('Inside react constructor!');
 
+    const backendConn = new BackendConnection('pntest1');
+    const backendConnected = backendConn.init();
+    global.backendConn = backendConn;
+
     ipcRenderer.on('toggle-preferences', () => {
       showModal(SettingsModal);
     });
 
-    const backendConn = new BackendConnection('pntest1');
-    const backendConnected = backendConn.init();
-    global.backendConn = backendConn;
+    ipcRenderer.on('open-project', (e, args) => {
+      global.backendConn.send('ProjectsController', 'open', {
+        filePath: args.filePath
+      });
+    });
 
     // Ensure that the app gets re-rendered once we connect to the backend
     // eslint-disable-next-line react/no-unused-state
