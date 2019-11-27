@@ -87,11 +87,11 @@ export default ({
     // const requestDiv = requestDivRef.current;
 
     if (e.key === 'ArrowUp') {
-      // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+      // dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
       dispatch({ type: 'SELECT_PREV_REQUEST_LOAD' });
     }
     if (e.key === 'ArrowDown') {
-      // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+      // dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
       dispatch({ type: 'SELECT_NEXT_REQUEST_LOAD' });
     }
     if (e.key === 'Shift') dispatch({ type: 'SHIFT_PRESSED' });
@@ -120,13 +120,14 @@ export default ({
     dispatch({
       type: 'SET_COLUMN_WIDTH',
       width: width,
-      columnIndex: columnIndex
+      columnIndex: columnIndex,
+      page: 'browserNetworkPage'
     });
   };
 
   const selectRequest = request => {
     // const requestDiv = requestDivRef.current;
-    // dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+    // dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
     dispatch({ type: 'SELECT_REQUEST_LOAD', request: request });
   };
   /*
@@ -137,7 +138,7 @@ export default ({
 
     return () => {
       console.log(`Leaving RequestsTable - saving scrollTop to: ${requestDiv.scrollTop}`)
-      dispatch({type: 'SET_SCROLLTOP', scrollTop: requestDiv.scrollTop});
+      dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
     };
   }, [requestDivRef, requestsTableScrollTop]);
 */
@@ -161,7 +162,8 @@ export default ({
                   onClick={() =>
                     dispatch({
                       type: 'TOGGLE_COLUMN_ORDER_REQUESTS',
-                      columnKey: column.key
+                      columnKey: column.key,
+                      page: 'browserNetworkPage'
                     })
                   }
                   className={classNameForTableHeader(column.key)}

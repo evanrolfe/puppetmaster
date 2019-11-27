@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTrackedState, useDispatch } from '../../state/state';
+import { useDispatch, useSelector } from '../../state/state';
 
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
@@ -14,16 +14,19 @@ import {
 export default ({ request, codeMirrorWidth }) => {
   console.log(`[RENDER] BodyTab`);
 
-  const state = useTrackedState();
   const dispatch = useDispatch();
 
-  const { viewMode, viewContent } = state;
+  const viewMode = useSelector(state => state.browserNetworkPage.viewMode);
+  const viewContent = useSelector(
+    state => state.browserNetworkPage.viewContent
+  );
 
   const selectDropdownItem = args => {
     dispatch({
       type: 'SET_BODYTAB_VIEW',
       viewMode: args[0],
-      viewContent: args[1]
+      viewContent: args[1],
+      page: 'browserNetworkPage'
     });
   };
 

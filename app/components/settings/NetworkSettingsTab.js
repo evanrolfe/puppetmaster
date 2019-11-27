@@ -1,18 +1,22 @@
 import React from 'react';
-import {
-  useTrackedState,
-  useDispatch,
-  ALL_TABLE_COLUMNS
-} from '../../state/state';
+import { useDispatch, useSelector, ALL_TABLE_COLUMNS } from '../../state/state';
 
 export default () => {
-  const state = useTrackedState();
   const dispatch = useDispatch();
-  const { orientation, requestsTableColumns } = state;
+  const orientation = useSelector(
+    state => state.browserNetworkPage.orientation
+  );
+  const requestsTableColumns = useSelector(
+    state => state.browserNetworkPage.requestsTableColumns
+  );
 
   const changeOrientation = event => {
     const value = event.target.value;
-    dispatch({ type: 'SET_ORIENTATION_STORAGE', orientation: value });
+    dispatch({
+      type: 'SET_ORIENTATION_STORAGE',
+      orientation: value,
+      page: 'browserNetworkPage'
+    });
   };
 
   const tableColumnIsChecked = columnKey =>
@@ -39,7 +43,8 @@ export default () => {
 
     dispatch({
       type: 'SET_TABLECOLUMNS_STORAGE',
-      requestsTableColumns: newTableColumns
+      requestsTableColumns: newTableColumns,
+      page: 'browserNetworkPage'
     });
   };
 

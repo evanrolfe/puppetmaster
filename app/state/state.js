@@ -66,54 +66,42 @@ const requestsTableColumns = ALL_TABLE_COLUMNS.filter(column =>
 
 const initialState = {
   activeTheme: 'default',
-  paneWidth: 700,
-  paneHeight: 350,
-  draggingPane: false,
-  orientation: 'vertical',
-  requests: [],
-  request: null,
-  requestViewTabIndex: 0,
-  viewMode: 'pretty', // pretty | raw | preview | parsed
-  viewContent: 'render', // source | render
-  selectedRequestId: null,
-  selectedRequestId2: null,
-  requestsTableColumns: requestsTableColumns,
   shiftPressed: false,
-  orderBy: 'id',
-  dir: 'desc',
-  requestsTableScrollTop: 0,
-  browsers: [],
-  filters: {
-    hostList: [],
-    hostSetting: '', // ''|'include'|'exclude'
-    pathList: [],
-    pathSetting: '', // ''|'include'|'exclude'
-    statusCodes: Object.keys(STATUS_CODES),
-    resourceTypes: RESOURCE_TYPES,
-    extSetting: '', // ''|'include'|'exclude'
-    extList: [],
-    search: '',
-    browserId: null
+  browserNetworkPage: {
+    paneWidth: 700,
+    paneHeight: 350,
+    draggingPane: false,
+    orientation: 'vertical',
+    requestViewTabIndex: 0,
+    viewMode: 'pretty', // pretty | raw | preview | parsed
+    viewContent: 'render', // source | render
+    orderBy: 'id',
+    dir: 'desc',
+    requestsTableColumns: requestsTableColumns,
+    requestsTableScrollTop: 0,
+    browsers: [],
+    requests: [],
+    request: null,
+    selectedRequestId: null,
+    selectedRequestId2: null,
+    filters: {
+      hostList: [],
+      hostSetting: '', // ''|'include'|'exclude'
+      pathList: [],
+      pathSetting: '', // ''|'include'|'exclude'
+      statusCodes: Object.keys(STATUS_CODES),
+      resourceTypes: RESOURCE_TYPES,
+      extSetting: '', // ''|'include'|'exclude'
+      extList: [],
+      search: '',
+      browserId: null
+    }
   }
 };
 
 /* ----------------------------------------------------------------------------*
  * Reducers:
  * ----------------------------------------------------------------------------*/
-const browsersLoaded = (state, action) => ({
-  ...state,
-  browsers: action.browsers
-});
-
-const requestsLoaded = (state, action) => {
-  ipcRenderer.send('requestsChanged', { requests: action.requests });
-
-  return {
-    ...state,
-    requests: action.requests
-  };
-};
-
 const handleRequestDelete = (state, action) => {
   let deletedIds;
   // If multiple requests were deleted:
@@ -131,143 +119,150 @@ const handleRequestDelete = (state, action) => {
   };
 };
 
-const selectPrevRequest = state => {
-  const index = state.requests.findIndex(
-    request => request.id === state.selectedRequestId
+const selectPrevRequest = (state, action) => {
+  const index = state[action.page].requests.findIndex(
+    request => request.id === state[action.page].selectedRequestId
   );
-  const prevRequest = state.requests[index - 1];
+  const prevRequest = state[action.page].requests[index - 1];
   if (prevRequest === undefined) return state;
 
-  return selectRequest(state, prevRequest.id);
+  return selectRequest(state, { requestId: prevRequest.id, page: action.page });
 };
 
-const selectNextRequest = state => {
-  const index = state.requests.findIndex(
-    request => request.id === state.selectedRequestId
+const selectNextRequest = (state, action) => {
+  const index = state[action.page].requests.findIndex(
+    request => request.id === state[action.page].selectedRequestId
   );
-  const nextRequest = state.requests[index + 1];
+  const nextRequest = state[action.page].requests[index + 1];
   if (nextRequest === undefined) return state;
 
-  return selectRequest(state, nextRequest.id);
+  return selectRequest(state, { requestId: nextRequest.id, page: action.page });
 };
 
-const selectRequest = (state, requestId) => {
+const selectRequest = (state, action) => {
   let selectedRequestId2 = null;
 
   if (state.shiftPressed === true) {
-    if (state.selectedRequestId2 === null) {
-      selectedRequestId2 = state.selectedRequestId;
+    if (state.browserNetworkPage.selectedRequestId2 === null) {
+      selectedRequestId2 = state.browserNetworkPage.selectedRequestId;
     } else {
-      selectedRequestId2 = state.selectedRequestId2;
+      selectedRequestId2 = state.browserNetworkPage.selectedRequestId2;
     }
   }
 
-  return {
-    ...state,
-    selectedRequestId: requestId,
-    selectedRequestId2: selectedRequestId2
-  };
+  const newState = { ...state };
+  newState[action.page].selectedRequestId = action.requestId;
+  newState[action.page].selectedRequestId2 = selectedRequestId2;
+  return newState;
 };
 
-const toggleColumnOrder = (state, columnKey) => {
+const toggleColumnOrder = (state, action) => {
   const newState = { ...state };
 
-  if (columnKey !== state.orderBy) {
-    newState.orderBy = columnKey;
+  if (action.columnKey !== state[action.page].orderBy) {
+    newState[action.page].orderBy = action.columnKey;
   } else {
-    newState.dir = state.dir === 'asc' ? 'desc' : 'asc';
+    newState[action.page].dir =
+      state[action.page].dir === 'asc' ? 'desc' : 'asc';
   }
 
   return newState;
 };
 
-const setColumnWidth = (state, columnIndex, width) => {
-  const newTableColumns = [...state.requestsTableColumns];
-  newTableColumns[columnIndex].width = width;
+const setColumnWidth = (state, action) => {
+  const newState = { ...state };
+  const newTableColumns = [...state[action.page].requestsTableColumns];
+  newTableColumns[action.columnIndex].width = action.width;
 
-  return { ...state, requestsTableColumns: newTableColumns };
+  newState[action.page].requestsTableColumns = newTableColumns;
+
+  return newState;
 };
 
-const setScrollTop = (state, action) => ({
-  ...state,
-  requestsTableScrollTop: action.scrollTop
-});
+const setSearch = (state, action) => {
+  const newFilters = Object.assign({}, state[action.page].filters);
+  newFilters.search = action.value;
 
-const setSearch = (state, value) => {
-  const newFilters = Object.assign({}, state.filters);
-  newFilters.search = value;
-  return { ...state, filters: newFilters };
+  const newState = { ...state };
+  newState[action.page].filters = newFilters;
+  return newState;
 };
 
-const setFilters = (state, filters) => {
-  const newFilters = Object.assign({}, state.filters);
+const setFilters = (state, action) => {
+  const newFilters = Object.assign({}, state[action.page].filters);
 
-  Object.keys(filters).forEach(key => {
-    newFilters[key] = filters[key];
+  Object.keys(action.filters).forEach(key => {
+    newFilters[key] = action.filters[key];
   });
 
-  return { ...state, filters: newFilters };
+  const newState = { ...state };
+  newState[action.page].filters = newFilters;
+  return newState;
 };
 
-const setTabIndex = (state, action) => ({
-  ...state,
-  requestViewTabIndex: action.requestViewTabIndex
-});
+const setBodyTabView = (state, action) => {
+  const newState = { ...state };
+  newState[action.page].viewMode = action.viewMode;
+  newState[action.page].viewContent = action.viewContent;
+  return newState;
+};
 
-const setBodyTabView = (state, action) => ({
-  ...state,
-  viewMode: action.viewMode,
-  viewContent: action.viewContent
-});
+const setNestedValue = (key, state, action) => {
+  const newState = { ...state };
+
+  newState[action.page][key] = action[key];
+  console.log(`[STATE] Set ${action.page}.${key} to: ${action[key]}`);
+  return newState;
+};
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'BROWSERS_LOADED':
-      return browsersLoaded(state, action);
+      return setNestedValue('browsers', state, action);
+
     case 'REQUESTS_LOADED':
-      return requestsLoaded(state, action);
+      ipcRenderer.send('requestsChanged', { requests: action.requests });
+      return setNestedValue('requests', state, action);
+
     case 'REQUEST_LOADED':
-      return { ...state, request: action.request };
+      return setNestedValue('request', state, action);
     case 'REQUEST_DELETED':
       return handleRequestDelete(state, action);
 
     // RequestsTable:
     case 'SELECT_REQUEST':
-      return selectRequest(state, action.requestId);
+      return selectRequest(state, action);
     case 'SELECT_PREV_REQUEST':
-      return selectPrevRequest(state);
+      return selectPrevRequest(state, action);
     case 'SELECT_NEXT_REQUEST':
-      return selectNextRequest(state);
+      return selectNextRequest(state, action);
     case 'SHIFT_PRESSED':
       return { ...state, shiftPressed: true };
     case 'SHIFT_RELEASED':
       return { ...state, shiftPressed: false };
     case 'TOGGLE_COLUMN_ORDER':
-      return toggleColumnOrder(state, action.columnKey);
+      return toggleColumnOrder(state, action);
     case 'SET_COLUMN_WIDTH':
-      return setColumnWidth(state, action.columnIndex, action.width);
+      return setColumnWidth(state, action);
     case 'SET_SCROLLTOP':
-      return setScrollTop(state, action);
-
-    // BrowserNetworkPage:
-    case 'START_DRAGGING_PANE':
-      return { ...state, draggingPane: true };
-    case 'STOP_DRAGGING_PANE':
-      return { ...state, draggingPane: false };
+      return setNestedValue('requestsTableScrollTop', state, action);
+    case 'SET_DRAGGING_PANE':
+      return setNestedValue('draggingPane', state, action);
     case 'SET_PANE_HEIGHT':
-      return { ...state, paneHeight: action.height };
+      return setNestedValue('paneHeight', state, action);
     case 'SET_PANE_WIDTH':
-      return { ...state, paneWidth: action.width };
+      return setNestedValue('paneWidth', state, action);
+
     case 'SET_SEARCH':
-      return setSearch(state, action.value);
+      return setSearch(state, action);
     case 'SET_FILTERS':
-      return setFilters(state, action.value);
+      return setFilters(state, action);
     case 'SET_WINDOW_SIZE_THROTTLED':
       return { ...state, windowSizeThrottel: action.windowSize };
 
     // RequestView:
     case 'SET_TABINDEX':
-      return setTabIndex(state, action);
+      return setNestedValue('requestViewTabIndex', state, action);
     case 'SET_BODYTAB_VIEW':
       return setBodyTabView(state, action);
 
@@ -275,9 +270,9 @@ const reducer = (state, action) => {
     case 'SET_THEME':
       return { ...state, activeTheme: action.theme };
     case 'SET_ORIENTATION':
-      return { ...state, orientation: action.orientation };
+      return setNestedValue('orientation', state, action);
     case 'SET_TABLECOLUMNS':
-      return { ...state, requestsTableColumns: action.requestsTableColumns };
+      return setNestedValue('requestsTableColumns', state, action);
 
     default:
       return state; // needs this for AsyncAction
@@ -295,19 +290,21 @@ function* saveState() {
 }
 
 function* loadState() {
+  /*
+  const orientation = yield localStorage.getItem('browserNetworkPage.orientation');
+  yield put({ type: 'SET_ORIENTATION', orientation: orientation, page: 'browserNetworkPage' });
+
   const activeTheme = yield localStorage.getItem('activeTheme');
-  const orientation = yield localStorage.getItem('orientation');
-  const paneWidth = yield localStorage.getItem('paneWidth');
-  const paneHeight = yield localStorage.getItem('paneHeight');
-
   yield put({ type: 'SET_THEME', theme: activeTheme });
-  yield put({ type: 'SET_ORIENTATION', orientation: orientation });
 
-  if (paneWidth !== null)
-    yield put({ type: 'SET_PANE_WIDTH', width: parseInt(paneWidth) });
+  const paneWidth = yield localStorage.getItem('browserNetworkPage.paneWidth');
+  const paneHeight = yield localStorage.getItem('browserNetworkPage.paneHeight');
+  if (paneWidth !== null && paneWidth !== undefined)
+    yield put({ type: 'SET_PANE_WIDTH', paneWidth: parseInt(paneWidth), page: 'browserNetworkPage' });
 
-  if (paneHeight !== null)
-    yield put({ type: 'SET_PANE_HEIGHT', height: parseInt(paneHeight) });
+  if (paneHeight !== null && paneHeight !== undefined)
+    yield put({ type: 'SET_PANE_HEIGHT', paneHeight: parseInt(paneHeight), page: 'browserNetworkPage' });
+*/
 }
 
 function* setThemeStorage(action) {
@@ -316,32 +313,48 @@ function* setThemeStorage(action) {
 }
 
 function* setOrientationStorage(action) {
-  yield put({ type: 'SET_ORIENTATION', orientation: action.orientation });
-  localStorage.setItem('orientation', action.orientation);
+  yield put({
+    type: 'SET_ORIENTATION',
+    orientation: action.orientation,
+    page: action.page
+  });
+  localStorage.setItem(`${action.page}.orientation`, action.orientation);
 }
 
 function* setTableColumnsStorage(action) {
   yield put({
     type: 'SET_TABLECOLUMNS',
-    requestsTableColumns: action.requestsTableColumns
+    requestsTableColumns: action.requestsTableColumns,
+    page: action.page
   });
-  localStorage.setItem('requestsTableColumns', action.requestsTableColumns);
+  localStorage.setItem(
+    `${action.page}.requestsTableColumns`,
+    action.requestsTableColumns
+  );
 }
 
 function* setPaneHeightStorage(action) {
-  yield put({ type: 'SET_PANE_HEIGHT', height: action.height });
-  localStorage.setItem('paneHeight', action.height);
+  yield put({
+    type: 'SET_PANE_HEIGHT',
+    paneHeight: action.height,
+    page: 'browserNetworkPage'
+  });
+  localStorage.setItem('browserNetworkPage.paneHeight', action.height);
 }
 
 function* setPaneWidthStorage(action) {
-  yield put({ type: 'SET_PANE_WIDTH', width: action.width });
-  localStorage.setItem('paneWidth', action.width);
+  yield put({
+    type: 'SET_PANE_WIDTH',
+    paneWidth: action.width,
+    page: 'browserNetworkPage'
+  });
+  localStorage.setItem('browserNetworkPage.paneWidth', action.width);
 }
 
 function* loadRequests() {
-  const filters = yield select(state => state.filters);
-  const orderBy = yield select(state => state.orderBy);
-  const dir = yield select(state => state.dir);
+  const filters = yield select(state => state.browserNetworkPage.filters);
+  const orderBy = yield select(state => state.browserNetworkPage.orderBy);
+  const dir = yield select(state => state.browserNetworkPage.dir);
 
   const params = { ...filters, order_by: orderBy, dir: dir };
 
@@ -353,11 +366,17 @@ function* loadRequests() {
 
   const requests = response.result.body;
 
-  yield put({ type: 'REQUESTS_LOADED', requests: requests });
+  yield put({
+    type: 'REQUESTS_LOADED',
+    requests: requests,
+    page: 'browserNetworkPage'
+  });
 }
 
 function* loadRequest() {
-  const requestId = yield select(state => state.selectedRequestId);
+  const requestId = yield select(
+    state => state.browserNetworkPage.selectedRequestId
+  );
 
   const response = yield global.backendConn.send('RequestsController', `show`, {
     id: requestId
@@ -365,7 +384,11 @@ function* loadRequest() {
   const request = response.result.body;
   console.log(`Loaded request ${request.id}`);
 
-  yield put({ type: 'REQUEST_LOADED', request: request });
+  yield put({
+    type: 'REQUEST_LOADED',
+    request: request,
+    page: 'browserNetworkPage'
+  });
 }
 
 function* loadBrowsers() {
@@ -376,7 +399,11 @@ function* loadBrowsers() {
   );
   const browsers = result.result.body;
 
-  yield put({ type: 'BROWSERS_LOADED', browsers: browsers });
+  yield put({
+    type: 'BROWSERS_LOADED',
+    browsers: browsers,
+    page: 'browserNetworkPage'
+  });
 }
 
 function* deleteRequest(action) {
@@ -387,32 +414,48 @@ function* deleteRequest(action) {
 }
 
 function* selectRequestLoad(action) {
-  yield put({ type: 'SELECT_REQUEST', requestId: action.request.id });
+  yield put({
+    type: 'SELECT_REQUEST',
+    requestId: action.request.id,
+    page: 'browserNetworkPage'
+  });
   yield put({ type: 'LOAD_REQUEST' });
 }
 
 function* selectPrevRequestLoad() {
-  yield put({ type: 'SELECT_PREV_REQUEST' });
+  yield put({ type: 'SELECT_PREV_REQUEST', page: 'browserNetworkPage' });
   yield put({ type: 'LOAD_REQUEST' });
 }
 
 function* selectNextRequestLoad() {
-  yield put({ type: 'SELECT_NEXT_REQUEST' });
+  yield put({ type: 'SELECT_NEXT_REQUEST', page: 'browserNetworkPage' });
   yield put({ type: 'LOAD_REQUEST' });
 }
 
 function* searchRequests(action) {
-  yield put({ type: 'SET_SEARCH', value: action.value });
+  yield put({
+    type: 'SET_SEARCH',
+    value: action.value,
+    page: 'browserNetworkPage'
+  });
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
 function* filterRequests(action) {
-  yield put({ type: 'SET_FILTERS', value: action.filters });
+  yield put({
+    type: 'SET_FILTERS',
+    filters: action.filters,
+    page: 'browserNetworkPage'
+  });
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
 function* toggleColumnOrderRequests(action) {
-  yield put({ type: 'TOGGLE_COLUMN_ORDER', columnKey: action.columnKey });
+  yield put({
+    type: 'TOGGLE_COLUMN_ORDER',
+    columnKey: action.columnKey,
+    page: action.page
+  });
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
@@ -445,5 +488,6 @@ const useValue = () => useSagaReducer(rootSaga, reducer, initialState);
 export const {
   Provider,
   useTrackedState,
+  useSelector,
   useUpdate: useDispatch
 } = createContainer(useValue);

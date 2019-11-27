@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTrackedState, useDispatch } from '../state/state';
+import { useDispatch, useSelector } from '../state/state';
 import {
   Dropdown,
   DropdownButton,
@@ -11,9 +11,8 @@ import EditBrowserModal from './modals/EditBrowserModal';
 export default () => {
   console.log(`[RENDER] BrowserSessionsDropdown`);
 
-  const state = useTrackedState();
   const dispatch = useDispatch();
-  const { browsers } = state;
+  const browsers = useSelector(state => state.browserNetworkPage.browsers);
 
   console.log(
     `[RENDER] BrowserSessionsDropdown with ${browsers.length} browsers`

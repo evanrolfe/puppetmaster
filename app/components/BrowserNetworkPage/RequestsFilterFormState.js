@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { useTrackedState, useDispatch } from '../../state/state';
+import { useDispatch, useSelector } from '../../state/state';
 import RequestsFilterForm from '../RequestsFilterForm';
 import { RESOURCE_TYPES, STATUS_CODES } from '../pages/BrowserNetworkPage';
 
 export default () => {
-  const state = useTrackedState();
   const dispatch = useDispatch();
-  const { filters } = state;
+  const filters = useSelector(state => state.browserNetworkPage.filters);
 
   const handleSearch = e => {
     dispatch({ type: 'SEARCH_REQUESTS', value: e.target.value });

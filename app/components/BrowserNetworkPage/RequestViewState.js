@@ -1,21 +1,28 @@
 import React from 'react';
 
-import { useTrackedState, useDispatch } from '../../state/state';
+import { useTrackedState, useDispatch, useSelector } from '../../state/state';
 import RequestView from '../RequestView';
 
 export default () => {
-  const state = useTrackedState();
+  const trackedState = useTrackedState();
   const dispatch = useDispatch();
-  const {
-    request,
-    requestViewTabIndex,
-    windowSizeThrottel,
-    orientation,
-    paneWidth
-  } = state;
+  const { windowSizeThrottel } = trackedState;
+
+  const paneWidth = useSelector(state => state.browserNetworkPage.paneWidth);
+  const request = useSelector(state => state.browserNetworkPage.request);
+  const orientation = useSelector(
+    state => state.browserNetworkPage.orientation
+  );
+  const requestViewTabIndex = useSelector(
+    state => state.browserNetworkPage.requestViewTabIndex
+  );
 
   const setRequestViewTabIndex = i =>
-    dispatch({ type: 'SET_TABINDEX', requestViewTabIndex: i });
+    dispatch({
+      type: 'SET_TABINDEX',
+      requestViewTabIndex: i,
+      page: 'browserNetworkPage'
+    });
 
   return (
     <RequestView

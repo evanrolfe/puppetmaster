@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { remote } from 'electron';
 import _ from 'lodash';
 
-import { useTrackedState, useDispatch } from '../../state/state';
+import { useDispatch, useSelector } from '../../state/state';
 import BrowserTabs from '../BrowserTabs';
 import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
 import RequestViewState from '../BrowserNetworkPage/RequestViewState';
@@ -64,11 +64,16 @@ const setPaneDragWidthDOM = (event, borderDiv, paneDiv) => {
 export default ({ history, location }) => {
   console.log(`[RENDER] BrowserNetworkPage`);
 
-  const state = useTrackedState();
   const dispatch = useDispatch();
-  const { orientation, paneWidth, paneHeight, draggingPane } = state;
 
-  console.log(`draggingPane: ${draggingPane}`);
+  const draggingPane = useSelector(
+    state => state.browserNetworkPage.draggingPane
+  );
+  const orientation = useSelector(
+    state => state.browserNetworkPage.orientation
+  );
+  const paneWidth = useSelector(state => state.browserNetworkPage.paneWidth);
+  const paneHeight = useSelector(state => state.browserNetworkPage.paneHeight);
 
   const inverseOrientation =
     orientation === 'vertical' ? 'horizontal' : 'vertical';
@@ -92,7 +97,11 @@ export default ({ history, location }) => {
     const paneDiv = paneDivRef.current;
 
     if (draggingPane === true) {
-      dispatch({ type: 'STOP_DRAGGING_PANE' });
+      dispatch({
+        type: 'SET_DRAGGING_PANE',
+        draggingPane: false,
+        page: 'browserNetworkPage'
+      });
 
       if (orientation === 'vertical') {
         dispatch({
@@ -167,7 +176,13 @@ export default ({ history, location }) => {
 
         <div
           className="pane-border pane-fixed"
-          onMouseDown={() => dispatch({ type: 'START_DRAGGING_PANE' })}
+          onMouseDown={() =>
+            dispatch({
+              type: 'SET_DRAGGING_PANE',
+              draggingPane: true,
+              page: 'browserNetworkPage'
+            })
+          }
           ref={borderDivRef}
         >
           <div className="pane-border-transparent" />
