@@ -3,13 +3,14 @@ import { remote } from 'electron';
 import _ from 'lodash';
 
 import { useDispatch, useSelector } from '../../state/state';
+import PaneContainer from '../pane/PaneContainer';
+import PaneRemaining from '../pane/PaneRemaining';
+import PaneFixed from '../pane/PaneFixed';
+import PaneResizeable from '../pane/PaneResizeable';
 import BrowserTabs from '../BrowserTabs';
 import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
 import RequestViewState from '../BrowserNetworkPage/RequestViewState';
 import RequestsFilterFormState from '../BrowserNetworkPage/RequestsFilterFormState';
-
-const MIN_PANE_WIDTH = 300;
-const MIN_PANE_HEIGHT = 175;
 
 export const RESOURCE_TYPES = [
   'document',
@@ -35,99 +36,31 @@ export const STATUS_CODES = {
   5: '5xx [Server Error]'
 };
 
-const getPaneStyle = (orientation, paneWidth, paneHeight) => {
-  const paneStyle = {};
-  if (orientation === 'horizontal') {
-    paneStyle.height = paneHeight;
-  } else if (orientation === 'vertical') {
-    paneStyle.width = paneWidth;
-  }
-  return paneStyle;
+type Props = {
+  history: 'object',
+  location: 'object'
 };
 
-const setPaneDragHeightDOM = (event, borderDiv, paneDiv) => {
-  const diff = event.clientX - borderDiv.offsetLeft - borderDiv.offsetWidth;
-  const newWidth = paneDiv.clientWidth + diff;
-
-  if (newWidth < MIN_PANE_WIDTH) return;
-  paneDiv.style.width = `${newWidth}px`;
-};
-
-const setPaneDragWidthDOM = (event, borderDiv, paneDiv) => {
-  const diff = event.clientY - borderDiv.offsetTop - borderDiv.offsetHeight;
-  const newHeight = paneDiv.clientHeight + diff;
-
-  if (newHeight < MIN_PANE_HEIGHT) return;
-  paneDiv.style.height = `${newHeight}px`;
-};
-
-export default ({ history, location }) => {
+export default ({ history, location }: Props) => {
   console.log(`[RENDER] BrowserNetworkPage`);
 
   const dispatch = useDispatch();
 
-  const draggingPane = useSelector(
-    state => state.browserNetworkPage.draggingPane
-  );
   const orientation = useSelector(
     state => state.browserNetworkPage.orientation
   );
-  const paneWidth = useSelector(state => state.browserNetworkPage.paneWidth);
-  const paneHeight = useSelector(state => state.browserNetworkPage.paneHeight);
-
   const inverseOrientation =
     orientation === 'vertical' ? 'horizontal' : 'vertical';
-  const paneStyle = getPaneStyle(orientation, paneWidth, paneHeight);
 
-  const borderDivRef = React.createRef();
-  const paneDivRef = React.createRef();
-
-  const loadRequests = () => dispatch({ type: 'LOAD_REQUESTS' });
-  loadRequests();
+  dispatch({ type: 'LOAD_REQUESTS' });
   dispatch({ type: 'LOAD_BROWSERS' });
 
   global.backendConn.listen('requestCreated', () => {
-    loadRequests();
+    dispatch({ type: 'LOAD_REQUESTS' });
   });
   global.backendConn.listen('browsersChanged', () => {
-    loadRequests();
+    dispatch({ type: 'LOAD_REQUESTS' });
   });
-
-  const _handleMouseUp = () => {
-    const paneDiv = paneDivRef.current;
-
-    if (draggingPane === true) {
-      dispatch({
-        type: 'SET_DRAGGING_PANE',
-        draggingPane: false,
-        page: 'browserNetworkPage'
-      });
-
-      if (orientation === 'vertical') {
-        dispatch({
-          type: 'SET_PANE_WIDTH_STORAGE',
-          width: paneDiv.clientWidth
-        });
-      } else if (orientation === 'horizontal') {
-        dispatch({
-          type: 'SET_PANE_HEIGHT_STORAGE',
-          height: paneDiv.clientHeight
-        });
-      }
-    }
-  };
-
-  const _handleMouseMove = e => {
-    if (draggingPane === true) {
-      const borderDiv = borderDivRef.current;
-      const paneDiv = paneDivRef.current;
-
-      if (orientation === 'vertical')
-        setPaneDragHeightDOM(e, borderDiv, paneDiv);
-      if (orientation === 'horizontal')
-        setPaneDragWidthDOM(e, borderDiv, paneDiv);
-    }
-  };
 
   const _setWindowSize = () => {
     const size = remote.getCurrentWindow().getSize();
@@ -139,57 +72,34 @@ export default ({ history, location }) => {
 
   useEffect(
     () => {
-      document.addEventListener('mouseup', _handleMouseUp);
-      document.addEventListener('mousemove', _handleMouseMove);
       window.addEventListener('resize', _setWindowSizeThrottled);
 
       return () => {
-        document.removeEventListener('mouseup', _handleMouseUp);
-        document.removeEventListener('mousemove', _handleMouseMove);
         window.removeEventListener('resize', _setWindowSizeThrottled);
       };
     },
-    [_handleMouseUp, _handleMouseMove]
+    [_setWindowSizeThrottled]
   );
 
   return (
-    <>
-      <div className={`pane-container-${inverseOrientation}`}>
-        <div
-          className="pane-fixed pane-container-vertical"
-          style={paneStyle}
-          ref={paneDivRef}
-        >
-          <div className="pane-fixed">
+    <PaneContainer orientation={inverseOrientation}>
+      <PaneResizeable>
+        <PaneContainer orientation="vertical">
+          <PaneFixed>
             <BrowserTabs history={history} location={location} />
-          </div>
+          </PaneFixed>
 
-          <div
-            className="pane-fixed"
-            style={{ marginLeft: '10px', padding: '6px' }}
-          >
+          <PaneFixed style={{ marginLeft: '10px', padding: '6px' }}>
             <RequestsFilterFormState />
-          </div>
+          </PaneFixed>
 
           <RequestsTableState />
-        </div>
+        </PaneContainer>
+      </PaneResizeable>
 
-        <div
-          className="pane-border pane-fixed"
-          onMouseDown={() =>
-            dispatch({
-              type: 'SET_DRAGGING_PANE',
-              draggingPane: true,
-              page: 'browserNetworkPage'
-            })
-          }
-          ref={borderDivRef}
-        >
-          <div className="pane-border-transparent" />
-        </div>
-
+      <PaneRemaining>
         <RequestViewState />
-      </div>
-    </>
+      </PaneRemaining>
+    </PaneContainer>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
 
+import PaneContainer from './pane/PaneContainer';
 import RequestTab from './RequestView/RequestTab';
 import ResponseTab from './RequestView/ResponseTab';
 import BodyTab from './RequestView/BodyTab';
@@ -39,7 +40,7 @@ export default ({
   };
 
   return (
-    <div className="pane-remaining pane-container-vertical ">
+    <PaneContainer orientation="vertical">
       <div className="pane-fixed">
         <Tabs
           className="theme--pane__body react-tabs"
@@ -81,6 +82,6 @@ export default ({
       {requestViewTabIndex === 2 && (
         <BodyTab request={request} codeMirrorWidth={getCodeMirrorWidth()} />
       )}
-    </div>
+    </PaneContainer>
   );
 };
