@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from '../../state/state';
 
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
@@ -11,24 +10,14 @@ import {
   isHTML
 } from '../../lib/CodeEditorUtils';
 
-export default ({ request, codeMirrorWidth }) => {
+export default ({
+  viewMode,
+  viewContent,
+  request,
+  codeMirrorWidth,
+  selectDropdownItem
+}) => {
   console.log(`[RENDER] BodyTab`);
-
-  const dispatch = useDispatch();
-
-  const viewMode = useSelector(state => state.browserNetworkPage.viewMode);
-  const viewContent = useSelector(
-    state => state.browserNetworkPage.viewContent
-  );
-
-  const selectDropdownItem = args => {
-    dispatch({
-      type: 'SET_BODYTAB_VIEW',
-      viewMode: args[0],
-      viewContent: args[1],
-      page: 'browserNetworkPage'
-    });
-  };
 
   const openInBrowser = () => {
     const content = request.response_body || '';

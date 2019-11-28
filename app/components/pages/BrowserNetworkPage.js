@@ -6,11 +6,14 @@ import { useDispatch, useSelector } from '../../state/state';
 import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
+import PaneWithTabsState from '../BrowserNetworkPage/PaneWithTabsState';
 import PaneResizeable from '../pane/PaneResizeable';
 import BrowserTabs from '../BrowserTabs';
 import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
-import RequestViewState from '../BrowserNetworkPage/RequestViewState';
 import RequestsFilterFormState from '../BrowserNetworkPage/RequestsFilterFormState';
+import RequestTabState from '../BrowserNetworkPage/RequestTabState';
+import ResponseTabState from '../BrowserNetworkPage/ResponseTabState';
+import BodyTabState from '../BrowserNetworkPage/BodyTabState';
 
 export const RESOURCE_TYPES = [
   'document',
@@ -68,8 +71,6 @@ export default ({ history, location }: Props) => {
   };
   const _setWindowSizeThrottled = _.throttle(_setWindowSize, 250);
 
-  _setWindowSize();
-
   useEffect(
     () => {
       window.addEventListener('resize', _setWindowSizeThrottled);
@@ -81,24 +82,30 @@ export default ({ history, location }: Props) => {
     [_setWindowSizeThrottled]
   );
 
+  const requestsTablePane = (
+    <PaneContainer orientation="vertical">
+      <PaneFixed>
+        <BrowserTabs history={history} location={location} />
+      </PaneFixed>
+
+      <PaneFixed style={{ marginLeft: '10px', padding: '6px' }}>
+        <RequestsFilterFormState />
+      </PaneFixed>
+
+      <RequestsTableState />
+    </PaneContainer>
+  );
+
   return (
     <PaneContainer orientation={inverseOrientation}>
-      <PaneResizeable>
-        <PaneContainer orientation="vertical">
-          <PaneFixed>
-            <BrowserTabs history={history} location={location} />
-          </PaneFixed>
-
-          <PaneFixed style={{ marginLeft: '10px', padding: '6px' }}>
-            <RequestsFilterFormState />
-          </PaneFixed>
-
-          <RequestsTableState />
-        </PaneContainer>
-      </PaneResizeable>
+      <PaneResizeable>{requestsTablePane}</PaneResizeable>
 
       <PaneRemaining>
-        <RequestViewState />
+        <PaneWithTabsState tabs={['Request', 'Response', 'Body']}>
+          <RequestTabState />
+          <ResponseTabState />
+          <BodyTabState />
+        </PaneWithTabsState>
       </PaneRemaining>
     </PaneContainer>
   );

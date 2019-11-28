@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { put, takeLatest, takeEvery, all, select } from 'redux-saga/effects';
 import { createContainer } from 'react-tracked';
 // eslint-disable-next-line import/no-named-as-default
@@ -67,6 +67,7 @@ const requestsTableColumns = ALL_TABLE_COLUMNS.filter(column =>
 const initialState = {
   activeTheme: 'default',
   shiftPressed: false,
+  windowSizeThrottel: remote.getCurrentWindow().getSize(),
   browserNetworkPage: {
     paneWidth: 700,
     paneHeight: 350,

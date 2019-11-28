@@ -56,6 +56,7 @@ export default class CodeEditor extends Component<Props> {
 
   constructor(props) {
     super(props);
+    console.log(`[RENDER] CodeEditor`);
     console.log(CodeMirror.modes);
     this._handleInitTextarea = this._handleInitTextarea.bind(this);
     this._codemirrorSetValue = this._codemirrorSetValue.bind(this);
