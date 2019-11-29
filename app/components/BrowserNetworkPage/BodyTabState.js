@@ -36,7 +36,7 @@ export default () => {
   const prevPanesWidth = useSelector(prevPanesWidthSelector);
 
   const orientation = useSelector(
-    state => state.browserNetworkPage.orientation
+    state => state.browserNetworkPage.page.orientation
   );
   const viewMode = useSelector(state => state.browserNetworkPage.viewMode);
   const viewContent = useSelector(

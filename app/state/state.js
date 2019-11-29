@@ -69,10 +69,6 @@ const initialState = {
   shiftPressed: false,
   windowSizeThrottel: remote.getCurrentWindow().getSize(),
   browserNetworkPage: {
-    paneWidth: 700,
-    paneHeight: 350,
-    draggingPane: false,
-    orientation: 'vertical',
     requestViewTabIndex: 0,
     viewMode: 'pretty', // pretty | raw | preview | parsed
     viewContent: 'render', // source | render
@@ -103,20 +99,20 @@ const initialState = {
         {
           id: 1,
           content: 'Network',
-          length: 700,
+          length: 500,
           draggingPane: false
         },
         {
           id: 2,
           content: ['Request'],
-          length: 300,
+          length: 500,
           draggingPane: false,
           tabIndex: 0
         },
         {
           id: 3,
           content: ['Response', 'Body'],
-          length: 300,
+          length: 500,
           draggingPane: false,
           tabIndex: 0
         }
@@ -241,6 +237,25 @@ const setNestedValue = (key, state, action) => {
   return newState;
 };
 
+const setOrientation = (state, action) => {
+  const newState = { ...state };
+
+  newState.browserNetworkPage.page.orientation = action.orientation;
+
+  // Set default lengths for each pane:
+  let defaultLength;
+  if (action.orientation === 'vertical') {
+    defaultLength = 500;
+  } else if (action.orientation === 'horizontal') {
+    defaultLength = 200;
+  }
+  newState.browserNetworkPage.page.panes.forEach(pane => {
+    pane.length = defaultLength;
+  });
+
+  return newState;
+};
+
 const setPaneValue = (key, state, action) => {
   const newState = { ...state };
 
@@ -311,7 +326,7 @@ const reducer = (state, action) => {
     case 'SET_THEME':
       return { ...state, activeTheme: action.theme };
     case 'SET_ORIENTATION':
-      return setNestedValue('orientation', state, action);
+      return setOrientation(state, action);
     case 'SET_TABLECOLUMNS':
       return setNestedValue('requestsTableColumns', state, action);
 
