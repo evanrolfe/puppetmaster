@@ -11,24 +11,34 @@ type Props = {
   setTabIndex: 'function'
 };
 
-export default ({ tabs, children, tabIndex, setTabIndex }: Props) => (
-  <PaneContainer orientation="vertical">
-    <PaneFixed>
-      <Tabs
-        className="theme--pane__body react-tabs"
-        selectedIndex={tabIndex}
-        onSelect={i => setTabIndex(i)}
-      >
-        <TabList>
-          {tabs.map(tabTitle => (
-            <Tab>
-              <button type="button">{tabTitle}</button>
-            </Tab>
-          ))}
-        </TabList>
-      </Tabs>
-    </PaneFixed>
+export default ({ tabs, children, tabIndex, setTabIndex }: Props) => {
+  let tabContent;
 
-    {children[tabIndex]}
-  </PaneContainer>
-);
+  if (Array.isArray(children)) {
+    tabContent = children[tabIndex];
+  } else {
+    tabContent = children;
+  }
+
+  return (
+    <PaneContainer orientation="vertical">
+      <PaneFixed>
+        <Tabs
+          className="theme--pane__body react-tabs"
+          selectedIndex={tabIndex}
+          onSelect={i => setTabIndex(i)}
+        >
+          <TabList>
+            {tabs.map(tabTitle => (
+              <Tab>
+                <button type="button">{tabTitle}</button>
+              </Tab>
+            ))}
+          </TabList>
+        </Tabs>
+      </PaneFixed>
+
+      {tabContent}
+    </PaneContainer>
+  );
+};

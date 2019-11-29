@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
 import PaneFixed from './PaneFixed';
-import { useDispatch, useSelector } from '../../state/state';
 
 const MIN_PANE_WIDTH = 300;
 const MIN_PANE_HEIGHT = 175;
 
-const getPaneStyle = (orientation, paneWidth, paneHeight) => {
+const getPaneStyle = (orientation, paneLength) => {
   const paneStyle = {};
   if (orientation === 'horizontal') {
-    paneStyle.height = paneHeight;
+    paneStyle.height = paneLength;
   } else if (orientation === 'vertical') {
-    paneStyle.width = paneWidth;
+    paneStyle.width = paneLength;
   }
   return paneStyle;
 };
@@ -31,50 +30,28 @@ const setPaneDragWidthDOM = (event, borderDiv, paneDiv) => {
   paneDiv.style.height = `${newHeight}px`;
 };
 
-export default props => {
-  const dispatch = useDispatch();
-
-  const draggingPane = useSelector(
-    state => state.browserNetworkPage.draggingPane
-  );
-  const orientation = useSelector(
-    state => state.browserNetworkPage.orientation
-  );
-  const paneWidth = useSelector(state => state.browserNetworkPage.paneWidth);
-  const paneHeight = useSelector(state => state.browserNetworkPage.paneHeight);
-
-  const paneStyle = getPaneStyle(orientation, paneWidth, paneHeight);
+export default ({
+  children,
+  draggingPane,
+  orientation,
+  paneLength,
+  setDraggingPane,
+  setPaneLength
+}) => {
+  const paneStyle = getPaneStyle(orientation, paneLength);
   const borderDivRef = React.createRef();
   const paneDivRef = React.createRef();
-
-  const _startDragging = () => {
-    dispatch({
-      type: 'SET_DRAGGING_PANE',
-      draggingPane: true,
-      page: 'browserNetworkPage'
-    });
-  };
 
   const _handleMouseUp = () => {
     const paneDiv = paneDivRef.current;
 
     if (draggingPane === true) {
-      dispatch({
-        type: 'SET_DRAGGING_PANE',
-        draggingPane: false,
-        page: 'browserNetworkPage'
-      });
+      setDraggingPane(false);
 
       if (orientation === 'vertical') {
-        dispatch({
-          type: 'SET_PANE_WIDTH_STORAGE',
-          width: paneDiv.clientWidth
-        });
+        setPaneLength(paneDiv.clientWidth);
       } else if (orientation === 'horizontal') {
-        dispatch({
-          type: 'SET_PANE_HEIGHT_STORAGE',
-          height: paneDiv.clientHeight
-        });
+        setPaneLength(paneDiv.clientHeight);
       }
     }
   };
@@ -107,12 +84,12 @@ export default props => {
   return (
     <>
       <PaneFixed style={paneStyle} ref={paneDivRef}>
-        {props.children}
+        {children}
       </PaneFixed>
 
       <PaneFixed
         className="pane-border"
-        onMouseDown={_startDragging}
+        onMouseDown={() => setDraggingPane(true)}
         ref={borderDivRef}
       >
         <div className="pane-border-transparent" />

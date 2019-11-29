@@ -17,13 +17,24 @@ const getCodeMirrorWidth = (orientation, paneWidth, windowSizeThrottel) => {
   return codeMirrorWidth;
 };
 
+// NOTE: This only applies when orientation is vertical
+const prevPanesWidthSelector = state => {
+  const panes = state.browserNetworkPage.page.panes;
+
+  return panes
+    .slice(0, panes.length - 1)
+    .map(pane => pane.length)
+    .reduce((a, b) => a + b, 0);
+};
+
 export default () => {
   const trackedState = useTrackedState();
   const dispatch = useDispatch();
   const { windowSizeThrottel } = trackedState;
 
   const request = useSelector(state => state.browserNetworkPage.request);
-  const paneWidth = useSelector(state => state.browserNetworkPage.paneWidth);
+  const prevPanesWidth = useSelector(prevPanesWidthSelector);
+
   const orientation = useSelector(
     state => state.browserNetworkPage.orientation
   );
@@ -43,9 +54,10 @@ export default () => {
 
   const codeMirrorWidth = getCodeMirrorWidth(
     orientation,
-    paneWidth,
+    prevPanesWidth,
     windowSizeThrottel
   );
+
   console.log(`codeMirrorWidth: ${codeMirrorWidth}`);
   return (
     <BodyTab

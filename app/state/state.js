@@ -96,6 +96,31 @@ const initialState = {
       extList: [],
       search: '',
       browserId: null
+    },
+    page: {
+      orientation: 'vertical',
+      panes: [
+        {
+          id: 1,
+          content: 'Network',
+          length: 700,
+          draggingPane: false
+        },
+        {
+          id: 2,
+          content: ['Request'],
+          length: 300,
+          draggingPane: false,
+          tabIndex: 0
+        },
+        {
+          id: 3,
+          content: ['Response', 'Body'],
+          length: 300,
+          draggingPane: false,
+          tabIndex: 0
+        }
+      ]
     }
   }
 };
@@ -216,6 +241,23 @@ const setNestedValue = (key, state, action) => {
   return newState;
 };
 
+const setPaneValue = (key, state, action) => {
+  const newState = { ...state };
+
+  const pane = newState[action.page].page.panes.find(
+    pane1 => pane1.id === action.paneId
+  );
+  pane[key] = action[key];
+
+  console.log(
+    `[STATE] Set ${action.page}.page.panes[${action.paneId}].${key} to: ${
+      action[key]
+    }`
+  );
+
+  return newState;
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'BROWSERS_LOADED':
@@ -248,11 +290,11 @@ const reducer = (state, action) => {
     case 'SET_SCROLLTOP':
       return setNestedValue('requestsTableScrollTop', state, action);
     case 'SET_DRAGGING_PANE':
-      return setNestedValue('draggingPane', state, action);
-    case 'SET_PANE_HEIGHT':
-      return setNestedValue('paneHeight', state, action);
-    case 'SET_PANE_WIDTH':
-      return setNestedValue('paneWidth', state, action);
+      return setPaneValue('draggingPane', state, action);
+    case 'SET_PANE_LENGTH':
+      return setPaneValue('length', state, action);
+    case 'SET_PANE_TABINDEX':
+      return setPaneValue('tabIndex', state, action);
 
     case 'SET_SEARCH':
       return setSearch(state, action);
@@ -262,8 +304,6 @@ const reducer = (state, action) => {
       return { ...state, windowSizeThrottel: action.windowSize };
 
     // RequestView:
-    case 'SET_TABINDEX':
-      return setNestedValue('requestViewTabIndex', state, action);
     case 'SET_BODYTAB_VIEW':
       return setBodyTabView(state, action);
 

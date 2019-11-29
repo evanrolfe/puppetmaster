@@ -4,7 +4,7 @@ import { useDispatch, useSelector, ALL_TABLE_COLUMNS } from '../../state/state';
 export default () => {
   const dispatch = useDispatch();
   const orientation = useSelector(
-    state => state.browserNetworkPage.orientation
+    state => state.browserNetworkPage.page.orientation
   );
   const requestsTableColumns = useSelector(
     state => state.browserNetworkPage.requestsTableColumns

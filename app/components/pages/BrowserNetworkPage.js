@@ -7,7 +7,7 @@ import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
 import PaneWithTabsState from '../BrowserNetworkPage/PaneWithTabsState';
-import PaneResizeable from '../pane/PaneResizeable';
+import PaneResizeableState from '../BrowserNetworkPage/PaneResizeableState';
 import BrowserTabs from '../BrowserTabs';
 import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
 import RequestsFilterFormState from '../BrowserNetworkPage/RequestsFilterFormState';
@@ -50,7 +50,7 @@ export default ({ history, location }: Props) => {
   const dispatch = useDispatch();
 
   const orientation = useSelector(
-    state => state.browserNetworkPage.orientation
+    state => state.browserNetworkPage.page.orientation
   );
   const inverseOrientation =
     orientation === 'vertical' ? 'horizontal' : 'vertical';
@@ -98,11 +98,16 @@ export default ({ history, location }: Props) => {
 
   return (
     <PaneContainer orientation={inverseOrientation}>
-      <PaneResizeable>{requestsTablePane}</PaneResizeable>
+      <PaneResizeableState paneId={1}>{requestsTablePane}</PaneResizeableState>
+
+      <PaneResizeableState paneId={2}>
+        <PaneWithTabsState paneId={2} tabs={['Request']}>
+          <RequestTabState />
+        </PaneWithTabsState>
+      </PaneResizeableState>
 
       <PaneRemaining>
-        <PaneWithTabsState tabs={['Request', 'Response', 'Body']}>
-          <RequestTabState />
+        <PaneWithTabsState paneId={3} tabs={['Response', 'Body']}>
           <ResponseTabState />
           <BodyTabState />
         </PaneWithTabsState>

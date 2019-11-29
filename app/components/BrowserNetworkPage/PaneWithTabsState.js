@@ -5,22 +5,25 @@ import PaneWithTabs from '../pane/PaneWithTabs';
 
 type Props = {
   tabs: 'array',
-  children: 'object'
+  children: 'object',
+  paneId: 'number'
 };
 
-export default ({ tabs, children }: Props) => {
+const getPane = (state, id) =>
+  state.browserNetworkPage.page.panes.find(pane => pane.id === id);
+
+export default ({ paneId, tabs, children }: Props) => {
   const dispatch = useDispatch();
 
-  const tabIndex = useSelector(
-    state => state.browserNetworkPage.requestViewTabIndex
-  );
+  const tabIndex = useSelector(state => getPane(state, paneId).tabIndex);
 
   const setTabIndex = i => {
     console.log(`Setting tab index: ${i}`);
     dispatch({
-      type: 'SET_TABINDEX',
-      requestViewTabIndex: i,
-      page: 'browserNetworkPage'
+      type: 'SET_PANE_TABINDEX',
+      tabIndex: i,
+      page: 'browserNetworkPage',
+      paneId: paneId
     });
   };
 
