@@ -7,6 +7,8 @@ export default class BrowserTabs extends Component {
   constructor(props) {
     super(props);
     this.state = { tabIndex: 0 };
+
+    this.goTo = this.goTo.bind(this);
   }
 
   componentDidMount() {
@@ -69,15 +71,15 @@ export default class BrowserTabs extends Component {
         className="pane__tabs theme--pane__body react-tabs"
       >
         <TabList>
-          <Tab>
+          <Tab onMouseDown={() => this.goTo(0)}>
             <button type="button">Network</button>
           </Tab>
 
-          <Tab>
+          <Tab onMouseDown={() => this.goTo(1)}>
             <button type="button">Intercept</button>
           </Tab>
 
-          <Tab>
+          <Tab onMouseDown={() => this.goTo(2)}>
             <button type="button">Sessions</button>
           </Tab>
         </TabList>

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useDispatch, useSelector } from '../../state/state';
+import { getPane, getParentPane } from '../../state/selectors';
 import PaneResizeable from '../pane/PaneResizeable';
 
 type Props = {
@@ -8,19 +9,18 @@ type Props = {
   children: 'object'
 };
 
-const getPane = (state, paneId) =>
-  state.browserNetworkPage.page.panes.find(pane => pane.id === paneId);
-
 export default ({ paneId, children }: Props) => {
   const dispatch = useDispatch();
 
   const orientation = useSelector(
-    state => state.browserNetworkPage.page.orientation
+    state => getParentPane(state, paneId).orientation
   );
   const draggingPane = useSelector(
     state => getPane(state, paneId).draggingPane
   );
   const paneLength = useSelector(state => getPane(state, paneId).length);
+
+  console.log(`Rendering resizeable pane ${paneId} with length: ${paneLength}`);
 
   const setDraggingPane = draggingPane1 => {
     dispatch({

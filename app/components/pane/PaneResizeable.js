@@ -6,9 +6,9 @@ const MIN_PANE_HEIGHT = 175;
 
 const getPaneStyle = (orientation, paneLength) => {
   const paneStyle = {};
-  if (orientation === 'horizontal') {
+  if (orientation === 'vertical') {
     paneStyle.height = paneLength;
-  } else if (orientation === 'vertical') {
+  } else if (orientation === 'horizontal') {
     paneStyle.width = paneLength;
   }
   return paneStyle;
@@ -39,6 +39,7 @@ export default ({
   setPaneLength
 }) => {
   const paneStyle = getPaneStyle(orientation, paneLength);
+  console.log(paneStyle);
   const borderDivRef = React.createRef();
   const paneDivRef = React.createRef();
 
@@ -48,9 +49,9 @@ export default ({
     if (draggingPane === true) {
       setDraggingPane(false);
 
-      if (orientation === 'vertical') {
+      if (orientation === 'horizontal') {
         setPaneLength(paneDiv.clientWidth);
-      } else if (orientation === 'horizontal') {
+      } else if (orientation === 'vertical') {
         setPaneLength(paneDiv.clientHeight);
       }
     }
@@ -61,9 +62,9 @@ export default ({
       const borderDiv = borderDivRef.current;
       const paneDiv = paneDivRef.current;
 
-      if (orientation === 'vertical')
-        setPaneDragHeightDOM(e, borderDiv, paneDiv);
       if (orientation === 'horizontal')
+        setPaneDragHeightDOM(e, borderDiv, paneDiv);
+      if (orientation === 'vertical')
         setPaneDragWidthDOM(e, borderDiv, paneDiv);
     }
   };
@@ -88,11 +89,11 @@ export default ({
       </PaneFixed>
 
       <PaneFixed
-        className="pane-border"
+        className={`pane-border-${orientation}`}
         onMouseDown={() => setDraggingPane(true)}
         ref={borderDivRef}
       >
-        <div className="pane-border-transparent" />
+        <div className={`pane-border-transparent-${orientation}`} />
       </PaneFixed>
     </>
   );

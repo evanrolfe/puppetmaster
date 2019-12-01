@@ -196,22 +196,22 @@
     height: 100%;
     overflow: auto;
   }
+}
 
-  /* PANE BORDER vertical (border runs left to right) */
-  .pane-border {
-    border-top: 1px solid @hl-md;
-    cursor: row-resize;
-    float: right;
-  }
+/* PANE BORDER vertical (border runs left to right) */
+.pane-border-vertical {
+  border-top: 1px solid @hl-md;
+  cursor: row-resize;
+  float: right;
+}
 
-  .pane-border-transparent {
-    opacity: 0.0;
-    z-index: 999;
-    height: 8px;
-    width: 100%;
-    margin-top: -8px;
-    cursor: row-resize;
-  }
+.pane-border-transparent-vertical {
+  opacity: 0.0;
+  z-index: 999;
+  height: 8px;
+  width: 100%;
+  margin-top: -8px;
+  cursor: row-resize;
 }
 
 .pane-container-horizontal {
@@ -229,22 +229,22 @@
     flex: 1 1 auto; // Fill remaining space
     width: 100%;
   }
+}
 
-  /* PANE BORDER Horizontal (border runs top to bottom) */
-  .pane-border {
-    border-left: 1px solid @hl-md;
-    cursor: col-resize;
-    float: right;
-  }
+/* PANE BORDER Horizontal (border runs top to bottom) */
+.pane-border-horizontal {
+  border-left: 1px solid @hl-md;
+  cursor: col-resize;
+  float: right;
+}
 
-  .pane-border-transparent {
-    opacity: 0.0;
-    z-index: 999;
-    width: 8px;
-    height: 100%;
-    margin-right: -8px;
-    cursor: col-resize;
-  }
+.pane-border-transparent-horizontal {
+  opacity: 0.0;
+  z-index: 999;
+  width: 8px;
+  height: 100%;
+  margin-right: -8px;
+  cursor: col-resize;
 }
 
 .status-bar {

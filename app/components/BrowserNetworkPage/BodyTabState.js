@@ -8,9 +8,9 @@ const getCodeMirrorWidth = (orientation, paneWidth, windowSizeThrottel) => {
   const windowWidth = windowSizeThrottel[0];
   const sideBarWidth = 53;
 
-  if (orientation === 'horizontal') {
+  if (orientation === 'vertical') {
     codeMirrorWidth = windowWidth - sideBarWidth;
-  } else if (orientation === 'vertical') {
+  } else if (orientation === 'horizontal') {
     codeMirrorWidth = windowWidth - sideBarWidth - paneWidth;
   }
 

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import PaneRemaining from '../pane/PaneRemaining';
+import PaneFixed from '../pane/PaneFixed';
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
 import ViewModeDropdown from './ViewModeDropdown';
@@ -105,10 +107,7 @@ export default ({
 
   return (
     <>
-      <div
-        className="pane-fixed code-editor-controls"
-        style={{ padding: '6px' }}
-      >
+      <PaneFixed className="code-editor-controls" style={{ padding: '6px' }}>
         <div
           className="form-control form-control--outlined"
           style={{ display: 'inline-block' }}
@@ -133,12 +132,12 @@ export default ({
             </button>
           )}
         </div>
-      </div>
+      </PaneFixed>
 
-      <div className="pane-remaining" style={{ width: `${codeMirrorWidth}px` }}>
+      <PaneRemaining style={{ width: `${codeMirrorWidth}px` }}>
         {showPreview && <Preview value={code} request={request} />}
         {showEditor && <CodeEditor value={code} mimeType={mimeType} />}
-      </div>
+      </PaneRemaining>
     </>
   );
 };

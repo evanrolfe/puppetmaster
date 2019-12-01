@@ -183,7 +183,7 @@ export default ({
               <tr
                 key={request.id}
                 id={`requestRow${request.id}`}
-                onClick={() => selectRequest(request)}
+                onMouseDown={() => selectRequest(request)}
                 onContextMenu={_handleRightClick.bind(this, request.id)}
                 className={_getRowClassName(request.id)}
               >

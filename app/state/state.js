@@ -3,6 +3,7 @@ import { put, takeLatest, takeEvery, all, select } from 'redux-saga/effects';
 import { createContainer } from 'react-tracked';
 // eslint-disable-next-line import/no-named-as-default
 import useSagaReducer from './useSagaReducer';
+import { getPane } from './selectors';
 
 export const RESOURCE_TYPES = [
   'document',
@@ -94,27 +95,35 @@ const initialState = {
       browserId: null
     },
     page: {
-      orientation: 'vertical',
+      orientation: 'horizontal',
       panes: [
         {
           id: 1,
-          content: 'Network',
-          length: 500,
+          tab: 'Network',
+          length: 700,
           draggingPane: false
         },
         {
           id: 2,
-          content: ['Request'],
+          orientation: 'vertical',
           length: 500,
           draggingPane: false,
-          tabIndex: 0
-        },
-        {
-          id: 3,
-          content: ['Response', 'Body'],
-          length: 500,
-          draggingPane: false,
-          tabIndex: 0
+          panes: [
+            {
+              id: 3,
+              tabs: ['Request'],
+              length: 150,
+              draggingPane: false,
+              tabIndex: 0
+            },
+            {
+              id: 4,
+              tabs: ['Response', 'Body'],
+              length: 300,
+              draggingPane: false,
+              tabIndex: 0
+            }
+          ]
         }
       ]
     }
@@ -259,9 +268,7 @@ const setOrientation = (state, action) => {
 const setPaneValue = (key, state, action) => {
   const newState = { ...state };
 
-  const pane = newState[action.page].page.panes.find(
-    pane1 => pane1.id === action.paneId
-  );
+  const pane = getPane(state, action.paneId);
   pane[key] = action[key];
 
   console.log(

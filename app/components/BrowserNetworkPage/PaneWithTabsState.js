@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useDispatch, useSelector } from '../../state/state';
+import { getPane } from '../../state/selectors';
 import PaneWithTabs from '../pane/PaneWithTabs';
 
 type Props = {
@@ -8,9 +9,6 @@ type Props = {
   children: 'object',
   paneId: 'number'
 };
-
-const getPane = (state, id) =>
-  state.browserNetworkPage.page.panes.find(pane => pane.id === id);
 
 export default ({ paneId, tabs, children }: Props) => {
   const dispatch = useDispatch();

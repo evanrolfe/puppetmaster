@@ -59,7 +59,7 @@ export default class Sidebar extends Component {
             0
           )}`}
           title="Browser (CTRL+1)"
-          onClick={() => this.goTo('/browser/network')}
+          onMouseDown={() => this.goTo('/browser/network')}
           role="menuitem"
         >
           <i className="fas fa-window-restore" />
@@ -70,7 +70,7 @@ export default class Sidebar extends Component {
             1
           )}`}
           title="Crawler (CTRL+2)"
-          onClick={() => this.goTo('/crawler')}
+          onMouseDown={() => this.goTo('/crawler')}
           role="menuitem"
         >
           <i className="fas fa-spider" />
@@ -81,7 +81,7 @@ export default class Sidebar extends Component {
             2
           )}`}
           title="Requests (CTRL+3)"
-          onClick={() => this.goTo('/requests')}
+          onMouseDown={() => this.goTo('/requests')}
           role="menuitem"
         >
           <i className="fas fa-crosshairs" />
@@ -92,7 +92,7 @@ export default class Sidebar extends Component {
             3
           )}`}
           title="Scans (CTRL+4)"
-          onClick={() => this.goTo('/scans')}
+          onMouseDown={() => this.goTo('/scans')}
           role="menuitem"
         >
           <i className="fas fa-rss" />
