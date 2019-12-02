@@ -67,7 +67,9 @@ const handleRequestDelete = (state, action) => {
 
   return {
     ...state,
-    requests: state.requests.filter(req => !deletedIds.includes(req.id))
+    requests: state.browserNetworkPage.requests.filter(
+      req => !deletedIds.includes(req.id)
+    )
   };
 };
 

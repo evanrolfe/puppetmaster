@@ -125,7 +125,9 @@ export default ({
     });
   };
 
-  const selectRequest = request => {
+  const selectRequest = (request, event) => {
+    // Do not proceed if this is a right-click
+    if (event.nativeEvent.which === 3) return;
     // const requestDiv = requestDivRef.current;
     // dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
     dispatch({ type: 'SELECT_REQUEST_LOAD', request: request });
@@ -183,7 +185,7 @@ export default ({
               <tr
                 key={request.id}
                 id={`requestRow${request.id}`}
-                onMouseDown={() => selectRequest(request)}
+                onMouseDown={e => selectRequest(request, e)}
                 onContextMenu={_handleRightClick.bind(this, request.id)}
                 className={_getRowClassName(request.id)}
               >
