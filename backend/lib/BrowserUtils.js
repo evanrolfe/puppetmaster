@@ -91,6 +91,10 @@ const openBrowser = async browserId => {
     args: []
   });
 
+  // Store in global vars
+  browser.id = browserId;
+  global.puppeteer_browsers.push(browser);
+
   // Load the cookies:
   const result = await global.dbStore
     .connection('browsers')
@@ -131,10 +135,6 @@ const openBrowser = async browserId => {
     // pages so we have to instrument the page manually:
     handleNewPage(page);
   }
-
-  // Store in global vars
-  browser.id = browserId;
-  global.puppeteer_browsers.push(browser);
 
   await instrumentBrowser(browser);
 
