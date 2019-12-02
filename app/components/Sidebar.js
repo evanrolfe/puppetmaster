@@ -67,17 +67,6 @@ export default class Sidebar extends Component {
 
         <div
           className={`sidebar-icon theme--sidebar__header ${this.activeClass(
-            1
-          )}`}
-          title="Crawler (CTRL+2)"
-          onMouseDown={() => this.goTo('/crawler')}
-          role="menuitem"
-        >
-          <i className="fas fa-spider" />
-        </div>
-
-        <div
-          className={`sidebar-icon theme--sidebar__header ${this.activeClass(
             2
           )}`}
           title="Requests (CTRL+3)"
@@ -85,17 +74,6 @@ export default class Sidebar extends Component {
           role="menuitem"
         >
           <i className="fas fa-crosshairs" />
-        </div>
-
-        <div
-          className={`sidebar-icon theme--sidebar__header ${this.activeClass(
-            3
-          )}`}
-          title="Scans (CTRL+4)"
-          onMouseDown={() => this.goTo('/scans')}
-          role="menuitem"
-        >
-          <i className="fas fa-rss" />
         </div>
       </div>
     );

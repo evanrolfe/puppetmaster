@@ -30,8 +30,11 @@ class DropdownItem extends PureComponent {
       color,
       onClick, // eslint-disable-line no-unused-vars
       stayOpenAfterClick, // eslint-disable-line no-unused-vars
+      active,
       ...props
     } = this.props;
+
+    const activeClass = active === true ? 'active' : '';
 
     if (this.props.browserLink) {
       return (
@@ -56,7 +59,7 @@ class DropdownItem extends PureComponent {
     } else {
       return (
         <button
-          className="dropdown__button"
+          className={`dropdown__button ${activeClass}`}
           onClick={this._handleClick}
           {...props}
         >

@@ -14,8 +14,8 @@ import BrowserInterceptPage from './pages/BrowserInterceptPage';
 import CrawlerPage from './pages/CrawlerPage';
 import RequestsPage from './pages/RequestsPage';
 import ScansPage from './pages/ScansPage';
-import BrowserSessionsDropdown from './BrowserSessionsDropdown';
 
+import BrowserNetworkConfig from './BrowserNetworkConfig';
 import { useDispatch } from '../state/state';
 
 export default () => {
@@ -54,7 +54,12 @@ export default () => {
             <div className="pane-remaining">{content}</div>
 
             <div className="pane-fixed status-bar">
-              <BrowserSessionsDropdown />
+              <Route exact path="/" component={BrowserNetworkConfig} />
+              <Route
+                exact
+                path="/browser/network"
+                component={BrowserNetworkConfig}
+              />
             </div>
           </div>
         </div>

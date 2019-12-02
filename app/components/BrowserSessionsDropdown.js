@@ -66,7 +66,7 @@ export default () => {
 
       <Dropdown ref={dropdownRef} className="browser-sessions pull-right">
         <DropdownButton className="browser-sessions">
-          Browser Sessions ({browsers.length})
+          <i className="fas fa-window-restore" /> Browser ({browsers.length})
         </DropdownButton>
 
         <DropdownDivider>Browser Sessions:</DropdownDivider>

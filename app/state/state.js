@@ -5,64 +5,16 @@ import { createContainer } from 'react-tracked';
 import useSagaReducer from './useSagaReducer';
 import { getPane } from './selectors';
 
-export const RESOURCE_TYPES = [
-  'document',
-  'eventsource',
-  'fetch',
-  'font',
-  'image',
-  'manifest',
-  'media',
-  'navigation',
-  'other',
-  'stylesheet',
-  'script',
-  'texttrack',
-  'websocket',
-  'xhr'
-];
-
-export const STATUS_CODES = {
-  2: '2xx [Success]',
-  3: '3xx [Redirect]',
-  4: '4xx [Request Error]',
-  5: '5xx [Server Error]'
-};
-
-export const ALL_TABLE_COLUMNS = [
-  { key: 'id', title: '#', width: 40 },
-  { key: 'title', title: 'Browser', width: 100 },
-  { key: 'method', title: 'Method', width: 70 },
-  { key: 'host', title: 'Host', width: 100 },
-  { key: 'path', title: 'Path', width: 200 },
-  { key: 'request_type', title: 'Type', width: 100 },
-  { key: 'ext', title: 'Ext', width: 40 },
-  { key: 'response_status', title: 'Status', width: 70 },
-  {
-    key: 'response_body_length',
-    title: 'Length',
-    width: 70
-  },
-  {
-    key: 'response_remote_address',
-    title: 'IP Address',
-    width: 130
-  },
-  { key: 'created_at', title: 'Time', width: 200 }
-];
-
-const selectedColumns = [
-  'id',
-  'title',
-  'method',
-  'host',
-  'path',
-  'response_status',
-  'request_type'
-];
+import {
+  RESOURCE_TYPES,
+  STATUS_CODES,
+  ALL_TABLE_COLUMNS,
+  DEFAULT_COLUMNS,
+  DEFAULT_PAGE_LAYOUTS
+} from './constants';
 
 const requestsTableColumns = ALL_TABLE_COLUMNS.filter(column =>
-  selectedColumns.includes(column.key)
+  DEFAULT_COLUMNS.includes(column.key)
 );
 
 const initialState = {
@@ -94,39 +46,8 @@ const initialState = {
       search: '',
       browserId: null
     },
-    page: {
-      orientation: 'horizontal',
-      panes: [
-        {
-          id: 1,
-          tab: 'Network',
-          length: 700,
-          draggingPane: false
-        },
-        {
-          id: 2,
-          orientation: 'vertical',
-          length: 500,
-          draggingPane: false,
-          panes: [
-            {
-              id: 3,
-              tabs: ['Request'],
-              length: 150,
-              draggingPane: false,
-              tabIndex: 0
-            },
-            {
-              id: 4,
-              tabs: ['Response', 'Body'],
-              length: 300,
-              draggingPane: false,
-              tabIndex: 0
-            }
-          ]
-        }
-      ]
-    }
+    page: DEFAULT_PAGE_LAYOUTS.vert2PaneSplit,
+    pageLayout: 'vert2PaneSplit'
   }
 };
 
@@ -280,6 +201,15 @@ const setPaneValue = (key, state, action) => {
   return newState;
 };
 
+const setLayout = (state, action) => {
+  const newState = { ...state };
+
+  newState[action.page].pageLayout = action.pageLayout;
+  newState[action.page].page = DEFAULT_PAGE_LAYOUTS[action.pageLayout];
+
+  return newState;
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'BROWSERS_LOADED':
@@ -324,6 +254,9 @@ const reducer = (state, action) => {
       return setFilters(state, action);
     case 'SET_WINDOW_SIZE_THROTTLED':
       return { ...state, windowSizeThrottel: action.windowSize };
+
+    case 'SET_LAYOUT':
+      return setLayout(state, action);
 
     // RequestView:
     case 'SET_BODYTAB_VIEW':
