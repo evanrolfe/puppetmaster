@@ -24,6 +24,15 @@ export default () => {
   const dispatch = useDispatch();
 
   dispatch({ type: 'LOAD_STATE' });
+  dispatch({ type: 'LOAD_REQUESTS' });
+  dispatch({ type: 'LOAD_BROWSERS' });
+
+  global.backendConn.listen('requestCreated', () => {
+    dispatch({ type: 'LOAD_REQUESTS' });
+  });
+  global.backendConn.listen('browsersChanged', () => {
+    dispatch({ type: 'LOAD_REQUESTS' });
+  });
 
   const content = (
     <>

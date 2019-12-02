@@ -51,16 +51,6 @@ export default ({ history, location }: Props) => {
 
   const page = useSelector(state => state.browserNetworkPage.page);
 
-  dispatch({ type: 'LOAD_REQUESTS' });
-  dispatch({ type: 'LOAD_BROWSERS' });
-
-  global.backendConn.listen('requestCreated', () => {
-    dispatch({ type: 'LOAD_REQUESTS' });
-  });
-  global.backendConn.listen('browsersChanged', () => {
-    dispatch({ type: 'LOAD_REQUESTS' });
-  });
-
   const _setWindowSize = () => {
     const size = remote.getCurrentWindow().getSize();
     dispatch({ type: 'SET_WINDOW_SIZE_THROTTLED', windowSize: size });
