@@ -23,7 +23,58 @@ const STATUS_CODES = ['2', '3', '4', '5'];
 const SEARCHABLE_COLUMNS = ['id', 'method', 'url'];
 
 class Request extends Store.BaseModel {
-  static async createFromBrowserResponse(page, response) {
+  static async createFromBrowserRequest(page, request) {
+    // Parse the URL:
+    const parsedUrl = new URL(request.url());
+    const splitPath = parsedUrl.pathname.split('.');
+    let ext;
+
+    if (splitPath.length > 1) {
+      ext = splitPath[splitPath.length - 1];
+    }
+
+    // Parse the Cookies:
+    const cookies = await page.cookies();
+    const cookiesStr = cookies
+      .map(cookie => `${cookie.name}=${cookie.value}`)
+      .join('; ');
+    const requestHeaders = request.headers();
+    requestHeaders.cookie = cookiesStr;
+
+    const requestParams = {
+      browser_id: page.browser().id,
+      method: request.method(),
+      url: request.url(),
+      host: parsedUrl.hostname,
+      path: parsedUrl.pathname,
+      ext: ext,
+      created_at: Date.now(),
+      request_type: request.resourceType(),
+      request_headers: JSON.stringify(requestHeaders),
+      request_payload: JSON.stringify(request.postData())
+    };
+
+    const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
+      requestParams
+    );
+
+    if (shouldRequestBeCaptured === true) {
+      const result = await global.dbStore
+        .connection('requests')
+        .insert(requestParams);
+
+      console.log(
+        `Saved request: ${requestParams.method} ${requestParams.url}`
+      );
+      return result[0]; // The request ID
+    }
+  }
+
+  static async updateFromBrowserResponse(page, response) {
+    const requestId = response.request().requestId;
+
+    console.log(`Updating request ${requestId} with a response...`);
+
     const remoteAddress = `${response.remoteAddress().ip}:${
       response.remoteAddress().port
     }`;
@@ -42,32 +93,7 @@ class Request extends Store.BaseModel {
       responseBody = '';
     }
 
-    const cookies = await page.cookies();
-    const cookiesStr = cookies
-      .map(cookie => `${cookie.name}=${cookie.value}`)
-      .join('; ');
-    const responseHeaders = response.request().headers();
-    responseHeaders.cookie = cookiesStr;
-
-    const parsedUrl = new URL(response.url());
-    const splitPath = parsedUrl.pathname.split('.');
-    let ext;
-
-    if (splitPath.length > 1) {
-      ext = splitPath[splitPath.length - 1];
-    }
-
     const requestParams = {
-      browser_id: page.browser().id,
-      method: response.request().method(),
-      url: response.url(),
-      host: parsedUrl.hostname,
-      path: parsedUrl.pathname,
-      ext: ext,
-      created_at: Date.now(),
-      request_type: response.request().resourceType(),
-      request_headers: JSON.stringify(responseHeaders),
-      request_payload: JSON.stringify(response.request().postData()),
       response_status: response.status(),
       response_status_message: response.statusText(),
       response_headers: JSON.stringify(response.headers()),
@@ -76,20 +102,12 @@ class Request extends Store.BaseModel {
       response_body_length: responseBody.length
     };
 
-    const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
-      requestParams
-    );
+    await global.dbStore
+      .connection('requests')
+      .where({ id: requestId })
+      .update(requestParams);
 
-    if (shouldRequestBeCaptured === true) {
-      const result = await global.dbStore
-        .connection('requests')
-        .insert(requestParams);
-
-      console.log(
-        `Saved request: ${requestParams.method} ${requestParams.url}`
-      );
-      return result[0]; // The request ID
-    }
+    console.log('Request updated.');
   }
 
   static findByParams(columns, params) {

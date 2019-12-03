@@ -171,11 +171,22 @@ const handleBrowserClosed = async browser => {
 };
 
 const handleNewPage = async page => {
+  await page.setRequestInterception(true);
+  page.on('request', async request => handleRequest(page, request));
   page.on('response', async response => handleResponse(page, response));
 };
 
+const handleRequest = async (page, request) => {
+  const requestId = await Request.createFromBrowserRequest(page, request);
+  request.requestId = requestId;
+  console.log(`handleRequest: set request id to: ${request.requestId}`);
+  request.continue();
+};
+
 const handleResponse = async (page, response) => {
-  const requestId = await Request.createFromBrowserResponse(page, response);
+  const requestId = response.request().requestId;
+  console.log(`handleResponse: requestId: ${requestId}`);
+  await Request.updateFromBrowserResponse(page, response);
 
   // Save the cookies & pages:
   const { cookies } = await page._client.send('Network.getAllCookies');

@@ -116,4 +116,23 @@ describe('BrowsersUtils', () => {
       expect(request.response_body_rendered).to.contain('<td>Hello</td>');
     });
   });
+
+  describe('navigating to http://localhost/api/posts.json', () => {
+    it('works', async () => {
+      const pages = await browser.pages();
+      const page = pages[0];
+      await page.goto('http://localhost/api/posts.json');
+      await sleep(500);
+
+      // Creates 8 requests
+      const result = await global.dbStore.connection('requests').count('*');
+      const requestsCount = result[0]['count(*)'];
+      expect(requestsCount).to.eql(1);
+
+      const request = await global.dbStore.connection('requests').first();
+
+      expect(request.id).to.eql(1);
+      expect(request.url).to.eql('http://localhost/api/posts.json');
+    });
+  });
 });
