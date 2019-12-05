@@ -26,11 +26,18 @@ export default props => {
     ipc.connectTo('intercept', () => {
       ipc.of.intercept.on('connect', () => {
         console.log(`[Frontend] sending IPC intercept message...`);
+
         ipc.of.intercept.emit('message', {
           action: 'forward',
           requestId: request.id
         });
         ipc.disconnect('intercept');
+
+        dispatch({
+          type: 'SET_INTERCEPT_REQUEST',
+          page: 'browserInterceptPage',
+          request: null
+        });
       });
     });
   };

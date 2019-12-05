@@ -22,7 +22,7 @@ const initialState = {
   shiftPressed: false,
   windowSizeThrottel: remote.getCurrentWindow().getSize(),
   browserInterceptPage: {
-    request: { method: 'POST', url: 'http://helloworld.com' }
+    request: null
   },
   browserNetworkPage: {
     requestViewTabIndex: 0,
