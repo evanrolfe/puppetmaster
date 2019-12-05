@@ -1,5 +1,6 @@
 const ipc = require('./server-ipc');
 const { handleBrowserClosed } = require('./lib/BrowserUtils');
+const InterceptServer = require('./lib/InterceptServer');
 
 console.log('Starting backend server...');
 
@@ -17,6 +18,10 @@ if (process.argv[2] === '--subprocess') {
     ipc.init(name, 'pntest-prod.db');
   });
 }
+
+const interceptServer = new InterceptServer();
+interceptServer.init();
+global.interceptServer = interceptServer;
 
 const events = [
   `SIGINT`,

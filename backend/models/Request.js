@@ -66,7 +66,9 @@ class Request extends Store.BaseModel {
       console.log(
         `Saved request: ${requestParams.method} ${requestParams.url}`
       );
-      return result[0]; // The request ID
+
+      requestParams.id = result[0];
+      return requestParams;
     }
   }
 

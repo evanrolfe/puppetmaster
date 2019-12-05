@@ -84,7 +84,8 @@
     "radix": "off",
     "no-else-return": "off",
     "jsx-a11y/label-has-for": "off",
-    "jsx-a11y/label-has-associated-control": "off"
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/alt-text": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {

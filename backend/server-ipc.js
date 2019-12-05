@@ -1,6 +1,7 @@
-const ipc = require('node-ipc');
+const RawIPC = require('node-ipc').IPC;
 const { setupDatabaseStore } = require('./lib/database.js');
 
+const ipc = new RawIPC();
 /*
  * Response (OK): { type: 'reply', id: '1232', result: { status: 'OK', id: '...' } }
  * Response (INVALID): { type: 'reply', id: '1232', result: { status: 'INVALID', messages: [] } }

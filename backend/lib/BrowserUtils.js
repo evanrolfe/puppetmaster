@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const Request = require('../models/Request');
-const ipc = require('../server-ipc');
+const mainIpc = require('../server-ipc');
 
 /*
  * NOTE: For each response intercepted, we save the response and its body to requests table.
@@ -61,7 +61,7 @@ const createBrowser = async () => {
 
   await instrumentBrowser(browser);
 
-  ipc.send('browsersChanged', {});
+  mainIpc.send('browsersChanged', {});
 
   return browser;
 };
@@ -72,7 +72,7 @@ const updateBrowser = async (browserId, title) => {
     .where({ id: browserId })
     .update({ title: title });
 
-  ipc.send('browsersChanged', {});
+  mainIpc.send('browsersChanged', {});
 };
 
 // NOTE: Sessions are not preserved in usersdatadir, see:
@@ -138,7 +138,7 @@ const openBrowser = async browserId => {
 
   await instrumentBrowser(browser);
 
-  ipc.send('browsersChanged', {});
+  mainIpc.send('browsersChanged', {});
 };
 
 const instrumentBrowser = async browser => {
@@ -167,20 +167,39 @@ const handleBrowserClosed = async browser => {
   global.puppeteer_browsers = global.puppeteer_browsers.filter(
     globalBrowser => globalBrowser !== browser
   );
-  ipc.send('browsersChanged', {});
+  mainIpc.send('browsersChanged', {});
 };
 
 const handleNewPage = async page => {
   await page.setRequestInterception(true);
-  page.on('request', async request => handleRequest(page, request));
+  page.on('request', async request => {
+    await handleRequest(page, request);
+  });
   page.on('response', async response => handleResponse(page, response));
 };
 
 const handleRequest = async (page, request) => {
-  const requestId = await Request.createFromBrowserRequest(page, request);
-  request.requestId = requestId;
+  const dbRequest = await Request.createFromBrowserRequest(page, request);
+  request.requestId = dbRequest.id;
   console.log(`handleRequest: set request id to: ${request.requestId}`);
-  request.continue();
+
+  console.log(
+    `[BrowserUtils] 1. request intercepted: ${dbRequest.method} ${
+      dbRequest.url
+    }`
+  );
+  console.log(`[BrowserUtils] 2. sending requestIntercepted message...`);
+
+  global.interceptServer.queueRequest(dbRequest);
+  const decision = await global.interceptServer.decisionFromClient(dbRequest);
+
+  console.log(`[BrowserUtils] received decision from client: ${decision}`);
+
+  if (decision === 'forward') {
+    request.continue();
+  } else if (decision === 'drop') {
+    request.abort();
+  }
 };
 
 const handleResponse = async (page, response) => {
@@ -243,7 +262,7 @@ const handleResponse = async (page, response) => {
     }
   }
 
-  ipc.send('requestCreated', {});
+  mainIpc.send('requestCreated', {});
 };
 
 const handleFramenavigated = async (page, frame, origURL) => {
