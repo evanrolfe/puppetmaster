@@ -10,6 +10,10 @@ export default () => (
       <i className="fas fa-spider" /> Crawler
     </div>
 
+    <div className="browser-sessions pull-right">
+      <i className="fas fa-random" /> Intecept: On
+    </div>
+
     <LayoutDropdown />
   </>
 );

@@ -25,7 +25,10 @@ export default class RequestsTab extends Component<Props> {
       <PaneRemaining>
         <div className="request-tab-panel">
           <span className="selectable force-wrap">
-            {request.method} {request.url}
+            <span className={`http-method-${request.method}`}>
+              {request.method}
+            </span>{' '}
+            {request.url}
           </span>
           <br />
           <br />

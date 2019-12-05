@@ -25,7 +25,7 @@ export default ({
   console.log(`Rendering RequestsFilterForm:`);
 
   return (
-    <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+    <div className="pane-control">
       <DisplayFiltersModal
         ref={registerModal}
         allStatusCodes={allStatusCodes}

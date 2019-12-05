@@ -10,7 +10,7 @@ import SettingsModal from './modals/SettingsModal';
 import Sidebar from './Sidebar';
 import BrowserSessionsPage from './pages/BrowserSessionsPage';
 import BrowserNetworkPage from './pages/BrowserNetworkPage';
-import BrowserInterceptPage from './pages/BrowserInterceptPage';
+import BrowserInterceptPageState from './BrowserInterceptPage/BrowserInterceptPageState';
 import CrawlerPage from './pages/CrawlerPage';
 import RequestsPage from './pages/RequestsPage';
 import ScansPage from './pages/ScansPage';
@@ -39,7 +39,11 @@ export default () => {
       <Route exact path="/" component={BrowserNetworkPage} />
       <Route exact path="/browser/network" component={BrowserNetworkPage} />
 
-      <Route exact path="/browser/intercept" component={BrowserInterceptPage} />
+      <Route
+        exact
+        path="/browser/intercept"
+        component={BrowserInterceptPageState}
+      />
       <Route exact path="/browser/sessions" component={BrowserSessionsPage} />
 
       <Route exact path="/crawler" component={CrawlerPage} />
@@ -64,11 +68,7 @@ export default () => {
 
             <div className="pane-fixed status-bar">
               <Route exact path="/" component={BrowserNetworkConfig} />
-              <Route
-                exact
-                path="/browser/network"
-                component={BrowserNetworkConfig}
-              />
+              <Route path="/browser" component={BrowserNetworkConfig} />
             </div>
           </div>
         </div>

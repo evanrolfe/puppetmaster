@@ -75,6 +75,20 @@ export default class Sidebar extends Component {
         >
           <i className="fas fa-crosshairs" />
         </div>
+
+        <div
+          className={`sidebar-icon theme--sidebar__header ${this.activeClass(
+            3
+          )}`}
+          title="Requests (CTRL+3)"
+          onMouseDown={() => this.goTo('/scans')}
+          role="menuitem"
+        >
+          <img
+            src="./radar.png"
+            style={{ width: '37px', filter: 'invert(1)' }}
+          />
+        </div>
       </div>
     );
   }

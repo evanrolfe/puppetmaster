@@ -21,6 +21,9 @@ const initialState = {
   activeTheme: 'default',
   shiftPressed: false,
   windowSizeThrottel: remote.getCurrentWindow().getSize(),
+  browserInterceptPage: {
+    request: { method: 'POST', url: 'http://helloworld.com' }
+  },
   browserNetworkPage: {
     requestViewTabIndex: 0,
     viewMode: 'pretty', // pretty | raw | preview | parsed
@@ -271,6 +274,9 @@ const reducer = (state, action) => {
       return setOrientation(state, action);
     case 'SET_TABLECOLUMNS':
       return setNestedValue('requestsTableColumns', state, action);
+
+    case 'SET_INTERCEPT_REQUEST':
+      return setNestedValue('request', state, action);
 
     default:
       return state; // needs this for AsyncAction
