@@ -11,10 +11,19 @@ type Props = {
   request: 'object',
   history: 'array',
   location: 'object',
-  forwardRequest: 'function'
+  interceptCommand: 'function',
+  interceptEnabled: 'boolean',
+  toggleIntercept: 'function'
 };
 
-export default ({ request, forwardRequest, history, location }: Props) => {
+export default ({
+  request,
+  interceptCommand,
+  interceptEnabled,
+  toggleIntercept,
+  history,
+  location
+}: Props) => {
   const buttonsDisabled = request === null;
 
   let requestTitle;
@@ -47,28 +56,43 @@ export default ({ request, forwardRequest, history, location }: Props) => {
 
         <div
           className="form-control form-control--outlined"
-          style={{ width: '40%', display: 'inline-block' }}
+          style={{ width: '100%', display: 'inline-block' }}
         >
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ display: 'inline-block' }}
-            onClick={forwardRequest}
+            onClick={() => interceptCommand('forward')}
             disabled={buttonsDisabled}
           >
-            Forward
+            <i className="fas fa-arrow-right" />
+            &nbsp; Forward
           </button>
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ marginLeft: '10px', display: 'inline-block' }}
+            onClick={() => interceptCommand('forwardAndIntercept')}
             disabled={buttonsDisabled}
           >
-            Drop
+            <i className="fas fa-exchange-alt" />
+            &nbsp; Forward & Intercept Response
           </button>
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ marginLeft: '10px', display: 'inline-block' }}
+            onClick={() => interceptCommand('drop')}
+            disabled={buttonsDisabled}
           >
-            Disable Intercept
+            <i className="fas fa-times" />
+            &nbsp; Drop
+          </button>
+          <button
+            className="pointer btn btn--outlined btn--super-compact"
+            style={{ marginLeft: '10px', display: 'inline-block' }}
+            onClick={toggleIntercept}
+          >
+            <i className="fas fa-power-off" />
+            &nbsp;
+            {interceptEnabled ? 'Disable Intercept' : 'Enable Intercept'}
           </button>
         </div>
       </PaneFixed>

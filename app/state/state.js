@@ -22,7 +22,8 @@ const initialState = {
   shiftPressed: false,
   windowSizeThrottel: remote.getCurrentWindow().getSize(),
   browserInterceptPage: {
-    request: null
+    request: null,
+    interceptEnabled: false
   },
   browserNetworkPage: {
     requestViewTabIndex: 0,
@@ -277,6 +278,8 @@ const reducer = (state, action) => {
 
     case 'SET_INTERCEPT_REQUEST':
       return setNestedValue('request', state, action);
+    case 'SET_INTERCEPT_ENABLED':
+      return setNestedValue('interceptEnabled', state, action);
 
     default:
       return state; // needs this for AsyncAction
@@ -377,6 +380,27 @@ function* loadRequests() {
   });
 }
 
+function* loadSettings() {
+  const result = yield global.backendConn.send(
+    'SettingsController',
+    'index',
+    {}
+  );
+  const settings = result.result.body;
+
+  const interceptEnabledSetting = settings.find(
+    setting => setting.key === 'interceptEnabled'
+  );
+
+  const interceptEnabled = interceptEnabledSetting.value === '1';
+
+  yield put({
+    type: 'SET_INTERCEPT_ENABLED',
+    page: 'browserInterceptPage',
+    interceptEnabled: interceptEnabled
+  });
+}
+
 function* loadRequest() {
   const requestId = yield select(
     state => state.browserNetworkPage.selectedRequestId
@@ -465,6 +489,7 @@ function* toggleColumnOrderRequests(action) {
 
 function* rootSaga() {
   yield all([
+    takeLatest('LOAD_SETTINGS', loadSettings),
     takeLatest('LOAD_BROWSERS', loadBrowsers),
     takeLatest('LOAD_REQUESTS', loadRequests),
     takeLatest('LOAD_REQUEST', loadRequest),

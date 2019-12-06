@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const Request = require('../models/Request');
+const Settings = require('../models/Settings');
 const mainIpc = require('../server-ipc');
 
 /*
@@ -188,7 +189,15 @@ const handleRequest = async (page, request) => {
       dbRequest.url
     }`
   );
-  console.log(`[BrowserUtils] 2. sending requestIntercepted message...`);
+
+  // Check if the intercept is enabled:
+  const setting = await Settings.getSetting('interceptEnabled');
+
+  // If its not enabled then we forward every request:
+  if (setting.value === '0') {
+    request.continue();
+    return;
+  }
 
   global.interceptServer.queueRequest(dbRequest);
   const decision = await global.interceptServer.decisionFromClient(dbRequest);

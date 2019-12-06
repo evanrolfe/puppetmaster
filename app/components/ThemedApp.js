@@ -26,6 +26,7 @@ export default () => {
   dispatch({ type: 'LOAD_STATE' });
   dispatch({ type: 'LOAD_REQUESTS' });
   dispatch({ type: 'LOAD_BROWSERS' });
+  dispatch({ type: 'LOAD_SETTINGS' });
 
   global.backendConn.listen('requestCreated', () => {
     dispatch({ type: 'LOAD_REQUESTS' });

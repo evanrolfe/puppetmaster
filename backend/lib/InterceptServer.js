@@ -18,6 +18,7 @@ const ipc = new RawIPC();
 class InterceptServer {
   constructor() {
     this.events = new EventEmitter();
+    this.requestQueue = [];
     this.awaitingReply = false;
 
     this.events.on('requestQueued', async request => {
@@ -45,7 +46,15 @@ class InterceptServer {
         console.log(
           `[InterceptServer] Received IPC message: ${JSON.stringify(data)}`
         );
-        this.events.emit(`requestDecision-${data.requestId}`, data);
+
+        if (['forward', 'drop'].includes(data.action)) {
+          this.events.emit(`requestDecision-${data.requestId}`, data);
+        } else if (data.action === 'forwardAndIntercept') {
+          // TODO
+        } else if (data.action === 'disable') {
+          console.log(`[InterceptServer] disabling the request queue...`);
+          this.clearQueue();
+        }
       });
     });
     ipc.server.start();
@@ -55,7 +64,15 @@ class InterceptServer {
   }
 
   queueRequest(request) {
+    this.requestQueue.push(request.id);
     this.events.emit('requestQueued', request);
+  }
+
+  clearQueue() {
+    // Forward all the requests and clear the queue:
+    this.requestQueue.forEach(requestId => {
+      this.events.emit(`requestDecision-${requestId}`, { action: 'forward' });
+    });
   }
 
   async decisionFromClient(request) {
@@ -66,6 +83,11 @@ class InterceptServer {
     // NOTE: For some reason once() returns an array of the event arguments
     const [data] = await once(this.events, `requestDecision-${request.id}`);
     this.awaitingReply = false;
+    this.requestQueue = this.requestQueue.filter(id => id !== request.id);
+
+    console.log(
+      `[InterceptServer] request queue: ${JSON.stringify(this.requestQueue)}`
+    );
 
     console.log(
       `[InterceptServer]  request ${request.id} complete. action: ${
