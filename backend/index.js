@@ -1,6 +1,8 @@
-const ipc = require('./server-ipc');
-const { handleBrowserClosed } = require('./lib/BrowserUtils');
-const InterceptServer = require('./lib/InterceptServer');
+import { ipcRenderer } from 'electron';
+
+import ipc from './server-ipc';
+import BrowserUtils from './lib/BrowserUtils';
+import InterceptServer from './lib/InterceptServer';
 
 console.log('Starting backend server...');
 
@@ -12,8 +14,6 @@ if (process.argv[2] === '--subprocess') {
   ipc.init(socketName, process.argv[5]);
 } else {
   // eslint-disable-next-line global-require
-  const { ipcRenderer } = require('electron');
-
   ipcRenderer.on('set-socket', (event, { name }) => {
     ipc.init(name, 'pntest-prod.db');
   });
@@ -44,7 +44,7 @@ for (let i = 0; i < events.length; i++) {
       const browser = global.puppeteer_browsers[j];
       browser.close();
       // eslint-disable-next-line no-await-in-loop
-      await handleBrowserClosed(browser);
+      await BrowserUtils.handleBrowserClosed(browser);
     }
 
     return process.exit(0);

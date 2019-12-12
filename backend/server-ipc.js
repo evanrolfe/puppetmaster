@@ -1,14 +1,19 @@
-const RawIPC = require('node-ipc').IPC;
-const { setupDatabaseStore } = require('./lib/database.js');
+import { IPC } from 'node-ipc';
+import database from './lib/database';
 
-const ipc = new RawIPC();
+import BrowsersController from './controllers/BrowsersController';
+import CaptureFiltersController from './controllers/CaptureFiltersController';
+import RequestsController from './controllers/RequestsController';
+import SettingsController from './controllers/SettingsController';
+
+const ipc = new IPC();
 /*
  * Response (OK): { type: 'reply', id: '1232', result: { status: 'OK', id: '...' } }
  * Response (INVALID): { type: 'reply', id: '1232', result: { status: 'INVALID', messages: [] } }
  * Response (ERROR): { type: 'error', id: '1232', result: 'ERROR: bla bla bla' }
  */
 async function init(socketName, databaseFile) {
-  global.dbStore = await setupDatabaseStore(databaseFile);
+  global.dbStore = await database.setupDatabaseStore(databaseFile);
 
   ipc.config.id = socketName;
   ipc.config.silent = true;
@@ -21,8 +26,14 @@ async function init(socketName, databaseFile) {
       );
 
       try {
-        const Controller = require(`./controllers/${request.controller}`);
-        const controller = new Controller();
+        const controllersMap = {
+          BrowsersController: BrowsersController,
+          CaptureFiltersController: CaptureFiltersController,
+          RequestsController: RequestsController,
+          SettingsController: SettingsController
+        };
+
+        const controller = new controllersMap[request.controller]();
         const result = await controller[request.action](request.args);
 
         ipc.server.emit(
@@ -63,4 +74,4 @@ function send(name, args) {
   }
 }
 
-module.exports = { init, send };
+export default { init, send };

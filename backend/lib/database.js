@@ -1,16 +1,14 @@
-const fs = require('fs');
-const Store = require('openrecord/store/sqlite3');
+import Store from 'openrecord/store/sqlite3';
+import schemaSql from './schema';
 
 const setupDatabaseStore = async databaseFile => {
   const store = new Store({
     file: databaseFile,
-    autoLoad: true,
-    models: [require('../models/Request')]
+    autoLoad: true
   });
   await store.ready();
 
   console.log('Loaded database');
-  const schemaSql = fs.readFileSync(`${__dirname}/schema.sql`, 'utf8');
 
   const queries = schemaSql
     .toString()
@@ -30,4 +28,4 @@ const setupDatabaseStore = async databaseFile => {
   return store;
 };
 
-module.exports = { setupDatabaseStore };
+export default { setupDatabaseStore };

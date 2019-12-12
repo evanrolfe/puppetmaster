@@ -1,7 +1,7 @@
-const Request = require('../models/Request');
-const ipc = require('../server-ipc');
+import Request from '../models/Request';
+import ipc from '../server-ipc';
 
-class RequestsController {
+export default class RequestsController {
   // GET /requests
   async index(args) {
     console.log(`[Backend] args: ${JSON.stringify(args)}`);
@@ -60,5 +60,3 @@ class RequestsController {
     return { status: 'OK', body: {} };
   }
 }
-
-module.exports = RequestsController;

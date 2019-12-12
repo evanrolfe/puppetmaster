@@ -23,7 +23,7 @@ const DEFAULT_FILTERS = {
   ]
 };
 
-class CaptureFilters {
+export default class CaptureFilters {
   static async getFilters() {
     let result = await global.dbStore
       .connection('capture_filters')
@@ -146,5 +146,3 @@ class CaptureFilters {
     return true;
   }
 }
-
-module.exports = CaptureFilters;

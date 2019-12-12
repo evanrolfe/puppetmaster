@@ -12,7 +12,10 @@ export default {
     } else {
       backendDir = '../backend';
     }
-    const serverPath = `${path.join(app.getAppPath(), backendDir)}/index.js`;
+    const serverPath = `${path.join(
+      app.getAppPath(),
+      backendDir
+    )}/index.prod.js`;
 
     console.log(`Starting server from: ${serverPath}`);
 

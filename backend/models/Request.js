@@ -1,5 +1,4 @@
-const Store = require('openrecord/store/sqlite3');
-const CaptureFilters = require('../models/CaptureFilters');
+import CaptureFilters from './CaptureFilters';
 
 const RESOURCE_TYPES = [
   'document',
@@ -22,7 +21,7 @@ const STATUS_CODES = ['2', '3', '4', '5'];
 
 const SEARCHABLE_COLUMNS = ['id', 'method', 'url'];
 
-class Request extends Store.BaseModel {
+export default class Request {
   static async createFromBrowserRequest(page, request) {
     // Parse the URL:
     const parsedUrl = new URL(request.url());
@@ -232,5 +231,3 @@ class Request extends Store.BaseModel {
     return requests;
   }
 }
-
-module.exports = Request;

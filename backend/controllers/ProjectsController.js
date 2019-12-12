@@ -1,7 +1,7 @@
 // const ipc = require('../server-ipc');
 // const { setupDatabaseStore } = require('../lib/database.js');
 
-class ProjectsController {
+export default class ProjectsController {
   async open(args) {
     console.log(`[Backend] opening project: ${args.filePath}`);
 
@@ -13,5 +13,3 @@ class ProjectsController {
     console.log(`[Backend] Done.`);
   }
 }
-
-module.exports = ProjectsController;

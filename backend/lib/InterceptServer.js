@@ -1,8 +1,9 @@
-const RawIPC = require('node-ipc').IPC;
-const { once, EventEmitter } = require('events');
-const mainIpc = require('../server-ipc');
+import { once, EventEmitter } from 'events';
+import { IPC } from 'node-ipc';
 
-const ipc = new RawIPC();
+import mainIpc from '../server-ipc';
+
+const ipc = new IPC();
 
 /*
  * InterceptServer: communicates with the BrowserInterceptPage on the frontend.
@@ -15,7 +16,7 @@ const ipc = new RawIPC();
  * it will wait until that first request has completed to send a new
  * "requestIntercepted" message to the client. And the process repeats...
  */
-class InterceptServer {
+export default class InterceptServer {
   constructor() {
     this.events = new EventEmitter();
     this.requestQueue = [];
@@ -99,5 +100,3 @@ class InterceptServer {
     return data;
   }
 }
-
-module.exports = InterceptServer;

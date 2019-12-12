@@ -1,6 +1,6 @@
-const Settings = require('../models/Settings');
+import Settings from '../models/Settings';
 
-class SettingsController {
+export default class SettingsController {
   async show(args) {
     const setting = Settings.getSetting(args.key);
     return { status: 'OK', body: setting };
@@ -32,5 +32,3 @@ class SettingsController {
     return { status: 'OK', body: {} };
   }
 }
-
-module.exports = SettingsController;

@@ -24,7 +24,7 @@ const DEFAULT_FILTERS = {
   ]
 };
 
-class InterceptFilters {
+export default class InterceptFilters {
   static async getFilters() {
     let result = await global.dbStore
       .connection('intercept_filters')
@@ -51,5 +51,3 @@ class InterceptFilters {
       .insert({ id: 1, filters: defaultFilters });
   }
 }
-
-module.exports = InterceptFilters;

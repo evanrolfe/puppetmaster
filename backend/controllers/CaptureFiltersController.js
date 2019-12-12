@@ -1,6 +1,6 @@
-const CaptureFilters = require('../models/CaptureFilters');
+import CaptureFilters from '../models/CaptureFilters';
 
-class CaptureFiltersController {
+export default class CaptureFiltersController {
   async show() {
     const filters = await CaptureFilters.getFilters();
 
@@ -13,5 +13,3 @@ class CaptureFiltersController {
     return { status: 'OK', body: {} };
   }
 }
-
-module.exports = CaptureFiltersController;

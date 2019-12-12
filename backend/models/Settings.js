@@ -2,7 +2,7 @@ const DEFAULT_SETTINGS = {
   interceptEnabled: false
 };
 
-class Settings {
+export default class Settings {
   static async getSetting(key) {
     let result = await global.dbStore
       .connection('settings')
@@ -28,5 +28,3 @@ class Settings {
       .insert({ key: key, value: DEFAULT_SETTINGS[key] });
   }
 }
-
-module.exports = Settings;

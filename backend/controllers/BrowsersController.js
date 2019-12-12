@@ -1,13 +1,9 @@
-const {
-  createBrowser,
-  updateBrowser,
-  openBrowser
-} = require('../lib/BrowserUtils');
+import BrowserUtils from '../lib/BrowserUtils';
 
-class BrowsersController {
+export default class BrowsersController {
   // POST /browsers
   async create() {
-    await createBrowser();
+    await BrowserUtils.createBrowser();
 
     return { status: 'OK' };
   }
@@ -19,7 +15,7 @@ class BrowsersController {
   }
 
   async update(args) {
-    await updateBrowser(args.browserId, args.title);
+    await BrowserUtils.updateBrowser(args.browserId, args.title);
 
     return { status: 'OK', body: {} };
   }
@@ -33,7 +29,7 @@ class BrowsersController {
     if (browser.open === 1) {
       await this.bringToForeground(args);
     } else {
-      await openBrowser(args.browserId);
+      await BrowserUtils.openBrowser(args.browserId);
     }
 
     return { status: 'OK', body: {} };
@@ -56,5 +52,3 @@ class BrowsersController {
     console.log(`[Backend] opened!`);
   }
 }
-
-module.exports = BrowsersController;

@@ -1,9 +1,9 @@
-const puppeteer = require('puppeteer');
-const { curly } = require('node-libcurl');
+import { curly } from 'node-libcurl';
+import puppeteer from 'puppeteer';
 
-const Request = require('../models/Request');
-const Settings = require('../models/Settings');
-const mainIpc = require('../server-ipc');
+import Request from '../models/Request';
+import Settings from '../models/Settings';
+import mainIpc from '../server-ipc';
 
 /*
  * NOTE: For each response intercepted, we save the response and its body to requests table.
@@ -237,9 +237,6 @@ const handleRequest = async (page, request) => {
 
     const response = await curly(request.url(), options);
 
-    console.log('Respons received:');
-    console.log(response.headers[0]);
-
     // TODO: How to handle multiple set-cookies?
     if (response.headers[0]['Set-Cookie'] !== undefined) {
       response.headers[0]['Set-Cookie'] = response.headers[0][
@@ -409,8 +406,10 @@ const startDOMListener = async page => {
   return domListenerId;
 };
 
-module.exports.openBrowser = openBrowser;
-module.exports.createBrowser = createBrowser;
-module.exports.updateBrowser = updateBrowser;
-module.exports.instrumentBrowser = instrumentBrowser;
-module.exports.handleBrowserClosed = handleBrowserClosed;
+export default {
+  openBrowser,
+  createBrowser,
+  updateBrowser,
+  instrumentBrowser,
+  handleBrowserClosed
+};
