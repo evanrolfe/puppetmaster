@@ -1,8 +1,10 @@
 // @flow
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createHashHistory } from 'history';
 import { Route } from 'react-router';
 import { HashRouter } from 'react-router-dom';
+import { remote } from 'electron';
+import _ from 'lodash';
 
 import { registerModal } from './modals/index';
 import AlertModal from './modals/AlertModal';
@@ -34,6 +36,43 @@ export default () => {
   global.backendConn.listen('browsersChanged', () => {
     dispatch({ type: 'LOAD_REQUESTS' });
   });
+
+  const _setWindowSize = () => {
+    const size = remote.getCurrentWindow().getSize();
+    dispatch({ type: 'SET_WINDOW_SIZE_THROTTLED', windowSize: size });
+  };
+  const _setWindowSizeThrottled = _.throttle(_setWindowSize, 250);
+
+  useEffect(
+    () => {
+      window.addEventListener('resize', _setWindowSizeThrottled);
+
+      return () => {
+        window.removeEventListener('resize', _setWindowSizeThrottled);
+      };
+    },
+    [_setWindowSizeThrottled]
+  );
+  /*
+  // FOR TESTING PURPOSES:
+  dispatch({
+    type: 'SET_INTERCEPT_REQUEST',
+    page: 'browserInterceptPage',
+    request: {
+      browser_id: 1,
+      created_at: 1576059737887,
+      ext: "json",
+      host: "localhost",
+      id: 11,
+      method: "POST",
+      path: "/api/users/sign_in.json",
+      request_headers: `{"referer":"http://localhost/login","origin":"http://localhost","user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.0 Safari/537.36","content-type":"application/json","cookie":""}`,
+      request_payload: `{"user":{"email":"alice@authcov.io","password":"password"}}`,
+      request_type: "fetch",
+      url: "http://localhost/api/users/sign_in.json"
+    }
+  });
+*/
 
   const content = (
     <>

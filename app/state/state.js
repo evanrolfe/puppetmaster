@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron';
+import ipc from 'node-ipc';
 import { put, takeLatest, takeEvery, all, select } from 'redux-saga/effects';
 import { createContainer } from 'react-tracked';
 // eslint-disable-next-line import/no-named-as-default
@@ -23,7 +24,10 @@ const initialState = {
   windowSizeThrottel: remote.getCurrentWindow().getSize(),
   browserInterceptPage: {
     request: null,
-    interceptEnabled: false
+    requestHeadersText: '',
+    requestPayloadText: '',
+    interceptEnabled: false,
+    tabIndex: 0
   },
   browserNetworkPage: {
     requestViewTabIndex: 0,
@@ -216,6 +220,29 @@ const setLayout = (state, action) => {
   return newState;
 };
 
+const setInterceptRequest = (state, action) => {
+  const newState = { ...state };
+
+  newState[action.page].request = action.request;
+  console.log(`[STATE] Set ${action.page}.request to: ${action.request}`);
+
+  // Parse the request headers to text:
+  if (action.request !== null) {
+    const headersObj = JSON.parse(action.request.request_headers);
+    const headersStr = Object.keys(headersObj)
+      .map(header => `${header}: ${headersObj[header]}`)
+      .join('\n');
+
+    newState[action.page].requestHeadersText = headersStr;
+    newState[action.page].requestPayloadText = action.request.request_payload;
+  } else {
+    newState[action.page].requestHeadersText = '';
+    newState[action.page].requestPayloadText = '';
+  }
+
+  return newState;
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'BROWSERS_LOADED':
@@ -259,6 +286,11 @@ const reducer = (state, action) => {
     case 'SET_FILTERS':
       return setFilters(state, action);
     case 'SET_WINDOW_SIZE_THROTTLED':
+      console.log(
+        `[State] setting windowSizeThrottel to ${JSON.stringify(
+          action.windowSize
+        )}`
+      );
       return { ...state, windowSizeThrottel: action.windowSize };
 
     case 'SET_LAYOUT':
@@ -277,9 +309,14 @@ const reducer = (state, action) => {
       return setNestedValue('requestsTableColumns', state, action);
 
     case 'SET_INTERCEPT_REQUEST':
-      return setNestedValue('request', state, action);
+      return setInterceptRequest(state, action);
+    case 'UPDATE_INTERCEPT_REQUEST':
+      return setNestedValue(action.key, state, action);
+
     case 'SET_INTERCEPT_ENABLED':
       return setNestedValue('interceptEnabled', state, action);
+    case 'SET_INTERCEPT_TABINDEX':
+      return setNestedValue('tabIndex', state, action);
 
     default:
       return state; // needs this for AsyncAction
@@ -392,7 +429,13 @@ function* loadSettings() {
     setting => setting.key === 'interceptEnabled'
   );
 
-  const interceptEnabled = interceptEnabledSetting.value === '1';
+  let interceptEnabled;
+
+  if (interceptEnabledSetting === undefined) {
+    interceptEnabled = false;
+  } else {
+    interceptEnabled = interceptEnabledSetting.value === '1';
+  }
 
   yield put({
     type: 'SET_INTERCEPT_ENABLED',
@@ -487,6 +530,64 @@ function* toggleColumnOrderRequests(action) {
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
+const interceptRequestIPC = async params =>
+  new Promise(resolve => {
+    ipc.connectTo('intercept', () => {
+      ipc.of.intercept.on('connect', () => {
+        console.log(`[STATE] sending IPC intercept message...`);
+
+        ipc.of.intercept.emit('message', params);
+        ipc.disconnect('intercept');
+        resolve();
+      });
+    });
+  });
+
+function* interceptRequest() {
+  const action = 'forward';
+  const request = yield select(state => state.browserInterceptPage.request);
+  const requestHeadersText = yield select(
+    state => state.browserInterceptPage.requestHeadersText
+  );
+  const requestPayloadText = yield select(
+    state => state.browserInterceptPage.requestPayloadText
+  );
+  const requestForBackend = Object.assign({}, request);
+  let params = {};
+
+  if (['forward'].includes(action)) {
+    const headers = {};
+    // TODO: This needs to be done in a saga because it needs to use the current value of requestHeadersText
+    requestHeadersText.split('\n').forEach(headerLine => {
+      const headerSplit = headerLine.split(':');
+      const key = headerSplit[0].trim();
+      const value = headerSplit[1].trim();
+
+      headers[key] = value;
+    });
+    console.log(
+      `[BrowserInterceptPageState] headers: ${JSON.stringify(headers)}`
+    );
+    requestForBackend.request_headers = headers;
+    requestForBackend.request_payload = requestPayloadText;
+
+    params = {
+      action: action,
+      request: requestForBackend
+    };
+
+    yield console.log(params);
+  }
+
+  yield interceptRequestIPC(params);
+
+  yield put({
+    type: 'SET_INTERCEPT_REQUEST',
+    page: 'browserInterceptPage',
+    request: null
+  });
+}
+
 function* rootSaga() {
   yield all([
     takeLatest('LOAD_SETTINGS', loadSettings),
@@ -502,6 +603,9 @@ function* rootSaga() {
     takeLatest('SELECT_NEXT_REQUEST_LOAD', selectNextRequestLoad),
     takeLatest('SAVE_STATE', saveState),
     takeLatest('LOAD_STATE', loadState),
+    // Intercept:
+    takeLatest('FORWARD_INTERCEPT_REQUEST', interceptRequest),
+
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),
     takeLatest('SET_ORIENTATION_STORAGE', setOrientationStorage),
@@ -518,5 +622,6 @@ export const {
   Provider,
   useTrackedState,
   useSelector,
+  getUntrackedObject,
   useUpdate: useDispatch
 } = createContainer(useValue);

@@ -1,15 +1,44 @@
 import React from 'react';
-import ipc from 'node-ipc';
+import { getUntrackedObject } from 'react-tracked';
 
-import { useSelector, useDispatch } from '../../state/state';
+import { useSelector, useDispatch, useTrackedState } from '../../state/state';
 import BrowserInterceptPage from '../pages/BrowserInterceptPage';
+
+const getCodeMirrorWidth = windowSizeThrottel => {
+  const windowWidth = windowSizeThrottel[0];
+  const sideBarWidth = 53;
+
+  return windowWidth - sideBarWidth;
+};
 
 export default props => {
   console.log(`[RENDER] BrowserInterceptPageState`);
 
   const dispatch = useDispatch();
 
+  const tabIndex = useSelector(state => state.browserInterceptPage.tabIndex);
+
+  const trackedState = useTrackedState();
+  const untrackedState = getUntrackedObject(trackedState);
+  const { windowSizeThrottel } = trackedState;
+  const codeMirrorWidth = getCodeMirrorWidth(windowSizeThrottel);
+
+  const setTabIndex = i => {
+    console.log(`Setting tab index: ${i}`);
+    dispatch({
+      type: 'SET_INTERCEPT_TABINDEX',
+      tabIndex: i,
+      page: 'browserInterceptPage'
+    });
+  };
+
   const request = useSelector(state => state.browserInterceptPage.request);
+
+  const requestHeadersText =
+    untrackedState.browserInterceptPage.requestHeadersText;
+  const requestPayloadText =
+    untrackedState.browserInterceptPage.requestPayloadText;
+
   const interceptEnabled = useSelector(
     state => state.browserInterceptPage.interceptEnabled
   );
@@ -24,27 +53,10 @@ export default props => {
     });
   });
 
-  const interceptCommand = action => {
+  const interceptCommand = () => {
     if (request === null) return; // Incase disable is pressed with no request
 
-    console.log(`[Frontend] connecting to IPC intercept`);
-    ipc.connectTo('intercept', () => {
-      ipc.of.intercept.on('connect', () => {
-        console.log(`[Frontend] sending IPC intercept message...`);
-
-        ipc.of.intercept.emit('message', {
-          action: action,
-          requestId: request.id
-        });
-        ipc.disconnect('intercept');
-
-        dispatch({
-          type: 'SET_INTERCEPT_REQUEST',
-          page: 'browserInterceptPage',
-          request: null
-        });
-      });
-    });
+    dispatch({ type: 'FORWARD_INTERCEPT_REQUEST' });
   };
 
   const toggleIntercept = () => {
@@ -68,12 +80,38 @@ export default props => {
     });
   };
 
+  const handleChange = codeMirror => {
+    const value = codeMirror.getValue();
+
+    if (tabIndex === 0) {
+      dispatch({
+        type: 'UPDATE_INTERCEPT_REQUEST',
+        page: 'browserInterceptPage',
+        key: 'requestHeadersText',
+        requestHeadersText: value
+      });
+    } else if (tabIndex === 1) {
+      dispatch({
+        type: 'UPDATE_INTERCEPT_REQUEST',
+        page: 'browserInterceptPage',
+        key: 'requestPayloadText',
+        requestPayloadText: value
+      });
+    }
+  };
+
   return (
     <BrowserInterceptPage
       request={request}
       interceptCommand={interceptCommand}
       interceptEnabled={interceptEnabled}
       toggleIntercept={toggleIntercept}
+      tabIndex={tabIndex}
+      setTabIndex={setTabIndex}
+      codeMirrorWidth={codeMirrorWidth}
+      handleChange={handleChange}
+      requestHeadersText={requestHeadersText}
+      requestPayloadText={requestPayloadText}
       {...props}
     />
   );

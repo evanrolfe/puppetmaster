@@ -22,7 +22,10 @@ class InterceptServer {
     this.awaitingReply = false;
 
     this.events.on('requestQueued', async request => {
-      if (this.awaitingReply === false) {
+      if (
+        this.awaitingReply === false &&
+        this.requestQueue.includes(request.id)
+      ) {
         this.awaitingReply = true;
 
         console.log(
@@ -48,7 +51,7 @@ class InterceptServer {
         );
 
         if (['forward', 'drop'].includes(data.action)) {
-          this.events.emit(`requestDecision-${data.requestId}`, data);
+          this.events.emit(`requestDecision-${data.request.id}`, data);
         } else if (data.action === 'forwardAndIntercept') {
           // TODO
         } else if (data.action === 'disable') {
@@ -70,6 +73,11 @@ class InterceptServer {
 
   clearQueue() {
     // Forward all the requests and clear the queue:
+    console.log(
+      `[InterceptServer] clearing queue of requests: ${JSON.stringify(
+        this.requestQueue
+      )}`
+    );
     this.requestQueue.forEach(requestId => {
       this.events.emit(`requestDecision-${requestId}`, { action: 'forward' });
     });
@@ -85,17 +93,10 @@ class InterceptServer {
     this.awaitingReply = false;
     this.requestQueue = this.requestQueue.filter(id => id !== request.id);
 
-    console.log(
-      `[InterceptServer] request queue: ${JSON.stringify(this.requestQueue)}`
-    );
+    console.log(`[InterceptServer]  request ${request.id} complete`);
+    console.log(data);
 
-    console.log(
-      `[InterceptServer]  request ${request.id} complete. action: ${
-        data.action
-      }`
-    );
-
-    return data.action;
+    return data;
   }
 }
 

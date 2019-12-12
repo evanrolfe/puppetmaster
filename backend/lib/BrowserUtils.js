@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+const { curly } = require('node-libcurl');
+
 const Request = require('../models/Request');
 const Settings = require('../models/Settings');
 const mainIpc = require('../server-ipc');
@@ -54,7 +56,11 @@ const createBrowser = async () => {
     defaultViewport: null,
     executablePath: puppeteerExec,
     userDataDir: `./tmp/browser${browserId}`,
-    args: []
+    args: [
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins,site-per-process',
+      '--disable-site-isolation-trials'
+    ]
   });
 
   browser.id = browserId;
@@ -172,6 +178,7 @@ const handleBrowserClosed = async browser => {
 };
 
 const handleNewPage = async page => {
+  await page.setCacheEnabled(false);
   await page.setRequestInterception(true);
   page.on('request', async request => {
     await handleRequest(page, request);
@@ -200,13 +207,52 @@ const handleRequest = async (page, request) => {
   }
 
   global.interceptServer.queueRequest(dbRequest);
-  const decision = await global.interceptServer.decisionFromClient(dbRequest);
+  const result = await global.interceptServer.decisionFromClient(dbRequest);
 
-  console.log(`[BrowserUtils] received decision from client: ${decision}`);
+  console.log(`[BrowserUtils] received decision from client: ${result.action}`);
 
-  if (decision === 'forward') {
-    request.continue();
-  } else if (decision === 'drop') {
+  if (result.action === 'forward') {
+    // result.request === undefined if you press the "Disable Intercept" button
+    // when there is still a queue of requests to get through
+    const headersObj =
+      result.request === undefined
+        ? request.headers()
+        : result.request.request_headers;
+    const headersArr = [];
+    Object.keys(headersObj).forEach(key => {
+      headersArr.push(`${key}: ${headersObj[key]}`);
+    });
+
+    const options = {
+      customRequest: request.method().toUpperCase(),
+      HTTPHEADER: headersArr
+    };
+
+    if (result.request.request_payload !== undefined) {
+      console.log(`[BrowserUtils] setting POST body`);
+      console.log(result.request.request_payload);
+
+      options.POSTFIELDS = result.request.request_payload;
+    }
+
+    const response = await curly(request.url(), options);
+
+    console.log('Respons received:');
+    console.log(response.headers[0]);
+
+    // TODO: How to handle multiple set-cookies?
+    if (response.headers[0]['Set-Cookie'] !== undefined) {
+      response.headers[0]['Set-Cookie'] = response.headers[0][
+        'Set-Cookie'
+      ].toString();
+    }
+
+    request.respond({
+      status: response.statusCode,
+      headers: { 'set-cookie': 'a=b; path=/; HttpOnly' },
+      body: response.data
+    });
+  } else if (result.action === 'drop') {
     request.abort();
   }
 };

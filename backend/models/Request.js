@@ -51,7 +51,7 @@ class Request extends Store.BaseModel {
       created_at: Date.now(),
       request_type: request.resourceType(),
       request_headers: JSON.stringify(requestHeaders),
-      request_payload: JSON.stringify(request.postData())
+      request_payload: request.postData()
     };
 
     const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(

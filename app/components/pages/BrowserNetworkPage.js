@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react';
-import { remote } from 'electron';
-import _ from 'lodash';
+import React from 'react';
 
-import { useDispatch, useSelector } from '../../state/state';
+import { useSelector } from '../../state/state';
 import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
@@ -47,26 +45,7 @@ type Props = {
 export default ({ history, location }: Props) => {
   console.log(`[RENDER] BrowserNetworkPage`);
 
-  const dispatch = useDispatch();
-
   const page = useSelector(state => state.browserNetworkPage.page);
-
-  const _setWindowSize = () => {
-    const size = remote.getCurrentWindow().getSize();
-    dispatch({ type: 'SET_WINDOW_SIZE_THROTTLED', windowSize: size });
-  };
-  const _setWindowSizeThrottled = _.throttle(_setWindowSize, 250);
-
-  useEffect(
-    () => {
-      window.addEventListener('resize', _setWindowSizeThrottled);
-
-      return () => {
-        window.removeEventListener('resize', _setWindowSizeThrottled);
-      };
-    },
-    [_setWindowSizeThrottled]
-  );
 
   const requestsTablePane = (
     <PaneContainer orientation="vertical">

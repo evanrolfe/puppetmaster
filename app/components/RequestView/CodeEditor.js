@@ -11,7 +11,8 @@ import 'codemirror/mode/css/css';
 
 type Props = {
   value: 'string',
-  mimeType: 'string'
+  mimeType: 'string',
+  handleChange: 'function'
 };
 
 // TODO: Make this work:
@@ -62,8 +63,15 @@ export default class CodeEditor extends Component<Props> {
     this._codemirrorSetValue = this._codemirrorSetValue.bind(this);
   }
 
+  componentDidMount() {
+    if (typeof this.props.handleChange === 'function') {
+      this.codeMirror.on('change', this.props.handleChange);
+    }
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.value !== prevProps.value) {
+      console.log(`[CodeEditor] componentDidUpdate`);
       this._codemirrorSetValue();
 
       setTimeout(() => {
@@ -99,12 +107,6 @@ export default class CodeEditor extends Component<Props> {
   }
 
   render() {
-    return (
-      <textarea
-        ref={this._handleInitTextarea}
-        value={this.props.value}
-        readOnly
-      />
-    );
+    return <textarea ref={this._handleInitTextarea} value={this.props.value} />;
   }
 }

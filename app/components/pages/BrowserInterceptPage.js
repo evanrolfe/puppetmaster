@@ -6,6 +6,7 @@ import BrowserTabs from '../BrowserTabs';
 import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
+import CodeEditor from '../RequestView/CodeEditor';
 
 type Props = {
   request: 'object',
@@ -13,7 +14,13 @@ type Props = {
   location: 'object',
   interceptCommand: 'function',
   interceptEnabled: 'boolean',
-  toggleIntercept: 'function'
+  toggleIntercept: 'function',
+  tabIndex: 'number',
+  setTabIndex: 'function',
+  codeMirrorWidth: 'number',
+  handleChange: 'function',
+  requestHeadersText: 'string',
+  requestPayloadText: 'string'
 };
 
 export default ({
@@ -22,11 +29,19 @@ export default ({
   interceptEnabled,
   toggleIntercept,
   history,
-  location
+  location,
+  tabIndex,
+  setTabIndex,
+  codeMirrorWidth,
+  handleChange,
+  requestHeadersText,
+  requestPayloadText
 }: Props) => {
   const buttonsDisabled = request === null;
 
   let requestTitle;
+
+  const codeEditorRef = React.createRef();
 
   if (request !== null) {
     requestTitle = (
@@ -38,6 +53,14 @@ export default ({
       </>
     );
   }
+
+  const forwardRequest = () => {
+    interceptCommand('forward', {});
+  };
+
+  const changeTab = i => {
+    setTabIndex(i);
+  };
 
   return (
     <PaneContainer orientation="vertical">
@@ -61,7 +84,7 @@ export default ({
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ display: 'inline-block' }}
-            onClick={() => interceptCommand('forward')}
+            onClick={forwardRequest}
             disabled={buttonsDisabled}
           >
             <i className="fas fa-arrow-right" />
@@ -98,21 +121,40 @@ export default ({
       </PaneFixed>
 
       <PaneFixed>
-        <Tabs className="theme--pane__body react-tabs" selectedIndex={0}>
+        <Tabs
+          className="theme--pane__body react-tabs"
+          selectedIndex={tabIndex}
+          onSelect={i => changeTab(i)}
+        >
           <TabList>
             <Tab>
-              <button type="button">Raw</button>
+              <button type="button">Request</button>
             </Tab>
             <Tab>
-              <button type="button">Headers</button>
-            </Tab>
-            <Tab>
-              <button type="button">Body</button>
+              <button type="button">Payload</button>
             </Tab>
           </TabList>
         </Tabs>
       </PaneFixed>
-      <PaneRemaining>Request body goes here.</PaneRemaining>
+
+      <PaneRemaining style={{ width: `${codeMirrorWidth}px` }}>
+        {tabIndex === 0 && (
+          <CodeEditor
+            value={requestHeadersText}
+            mimeType={null}
+            ref={codeEditorRef}
+            handleChange={handleChange}
+          />
+        )}
+        {tabIndex === 1 && (
+          <CodeEditor
+            value={requestPayloadText}
+            mimeType={null}
+            ref={codeEditorRef}
+            handleChange={handleChange}
+          />
+        )}
+      </PaneRemaining>
     </PaneContainer>
   );
 };
