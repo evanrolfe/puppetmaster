@@ -31,7 +31,7 @@
     "start-prod": "cross-env NODE_ENV=production electron ./app/main.prod.js",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register --remote-debugging-port=9223 ./app/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config configs/webpack.config.renderer.dev.babel.js",
-    "start-backend": "node -r @babel/register --inspect ./backend/index.js",
+    "start-backend": "node -r @babel/register --inspect ./src/backend/index.js",
     "test": "mocha --require @babel/register",
     "test-all": "yarn lint && yarn flow && yarn build && yarn test && yarn build-e2e && yarn test-e2e",
     "test-e2e": "node -r @babel/register ./internals/scripts/CheckBuiltsExist.js && cross-env NODE_ENV=test testcafe electron:./ ./test/e2e/HomePage.e2e.js",
@@ -67,7 +67,7 @@
       "app/app.html",
       "app/main.prod.js",
       "app/main.prod.js.map",
-      "backend/index.prod.js",
+      "src/backend/index.prod.js",
       "package.json"
     ],
     "dmg": {

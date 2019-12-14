@@ -50,8 +50,10 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 
-  console.log(`Killing backend server process...`);
-  backendProcess.kill('SIGHUP');
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`Killing backend server process...`);
+    backendProcess.kill('SIGHUP');
+  }
 });
 
 app.on('ready', async () => {

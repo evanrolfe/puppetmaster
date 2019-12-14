@@ -42,8 +42,8 @@ app/renderer.prod.js
 app/renderer.prod.js.map
 app/style.css
 app/style.css.map
-backend/index.prod.js
-backend/index.prod.js.map
+src/backend/index.prod.js
+src/backend/index.prod.js.map
 dist
 dll
 main.js

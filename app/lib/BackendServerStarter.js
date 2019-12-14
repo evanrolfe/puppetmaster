@@ -1,21 +1,14 @@
 import path from 'path';
-import { BrowserWindow } from 'electron';
 import { fork } from 'child_process';
 
 export default {
   createBackgroundProcess(socketName, app) {
     console.log(`Starting background Process...`);
-    let backendDir;
 
-    if (app.isPackaged) {
-      backendDir = './backend';
-    } else {
-      backendDir = '../backend';
-    }
+    // TODO: THis is only run in production so should be ./dist/backend.js
     const serverPath = `${path.join(
-      app.getAppPath(),
-      backendDir
-    )}/index.prod.js`;
+      app.getAppPath()
+    )}/src/backend/index.prod.js`;
 
     console.log(`Starting server from: ${serverPath}`);
 
@@ -26,28 +19,5 @@ export default {
     });
 
     return serverProcess;
-  },
-  createBackgroundWindow(socketName, app) {
-    const win = new BrowserWindow({
-      x: 500,
-      y: 300,
-      width: 700,
-      height: 500,
-      show: true,
-      webPreferences: {
-        nodeIntegration: true
-      }
-    });
-
-    const filePath = `${path.join(
-      app.getAppPath(),
-      '../backend'
-    )}/server-dev.html`;
-
-    win.loadURL(`file://${filePath}`);
-
-    win.webContents.on('did-finish-load', () => {
-      win.webContents.send('set-socket', { name: socketName });
-    });
   }
 };
