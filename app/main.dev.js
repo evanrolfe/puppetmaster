@@ -17,8 +17,6 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import BackendServerStarter from './lib/BackendServerStarter';
 
-const DEBUG_BACKEND = false;
-
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'verbose';
@@ -71,18 +69,11 @@ app.on('ready', async () => {
 */
   log.warn('App ready.');
 
-  if (DEBUG_BACKEND === true) {
-    log.warn('Starting background server in debug mode...');
-    backendProcess = BackendServerStarter.createBackgroundWindow(
-      serverSocket,
-      app
-    );
-  } else {
+  if (process.env.NODE_ENV === 'production') {
     log.warn('Starting background server...');
     backendProcess = BackendServerStarter.createBackgroundProcess(
       serverSocket,
-      app,
-      'pntest-prod.db'
+      app
     );
   }
 

@@ -1,4 +1,4 @@
-import { curly } from 'node-libcurl';
+// import { curly } from 'node-libcurl';
 import puppeteer from 'puppeteer';
 
 import Request from '../models/Request';
@@ -212,6 +212,8 @@ const handleRequest = async (page, request) => {
   console.log(`[BrowserUtils] received decision from client: ${result.action}`);
 
   if (result.action === 'forward') {
+    request.continue();
+    /*
     // result.request === undefined if you press the "Disable Intercept" button
     // when there is still a queue of requests to get through
     const headersObj =
@@ -235,7 +237,7 @@ const handleRequest = async (page, request) => {
       options.POSTFIELDS = result.request.request_payload;
     }
 
-    const response = await curly(request.url(), options);
+    // const response = await curly(request.url(), options);
 
     // TODO: How to handle multiple set-cookies?
     if (response.headers[0]['Set-Cookie'] !== undefined) {
@@ -249,6 +251,7 @@ const handleRequest = async (page, request) => {
       headers: { 'set-cookie': 'a=b; path=/; HttpOnly' },
       body: response.data
     });
+*/
   } else if (result.action === 'drop') {
     request.abort();
   }

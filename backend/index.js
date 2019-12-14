@@ -1,5 +1,3 @@
-import { ipcRenderer } from 'electron';
-
 import ipc from './server-ipc';
 import BrowserUtils from './lib/BrowserUtils';
 import InterceptServer from './lib/InterceptServer';
@@ -8,16 +6,9 @@ console.log('Starting backend server...');
 
 global.puppeteer_browsers = [];
 
-if (process.argv[2] === '--subprocess') {
-  const socketName = process.argv[4];
+const socketName = 'pntest1';
 
-  ipc.init(socketName, process.argv[5]);
-} else {
-  // eslint-disable-next-line global-require
-  ipcRenderer.on('set-socket', (event, { name }) => {
-    ipc.init(name, 'pntest-prod.db');
-  });
-}
+ipc.init(socketName, 'pntest-prod.db');
 
 const interceptServer = new InterceptServer();
 interceptServer.init();

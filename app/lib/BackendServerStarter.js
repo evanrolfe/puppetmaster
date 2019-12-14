@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron';
 import { fork } from 'child_process';
 
 export default {
-  createBackgroundProcess(socketName, app, dbFile) {
+  createBackgroundProcess(socketName, app) {
     console.log(`Starting background Process...`);
     let backendDir;
 
@@ -19,12 +19,7 @@ export default {
 
     console.log(`Starting server from: ${serverPath}`);
 
-    const serverProcess = fork(serverPath, [
-      '--subprocess',
-      app.getVersion(),
-      socketName,
-      dbFile
-    ]);
+    const serverProcess = fork(serverPath);
 
     serverProcess.on('message', msg => {
       console.log(msg);
