@@ -5,10 +5,9 @@ export default {
   createBackgroundProcess(socketName, app) {
     console.log(`Starting background Process...`);
 
-    // TODO: THis is only run in production so should be ./dist/backend.js
-    const serverPath = `${path.join(
-      app.getAppPath()
-    )}/src/backend/index.prod.js`;
+    let serverPath = path.join(app.getAppPath());
+    if (app.isPackaged === true) serverPath += '/dist';
+    serverPath += '/backend.prod.js';
 
     console.log(`Starting server from: ${serverPath}`);
 

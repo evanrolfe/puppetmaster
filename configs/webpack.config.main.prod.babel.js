@@ -23,7 +23,7 @@ export default merge.smart(baseConfig, {
 
   output: {
     path: path.join(__dirname, '..'),
-    filename: './src/ui/main.prod.js'
+    filename: './dist/main.prod.js'
   },
 
   optimization: {
