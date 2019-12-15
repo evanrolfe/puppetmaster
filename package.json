@@ -28,8 +28,8 @@
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "precommit": "lint-staged",
     "prestart": "yarn build",
-    "start-prod": "cross-env NODE_ENV=production electron ./app/main.prod.js",
-    "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register --remote-debugging-port=9223 ./app/main.dev.js",
+    "start-prod": "cross-env NODE_ENV=production electron ./src/ui/main.prod.js",
+    "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register --remote-debugging-port=9223 ./src/ui/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config configs/webpack.config.renderer.dev.babel.js",
     "start-backend": "node -r @babel/register --inspect ./src/backend/index.js",
     "test": "mocha --require @babel/register",
@@ -48,25 +48,20 @@
       "prettier --ignore-path .eslintignore --parser json --write",
       "git add"
     ],
-    "*.{css,scss}": [
-      "stylelint --ignore-path .eslintignore --syntax scss --fix",
-      "prettier --ignore-path .eslintignore --single-quote --write",
-      "git add"
-    ],
     "*.{yml,md}": [
       "prettier --ignore-path .eslintignore --single-quote --write",
       "git add"
     ]
   },
-  "main": "./app/main.prod.js",
+  "main": "./src/ui/main.prod.js",
   "build": {
     "productName": "PnTest",
     "appId": "org.pntest.pntest",
     "files": [
-      "app/dist/",
-      "app/app.html",
-      "app/main.prod.js",
-      "app/main.prod.js.map",
+      "src/ui/dist/",
+      "src/ui/app.html",
+      "src/ui/main.prod.js",
+      "src/ui/main.prod.js.map",
       "src/backend/index.prod.js",
       "package.json"
     ],

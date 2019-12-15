@@ -36,18 +36,21 @@ flow-typed/npm/*
 
 # App packaged
 release
-app/app.html
-app/main.prod.js
-app/main.prod.js.map
-app/renderer.prod.js
-app/renderer.prod.js.map
-app/style.css
-app/style.css.map
+src/ui/app.html
+src/ui/main.prod.js
+src/ui/main.prod.js.map
+src/ui/renderer.prod.js
+src/ui/renderer.prod.js.map
+src/ui/style.css
+src/ui/style.css.map
 dist
 dll
 main.js
 main.js.map
-backend/server-dev.html
+src/backend/server-dev.html
+
+# TODO:
+src/ui/utils/theme-utils.js
 
 .idea
 npm-debug.log.*

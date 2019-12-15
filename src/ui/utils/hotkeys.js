@@ -436,9 +436,9 @@ export function areSameKeyCombinations(
 // eslint-disable-next-line no-shadow
 export function areKeyBindingsSameAsDefault(
   hotKeyRefId: string,
-  keyBinds: KeyBindings
+  keyBindsArg: KeyBindings
 ): boolean {
-  const keyCombs = getPlatformKeyCombinations(keyBinds);
+  const keyCombs = getPlatformKeyCombinations(keyBindsArg);
   const defaultKeyCombs = getPlatformKeyCombinations(
     defaultRegistry[hotKeyRefId]
   );

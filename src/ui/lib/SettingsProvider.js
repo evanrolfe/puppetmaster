@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ALL_TABLE_COLUMNS } from '../components/pages/BrowserNetworkPage';
+import { ALL_TABLE_COLUMNS } from '../state/constants';
 import SettingsContext from './SettingsContext';
 
 type Props = {

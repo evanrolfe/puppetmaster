@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDispatch, useSelector, ALL_TABLE_COLUMNS } from '../../state/state';
+import { useDispatch, useSelector } from '../../state/state';
+import { ALL_TABLE_COLUMNS } from '../../state/constants';
 
 export default () => {
   const dispatch = useDispatch();
