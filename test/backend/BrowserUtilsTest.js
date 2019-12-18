@@ -1,8 +1,8 @@
-const { createBrowser } = require('../../../backend/lib/BrowserUtils');
+// const { createBrowser } = require('../../../backend/lib/BrowserUtils');
 
-const sleep = n => new Promise(resolve => setTimeout(resolve, n));
-
+// const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 describe('BrowsersUtils', () => {
+  /*
   let browser;
 
   beforeEach(async () => {
@@ -135,4 +135,5 @@ describe('BrowsersUtils', () => {
       expect(request.url).to.eql('http://localhost/api/posts.json');
     });
   });
+*/
 });
