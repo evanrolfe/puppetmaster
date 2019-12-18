@@ -6,7 +6,8 @@ const setupDatabaseStore = async databaseFile => {
     client: 'sqlite3',
     connection: {
       filename: databaseFile
-    }
+    },
+    useNullAsDefault: true
   });
 
   console.log('Loaded database');

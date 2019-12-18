@@ -51,16 +51,22 @@ const createBrowser = async () => {
     .executablePath()
     .replace('app.asar', 'app.asar.unpacked');
 
+  const browserArgs = [
+    '--disable-web-security',
+    '--disable-features=IsolateOrigins,site-per-process',
+    '--disable-site-isolation-trials'
+  ];
+
+  if (process.env.NODE_ENV === 'test') {
+    browserArgs.push('--remote-debugging-port=9222');
+  }
+
   const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
     executablePath: puppeteerExec,
     userDataDir: `./tmp/browser${browserId}`,
-    args: [
-      '--disable-web-security',
-      '--disable-features=IsolateOrigins,site-per-process',
-      '--disable-site-isolation-trials'
-    ]
+    args: browserArgs
   });
 
   browser.id = browserId;
@@ -176,6 +182,8 @@ const handleBrowserClosed = async browser => {
 };
 
 const handleNewPage = async page => {
+  if (page === null) return;
+
   await page.setCacheEnabled(false);
   await page.setRequestInterception(true);
   page.on('request', async request => {
@@ -186,8 +194,12 @@ const handleNewPage = async page => {
 
 const handleRequest = async (page, request) => {
   const dbRequest = await Request.createFromBrowserRequest(page, request);
+
+  if (dbRequest === undefined) {
+    return request.continue();
+  }
+
   request.requestId = dbRequest.id;
-  console.log(`handleRequest: set request id to: ${request.requestId}`);
 
   console.log(
     `[BrowserUtils] 1. request intercepted: ${dbRequest.method} ${

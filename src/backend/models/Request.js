@@ -72,6 +72,8 @@ export default class Request {
   static async updateFromBrowserResponse(page, response) {
     const requestId = response.request().requestId;
 
+    if (requestId === undefined) return;
+
     console.log(`Updating request ${requestId} with a response...`);
 
     const remoteAddress = `${response.remoteAddress().ip}:${

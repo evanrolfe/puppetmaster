@@ -1,23 +1,19 @@
-// const { createBrowser } = require('../../../backend/lib/BrowserUtils');
+import puppeteer from 'puppeteer';
 
-// const sleep = n => new Promise(resolve => setTimeout(resolve, n));
+const sleep = n => new Promise(resolve => setTimeout(resolve, n));
+
 describe('BrowsersUtils', () => {
-  /*
   let browser;
 
   beforeEach(async () => {
-    await global.dbStore.connection.raw('Delete FROM browsers;');
-    await global.dbStore.connection.raw(
-      'DELETE FROM SQLITE_SEQUENCE WHERE name="browsers";'
-    );
-    await global.dbStore.connection.raw('Delete FROM capture_filters;');
-    await global.dbStore.connection.raw(
+    await global.knex.raw('Delete FROM browsers;');
+    await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="browsers";');
+    await global.knex.raw('Delete FROM capture_filters;');
+    await global.knex.raw(
       'DELETE FROM SQLITE_SEQUENCE WHERE name="capture_filters";'
     );
-    await global.dbStore.connection.raw('Delete FROM requests;');
-    await global.dbStore.connection.raw(
-      'DELETE FROM SQLITE_SEQUENCE WHERE name="requests";'
-    );
+    await global.knex.raw('Delete FROM requests;');
+    await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="requests";');
 
     const filters = {
       hostList: [],
@@ -44,14 +40,12 @@ describe('BrowsersUtils', () => {
       ]
     };
 
-    // HACK: Yes we shouldn't be using global vars like this..
-    global.puppeteer_browsers = [];
-
-    await global.dbStore
-      .connection('capture_filters')
+    await global
+      .knex('capture_filters')
       .insert({ id: 1, filters: JSON.stringify(filters) });
 
-    browser = await createBrowser();
+    await backendConn.send('BrowsersController', 'create', {});
+    browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
   });
 
   afterEach(async () => {
@@ -68,13 +62,13 @@ describe('BrowsersUtils', () => {
       await sleep(500);
 
       // Creates 8 requests
-      let result = await global.dbStore.connection('requests').count('*');
+      let result = await global.knex('requests').count('*');
       const requestsCount = result[0]['count(*)'];
       expect(requestsCount).to.eql(4);
 
       // The GET http://localhost/ request is saved along with the rendered DOM
-      result = await global.dbStore
-        .connection('requests')
+      result = await global
+        .knex('requests')
         .where({ url: 'http://localhost/', method: 'GET' });
       let request = result[0];
       expect(request.request_type).to.eql('document');
@@ -82,8 +76,8 @@ describe('BrowsersUtils', () => {
       expect(request.response_body_rendered).to.contain('Are you logged in?');
 
       // The http://localhost/posts request is saved along with the rendered DOM
-      result = await global.dbStore
-        .connection('requests')
+      result = await global
+        .knex('requests')
         .where({ url: 'http://localhost/posts', request_type: 'navigation' });
       request = result[0];
       expect(request.method).to.eql(null);
@@ -102,13 +96,13 @@ describe('BrowsersUtils', () => {
       await sleep(500);
 
       // Creates 18 requests
-      let result = await global.dbStore.connection('requests').count('*');
+      let result = await global.knex('requests').count('*');
       const requestsCount = result[0]['count(*)'];
       expect(requestsCount).to.eql(1);
 
       // The first request is GET http://localhost/
-      result = await global.dbStore
-        .connection('requests')
+      result = await global
+        .knex('requests')
         .where({ url: 'http://localhost:3001/', method: 'GET' });
       const request = result[0];
       expect(request.request_type).to.eql('document');
@@ -125,15 +119,14 @@ describe('BrowsersUtils', () => {
       await sleep(500);
 
       // Creates 8 requests
-      const result = await global.dbStore.connection('requests').count('*');
+      const result = await global.knex('requests').count('*');
       const requestsCount = result[0]['count(*)'];
       expect(requestsCount).to.eql(1);
 
-      const request = await global.dbStore.connection('requests').first();
+      const request = await global.knex('requests').first();
 
       expect(request.id).to.eql(1);
       expect(request.url).to.eql('http://localhost/api/posts.json');
     });
   });
-*/
 });
