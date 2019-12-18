@@ -1,12 +1,13 @@
-import Store from 'openrecord/store/sqlite3';
+import knex from 'knex';
 import schemaSql from './schema';
 
 const setupDatabaseStore = async databaseFile => {
-  const store = new Store({
-    file: databaseFile,
-    autoLoad: true
+  const dbconn = knex({
+    client: 'sqlite3',
+    connection: {
+      filename: databaseFile
+    }
   });
-  await store.ready();
 
   console.log('Loaded database');
 
@@ -20,12 +21,12 @@ const setupDatabaseStore = async databaseFile => {
 
   for (let i = 0; i < queries.length; i++) {
     // eslint-disable-next-line no-await-in-loop
-    await store.connection.raw(queries[i]);
+    await dbconn.raw(queries[i]);
   }
 
   console.log('Executed schema.sql');
 
-  return store;
+  return dbconn;
 };
 
 export default { setupDatabaseStore };

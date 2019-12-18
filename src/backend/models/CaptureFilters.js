@@ -25,16 +25,16 @@ const DEFAULT_FILTERS = {
 
 export default class CaptureFilters {
   static async getFilters() {
-    let result = await global.dbStore
-      .connection('capture_filters')
+    let result = await global
+      .knex('capture_filters')
       .where({ id: 1 })
       .select();
 
     if (result.length === 0) {
       console.log(`No capture_filters found, so creating default..`);
       await this.createDefault();
-      result = await global.dbStore
-        .connection('capture_filters')
+      result = await global
+        .knex('capture_filters')
         .where({ id: 1 })
         .select();
     }
@@ -43,16 +43,16 @@ export default class CaptureFilters {
   }
 
   static async setFilters(newValuesObj) {
-    let result = await global.dbStore
-      .connection('capture_filters')
+    let result = await global
+      .knex('capture_filters')
       .where({ id: 1 })
       .select();
 
     if (result.length === 0) {
       console.log(`No capture_filters found, so creating default..`);
       await this.createDefault();
-      result = await global.dbStore
-        .connection('capture_filters')
+      result = await global
+        .knex('capture_filters')
         .where({ id: 1 })
         .select();
     }
@@ -64,8 +64,8 @@ export default class CaptureFilters {
       newFilters[key] = newValuesObj[key];
     });
 
-    await global.dbStore
-      .connection('capture_filters')
+    await global
+      .knex('capture_filters')
       .where({ id: 1 })
       .update({ filters: JSON.stringify(newFilters) });
   }
@@ -73,8 +73,8 @@ export default class CaptureFilters {
   static async createDefault() {
     console.log('Creating default CaptureFilters...');
     const defaultFilters = JSON.stringify(DEFAULT_FILTERS);
-    return global.dbStore
-      .connection('capture_filters')
+    return global
+      .knex('capture_filters')
       .insert({ id: 1, filters: defaultFilters });
   }
 

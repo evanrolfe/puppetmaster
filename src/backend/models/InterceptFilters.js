@@ -26,16 +26,16 @@ const DEFAULT_FILTERS = {
 
 export default class InterceptFilters {
   static async getFilters() {
-    let result = await global.dbStore
-      .connection('intercept_filters')
+    let result = await global
+      .knex('intercept_filters')
       .where({ id: 1 })
       .select();
 
     if (result.length === 0) {
       console.log(`No intercept_filters found, so creating default..`);
       await this.createDefault();
-      result = await global.dbStore
-        .connection('intercept_filters')
+      result = await global
+        .knex('intercept_filters')
         .where({ id: 1 })
         .select();
     }
@@ -46,8 +46,8 @@ export default class InterceptFilters {
   static async createDefault() {
     console.log('Creating default InterceptFilters...');
     const defaultFilters = JSON.stringify(DEFAULT_FILTERS);
-    return global.dbStore
-      .connection('intercept_filters')
+    return global
+      .knex('intercept_filters')
       .insert({ id: 1, filters: defaultFilters });
   }
 }

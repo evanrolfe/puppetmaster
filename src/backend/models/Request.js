@@ -58,9 +58,7 @@ export default class Request {
     );
 
     if (shouldRequestBeCaptured === true) {
-      const result = await global.dbStore
-        .connection('requests')
-        .insert(requestParams);
+      const result = await global.knex('requests').insert(requestParams);
 
       console.log(
         `Saved request: ${requestParams.method} ${requestParams.url}`
@@ -103,8 +101,8 @@ export default class Request {
       response_body_length: responseBody.length
     };
 
-    await global.dbStore
-      .connection('requests')
+    await global
+      .knex('requests')
       .where({ id: requestId })
       .update(requestParams);
 
@@ -112,8 +110,8 @@ export default class Request {
   }
 
   static findByParams(columns, params) {
-    let query = global.dbStore
-      .connection('requests')
+    let query = global
+      .knex('requests')
       .select(columns)
       .from('requests');
 

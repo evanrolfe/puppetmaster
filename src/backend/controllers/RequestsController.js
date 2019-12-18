@@ -31,9 +31,7 @@ export default class RequestsController {
   }
 
   async show(args) {
-    const result = await global.dbStore
-      .connection('requests')
-      .where({ id: args.id });
+    const result = await global.knex('requests').where({ id: args.id });
 
     return { status: 'OK', body: result[0] };
   }
@@ -43,13 +41,13 @@ export default class RequestsController {
     console.log(args);
 
     if (Array.isArray(args.id)) {
-      await global.dbStore
-        .connection('requests')
+      await global
+        .knex('requests')
         .whereIn('id', args.id)
         .del();
     } else {
-      await global.dbStore
-        .connection('requests')
+      await global
+        .knex('requests')
         .where({ id: args.id })
         .del();
     }

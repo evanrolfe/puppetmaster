@@ -30,14 +30,14 @@ import mainIpc from '../server-ipc';
  */
 
 const createBrowserDb = async () => {
-  const result = await global.dbStore
-    .connection('browsers')
+  const result = await global
+    .knex('browsers')
     .insert({ open: 1, created_at: Date.now() });
 
   const browserId = result[0];
 
-  await global.dbStore
-    .connection('browsers')
+  await global
+    .knex('browsers')
     .where({ id: browserId })
     .update({ title: `Session #${browserId}` });
 
@@ -74,8 +74,8 @@ const createBrowser = async () => {
 };
 
 const updateBrowser = async (browserId, title) => {
-  await global.dbStore
-    .connection('browsers')
+  await global
+    .knex('browsers')
     .where({ id: browserId })
     .update({ title: title });
 
@@ -103,9 +103,7 @@ const openBrowser = async browserId => {
   global.puppeteer_browsers.push(browser);
 
   // Load the cookies:
-  const result = await global.dbStore
-    .connection('browsers')
-    .where({ id: browserId });
+  const result = await global.knex('browsers').where({ id: browserId });
   const browserRecord = result[0];
   const cookiesObj = JSON.parse(browserRecord.cookies);
   console.log('loaded cookies:');
@@ -166,8 +164,8 @@ const instrumentBrowser = async browser => {
 const handleBrowserClosed = async browser => {
   console.log(`handleBrowserClosed for browser #${browser.id}`);
 
-  await global.dbStore
-    .connection('browsers')
+  await global
+    .knex('browsers')
     .where({ id: browser.id })
     .update({ open: 0 });
 
@@ -266,8 +264,8 @@ const handleResponse = async (page, response) => {
   const { cookies } = await page._client.send('Network.getAllCookies');
   const pages = await page.browser().pages();
   const pageUrls = pages.map(pageEnum => pageEnum.url());
-  await global.dbStore
-    .connection('browsers')
+  await global
+    .knex('browsers')
     .where({ id: page.browser().id })
     .update({
       cookies: JSON.stringify(cookies),
@@ -285,8 +283,8 @@ const handleResponse = async (page, response) => {
       `BrowserUtils: Navigation request for ${page.url()}, requestID: ${requestId}`
     );
 
-    await global.dbStore
-      .connection('browsers')
+    await global
+      .knex('browsers')
       .where({ id: page.browser().id })
       .update({ pages: JSON.stringify(pageUrls) });
 
@@ -357,9 +355,7 @@ const handleFramenavigated = async (page, frame, origURL) => {
     created_at: Date.now()
   };
 
-  const result = await global.dbStore
-    .connection('requests')
-    .insert(requestParams);
+  const result = await global.knex('requests').insert(requestParams);
   //  console.log(
   //    `BrowserUtils: create new request ${result[0]} and starting DOMListener...`
   //  );
@@ -383,8 +379,8 @@ const startDOMListener = async page => {
 
     // UGLY WORKAROUND: Prevent the race condition described at the top of page:
     // Check that the page url has not changed while this callback has been running
-    const result = await global.dbStore
-      .connection('requests')
+    const result = await global
+      .knex('requests')
       .select('url')
       .where({ id: page.requestId });
     const request = result[0];
@@ -394,8 +390,8 @@ const startDOMListener = async page => {
     }
 
     // Update the request in the database
-    await global.dbStore
-      .connection('requests')
+    await global
+      .knex('requests')
       .where({ id: page.requestId })
       .update({ response_body_rendered: body });
 

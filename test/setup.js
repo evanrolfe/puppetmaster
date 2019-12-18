@@ -43,11 +43,11 @@ before(async () => {
 
   global.backendConn = new BackendConn(socketName);
   await global.backendConn.init();
-  global.dbStore = await database.setupDatabaseStore(dbFile);
+  global.knex = await database.setupDatabaseStore(dbFile);
 });
 
 after(() => {
-  global.dbStore.close();
+  global.knex.destroy();
   global.backendConn.disconnect();
 
   // See this: https://azimi.me/2014/12/31/kill-child_process-node-js.html

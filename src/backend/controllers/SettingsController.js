@@ -8,23 +8,21 @@ export default class SettingsController {
 
   async index() {
     Settings.getSetting('interceptEnabled'); // Create a default if necessary
-    const result = await global.dbStore.connection('settings');
+    const result = await global.knex('settings');
 
     return { status: 'OK', body: result };
   }
 
   async update(args) {
-    const result = await global.dbStore
-      .connection('settings')
-      .where({ key: args.key });
+    const result = await global.knex('settings').where({ key: args.key });
 
     if (result.length === 0) {
-      await global.dbStore
-        .connection('settings')
+      await global
+        .knex('settings')
         .insert({ key: 'interceptEnabled', value: args.value });
     } else {
-      await global.dbStore
-        .connection('settings')
+      await global
+        .knex('settings')
         .where({ key: args.key })
         .update({ value: args.value });
     }

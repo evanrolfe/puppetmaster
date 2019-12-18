@@ -9,13 +9,13 @@ const DEFAULT_FILTERS = {
 
 describe('CaptureFiltersController', () => {
   beforeEach(async () => {
-    await global.dbStore.connection.raw('Delete FROM capture_filters;');
-    await global.dbStore.connection.raw(
+    await global.knex.raw('Delete FROM capture_filters;');
+    await global.knex.raw(
       'DELETE FROM SQLITE_SEQUENCE WHERE name="capture_filters";'
     );
 
-    await global.dbStore
-      .connection('capture_filters')
+    await global
+      .knex('capture_filters')
       .insert({ id: 1, filters: JSON.stringify(DEFAULT_FILTERS) });
   });
 
@@ -45,8 +45,8 @@ describe('CaptureFiltersController', () => {
 
       expect(result.result.status).to.eql('OK');
 
-      const dbResult = await global.dbStore
-        .connection('capture_filters')
+      const dbResult = await global
+        .knex('capture_filters')
         .where({ id: 1 })
         .select();
       const filters = JSON.parse(dbResult[0].filters);

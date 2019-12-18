@@ -1,11 +1,9 @@
 describe('Requests', () => {
   beforeEach(async () => {
-    await global.dbStore.connection.raw('Delete FROM requests;');
-    await global.dbStore.connection.raw(
-      'DELETE FROM SQLITE_SEQUENCE WHERE name="requests";'
-    );
+    await global.knex.raw('Delete FROM requests;');
+    await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="requests";');
 
-    await global.dbStore.Model('Request').create({
+    await global.knex('requests').insert({
       id: 1,
       host: 'localhost',
       path: '/api/secrets.json',
@@ -15,7 +13,7 @@ describe('Requests', () => {
       response_status: 401,
       response_body: 'Hello World!'
     });
-    await global.dbStore.Model('Request').create({
+    await global.knex('requests').insert({
       id: 2,
       host: 'localhost',
       path: '/api/posts.json',

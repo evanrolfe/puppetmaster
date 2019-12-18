@@ -9,7 +9,7 @@ export default class BrowsersController {
   }
 
   async index() {
-    const browsers = await global.dbStore.connection('browsers');
+    const browsers = await global.knex('browsers');
 
     return { status: 'OK', body: browsers };
   }
@@ -22,10 +22,9 @@ export default class BrowsersController {
 
   async open(args) {
     // args.browserId
-    const result = await global.dbStore
-      .connection('browsers')
-      .where({ id: args.browserId });
+    const result = await global.knex('browsers').where({ id: args.browserId });
     const browser = result[0];
+
     if (browser.open === 1) {
       await this.bringToForeground(args);
     } else {

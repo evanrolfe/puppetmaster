@@ -29,7 +29,7 @@ const handleExit = async () => {
     global.puppeteer_browsers = [];
 
     // Load the database
-    global.dbStore = await database.setupDatabaseStore(dbFile);
+    global.knex = await database.setupDatabaseStore(dbFile);
     console.log(`[Backend] Database loaded`);
 
     // Load the IPC Server

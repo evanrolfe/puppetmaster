@@ -4,16 +4,14 @@ const DEFAULT_SETTINGS = {
 
 export default class Settings {
   static async getSetting(key) {
-    let result = await global.dbStore
-      .connection('settings')
-      .where({ key: key });
+    let result = await global.knex('settings').where({ key: key });
 
     if (result.length === 0) {
       console.log(`No settings found, so creating default..`);
       await this.createDefault(key);
 
-      result = await global.dbStore
-        .connection('settings')
+      result = await global
+        .knex('settings')
         .where({ key: key })
         .select();
     }
@@ -23,8 +21,8 @@ export default class Settings {
 
   static async createDefault(key) {
     console.log(`Creating default setting for ${key}...`);
-    return global.dbStore
-      .connection('settings')
+    return global
+      .knex('settings')
       .insert({ key: key, value: DEFAULT_SETTINGS[key] });
   }
 }

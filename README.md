@@ -12,7 +12,7 @@ And then install the dependencies with yarn.
 
 ```bash
 $ cd your-project-name
-$ yarn
+$ ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true yarn install
 ```
 
 ## Run
