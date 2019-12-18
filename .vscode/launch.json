@@ -5,29 +5,65 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
-      "request": "attach",
-      "name": "Attach to Chrome",
-      "port": 9223,
-      "webRoot": "${workspaceFolder}",
-      "remoteRoot": "/home/evan/Code/pntest/",
-      "smartStep": false
-    },
-    {
       "type": "node",
-      "request": "attach",
-      "name": "Attach by Process ID",
-      "processId": "${command:PickProcess}",
+      "request": "launch",
+      "name": "Backend [TEST]",
+      "args": [
+        "-r",
+        "@babel/register",
+        "${workspaceFolder}/src/backend/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "test"
+      },
       "protocol": "inspector",
       "localRoot": "${workspaceFolder}",
       "remoteRoot": "/home/evan/Code/pntest/",
-      "smartStep": false
+      "smartStep": false,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Test",
-      "program": "${workspaceFolder}/test.js"
+      "name": "Backend [DEVELOPMENT]",
+      "args": [
+        "-r",
+        "@babel/register",
+        "${workspaceFolder}/src/backend/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "protocol": "inspector",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/home/evan/Code/pntest/",
+      "smartStep": false,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Test (Current File)",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "-r",
+        "@babel/register",
+        "--colors",
+        "--timeout",
+        "999999",
+        "${file}"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "protocol": "inspector",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/home/evan/Code/pntest/",
+      "smartStep": false,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

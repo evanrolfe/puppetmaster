@@ -57,26 +57,11 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
-  // TODO: Remove this hardcoded server socket, and also from app/App.js
-  const serverSocket = 'pntest1';
-  /*
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    BackendServerStarter.createBackgroundWindow(serverSocket);
-    // await installExtensions();
-  } else {
-  }
-*/
   log.warn('App ready.');
 
   if (process.env.NODE_ENV === 'production') {
-    log.warn('Starting background server...');
-    backendProcess = BackendServerStarter.createBackgroundProcess(
-      serverSocket,
-      app
-    );
+    log.warn('[MAIN] Starting background server...');
+    backendProcess = BackendServerStarter.createBackgroundProcess(app);
   }
 
   log.warn('Started.');

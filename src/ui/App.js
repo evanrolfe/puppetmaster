@@ -1,7 +1,6 @@
 // @flow
 import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
-import log from 'electron-log';
 
 import { showModal } from './components/modals/index';
 import SettingsModal from './components/modals/SettingsModal';
@@ -10,13 +9,14 @@ import ThemeSetter from './components/ThemeSetter';
 import BackendConnection from './lib/BackendConnection';
 import { Provider } from './state/state';
 
+import { MAIN_SOCKET_NAMES } from '../shared/constants';
+
 export default class App extends Component {
   constructor(props) {
     super(props);
 
-    log.warn('Inside react constructor!');
-
-    const backendConn = new BackendConnection('pntest1');
+    const socketName = MAIN_SOCKET_NAMES[process.env.NODE_ENV];
+    const backendConn = new BackendConnection(socketName);
     const backendConnected = backendConn.init();
     global.backendConn = backendConn;
 

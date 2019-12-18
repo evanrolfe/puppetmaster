@@ -1,42 +1,55 @@
 import path from 'path';
 import { before, after } from 'mocha';
 import { expect } from 'chai';
+import { spawn } from 'child_process';
 
-import Backend from '../app/lib/BackendServerStarter';
-import BackendConn from '../app/lib/BackendConnection';
-import { setupDatabaseStore } from '../backend/lib/database';
+import BackendConn from '../src/ui/lib/BackendConnection';
+import database from '../src/backend/lib/database';
+import { DATABASE_FILES, MAIN_SOCKET_NAMES } from '../src/shared/constants';
 
 global.expect = expect;
 global.rootPath = path.join('../app/', '');
 
 let serverProcess;
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const noBackend =
+  process.argv.includes('--no-backend') || process.argv.includes('-nb');
+
 before(async () => {
-  const appMock = {
-    getVersion() {
-      return '1.2.3';
-    },
-    getAppPath() {
-      return '';
-    },
-    isPackaged: true
-  };
+  if (!noBackend) {
+    console.log('Spawning backend process...');
+    console.log(noBackend);
+    serverProcess = spawn('yarn', ['start-backend'], {
+      shell: true,
+      env: process.env,
+      stdio: 'inherit',
+      detached: true
+    })
+      .on('close', code => process.exit(code))
+      .on('error', spawnError => console.error(spawnError));
 
-  serverProcess = Backend.createBackgroundProcess(
-    'testapp1',
-    appMock,
-    'pntest-test.db'
-  );
+    // HACK: Currently serverProcess does not know when the backend has finished
+    // loading, so we just sleep and hope for the best. Adjust this as needed.
+    // TODO: Find a better way, perhaps by checking stdout for the word "loaded",
+    // or maybe have the backend send an IPC messsage "loaded"?
+    await sleep(500);
 
-  global.backendConn = new BackendConn('testapp1');
+    console.log(`server Process created.`);
+  }
+
+  const dbFile = DATABASE_FILES[process.env.NODE_ENV];
+  const socketName = MAIN_SOCKET_NAMES[process.env.NODE_ENV];
+
+  global.backendConn = new BackendConn(socketName);
   await global.backendConn.init();
-
-  global.dbStore = await setupDatabaseStore('pntest-test.db');
+  global.dbStore = await database.setupDatabaseStore(dbFile);
 });
 
 after(() => {
   global.dbStore.close();
   global.backendConn.disconnect();
-  serverProcess.kill('SIGHUP');
-  console.log('Process killed.');
+
+  // See this: https://azimi.me/2014/12/31/kill-child_process-node-js.html
+  if (!noBackend) process.kill(-serverProcess.pid);
 });

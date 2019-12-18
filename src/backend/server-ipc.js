@@ -1,5 +1,4 @@
 import { IPC } from 'node-ipc';
-import database from './lib/database';
 
 import BrowsersController from './controllers/BrowsersController';
 import CaptureFiltersController from './controllers/CaptureFiltersController';
@@ -12,9 +11,7 @@ const ipc = new IPC();
  * Response (INVALID): { type: 'reply', id: '1232', result: { status: 'INVALID', messages: [] } }
  * Response (ERROR): { type: 'error', id: '1232', result: 'ERROR: bla bla bla' }
  */
-async function init(socketName, databaseFile) {
-  global.dbStore = await database.setupDatabaseStore(databaseFile);
-
+async function init(socketName) {
   ipc.config.id = socketName;
   ipc.config.silent = true;
 
