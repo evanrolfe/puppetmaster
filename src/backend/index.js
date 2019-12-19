@@ -20,6 +20,10 @@ const handleExit = async () => {
   return process.exit(0);
 };
 
+if (process.env.NODE_ENV === undefined) {
+  throw new Error('You must set the NODE_ENV var!');
+}
+
 // Start the backend:
 (async () => {
   try {

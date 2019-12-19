@@ -45,6 +45,8 @@ describe('BrowsersUtils', () => {
       .insert({ id: 1, filters: JSON.stringify(filters) });
 
     await backendConn.send('BrowsersController', 'create', {});
+
+    // Connect to the browser we just opened so we can control it:
     browser = await puppeteer.connect({ browserURL: 'http://localhost:9222' });
   });
 
