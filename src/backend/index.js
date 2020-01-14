@@ -21,7 +21,9 @@ const handleExit = async () => {
 };
 
 if (process.env.NODE_ENV === undefined) {
-  throw new Error('You must set the NODE_ENV var!');
+  throw new Error(
+    `You must set the NODE_ENV var!\ni.e. NODE_ENV=development yarn start-backend`
+  );
 }
 
 // Start the backend:

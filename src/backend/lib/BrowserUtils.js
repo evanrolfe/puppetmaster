@@ -51,10 +51,29 @@ const createBrowser = async () => {
     .executablePath()
     .replace('app.asar', 'app.asar.unpacked');
 
+  /*
+--ignore-certificate-errors-spki-list=mmf5M/0j6x5DXLVan52Clgxon6Omth3DQ8aadSOTq8M=
+--user-data-dir=/home/evan/.config/httptoolkit/chrome-78.0.3904.108
+--proxy-server=https://127.0.0.1:8001
+--proxy-bypass-list=<-loopback>;http://localhost:8002
+--disable-restore-session-state
+--no-default-browser-check
+--disable-popup-blocking
+--disable-translate
+--start-maximized
+--disable-default-apps
+--disable-sync
+--enable-fixed-layout
+--no-first-run
+--noerrdialogs http://localhost:8002/hide-warning
+*/
+
   const browserArgs = [
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',
-    '--disable-site-isolation-trials'
+    '--disable-site-isolation-trials',
+    '--proxy-server=127.0.0.1:8080',
+    '--proxy-bypass-list=<-loopback>' // Allows you to access localhost
   ];
 
   if (process.env.NODE_ENV === 'test') {
@@ -72,7 +91,8 @@ const createBrowser = async () => {
   browser.id = browserId;
   global.puppeteer_browsers.push(browser);
 
-  await instrumentBrowser(browser);
+  // TODO: Add this back in but without saving the requests to the db:
+  // await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 
@@ -147,7 +167,8 @@ const openBrowser = async browserId => {
     handleNewPage(page);
   }
 
-  await instrumentBrowser(browser);
+  // TODO;
+  // await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 };

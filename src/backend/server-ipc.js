@@ -61,6 +61,7 @@ async function init(socketName) {
   ipc.server.start();
 }
 
+// TODO: Move this to src/shared:
 function send(name, args) {
   // HACK: Broadcast is not available in test mode
   if (typeof ipc.server.broadcast === 'function') {

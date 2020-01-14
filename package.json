@@ -32,6 +32,7 @@
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register --remote-debugging-port=9223 ./src/ui/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config configs/webpack.config.renderer.dev.babel.js",
     "start-backend": "node -r @babel/register ./src/backend/index.js",
+    "start-proxy": "node -r @babel/register ./src/proxy/index.js",
     "test": "NODE_ENV=test _mocha -r @babel/register --timeout=999999"
   },
   "lint-staged": {
@@ -241,6 +242,7 @@
     "electron-updater": "^3.2.3",
     "events": "^3.0.0",
     "history": "^4.7.2",
+    "http-mitm-proxy": "^0.8.2",
     "js-beautify": "^1.10.2",
     "knex": "^0.20.4",
     "lodash": "^4.17.15",

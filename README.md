@@ -17,16 +17,24 @@ $ ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true yarn install
 
 ## Run
 
-Start the app in the `dev` environment.
+To run the app in development mode, you need to start three seperate processes:
+
+1. Start the electron app in the `dev` environment.
 
 ```bash
 $ yarn dev
 ```
 
-Start the backend too:
+2. Start the backend:
 
 ```bash
 $ NODE_ENV=development yarn start-backend
+```
+
+3. Start the proxy:
+
+```bash
+$ NODE_ENV=development yarn start-proxy
 ```
 
 ## Test
