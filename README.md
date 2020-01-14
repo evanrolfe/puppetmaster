@@ -1,4 +1,6 @@
-# Puppet Master (formerly PnTest)
+# Puppet Master
+
+An HTTP proxy application for performing penetration tests against web applications, with advanced capabilities for handling single-page-applications.
 
 ![](./screenshot.png)
 
@@ -7,7 +9,7 @@
 First, clone the repo via git:
 
 ```bash
-git clone --depth 1 https://github.com/evanrolfe/pntest
+git clone --depth 1 https://github.com/evanrolfe/puppetmaster
 ```
 
 And then install the dependencies with yarn.
