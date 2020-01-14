@@ -1,11 +1,15 @@
-# PnTest
+# Puppet Master
+
+An HTTP proxy application for performing penetration tests against web applications, with advanced capabilities for handling single-page-applications.
+
+![](./screenshot.png)
 
 ## Install
 
 First, clone the repo via git:
 
 ```bash
-git clone --depth 1 https://github.com/evanrolfe/pntest
+git clone --depth 1 https://github.com/evanrolfe/puppetmaster
 ```
 
 And then install the dependencies with yarn.
@@ -15,7 +19,7 @@ $ cd your-project-name
 $ ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true yarn install
 ```
 
-## Run
+## Develop
 
 To run the app in development mode, you need to start three seperate processes:
 
@@ -55,7 +59,7 @@ then run the test with the `--no-backend` or `-nb` option:
 $ yarn test -nb
 ```
 
-## Run in production
+## Run in production mode
 
 Build:
 
@@ -69,7 +73,7 @@ This will compile files to ./dist folder. Then:
 $ yarn start-prod
 ```
 
-## Packaging
+## Package
 
 To package apps for all platforms:
 
