@@ -1,7 +1,7 @@
 import { once, EventEmitter } from 'events';
 import { IPC } from 'node-ipc';
 
-import mainIpc from '../server-ipc';
+import mainIpc from '../../shared/ipc-server';
 
 const ipc = new IPC();
 

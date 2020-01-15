@@ -1,9 +1,15 @@
-import ipc from './server-ipc';
-import { DATABASE_FILES, MAIN_SOCKET_NAMES } from '../shared/constants';
+import ipc from '../shared/ipc-server';
+import { DATABASE_FILES, BACKEND_SOCKET_NAMES } from '../shared/constants';
 
 import database from './lib/database';
 import BrowserUtils from './lib/BrowserUtils';
 import InterceptServer from './lib/InterceptServer';
+
+// Controllers:
+import BrowsersController from './controllers/BrowsersController';
+import CaptureFiltersController from './controllers/CaptureFiltersController';
+import RequestsController from './controllers/RequestsController';
+import SettingsController from './controllers/SettingsController';
 
 const handleExit = async () => {
   console.log('Exiting the backend server...');
@@ -31,7 +37,7 @@ if (process.env.NODE_ENV === undefined) {
   try {
     console.log(`Starting backend server in mode: ${process.env.NODE_ENV}`);
     const dbFile = DATABASE_FILES[process.env.NODE_ENV];
-    const socketName = MAIN_SOCKET_NAMES[process.env.NODE_ENV];
+    const socketName = BACKEND_SOCKET_NAMES[process.env.NODE_ENV];
     global.puppeteer_browsers = [];
 
     // Load the database
@@ -39,7 +45,13 @@ if (process.env.NODE_ENV === undefined) {
     console.log(`[Backend] Database loaded`);
 
     // Load the IPC Server
-    await ipc.init(socketName);
+    const controllersMap = {
+      BrowsersController: BrowsersController,
+      CaptureFiltersController: CaptureFiltersController,
+      RequestsController: RequestsController,
+      SettingsController: SettingsController
+    };
+    await ipc.init(socketName, controllersMap);
     console.log(`[Backend] IPC server started`);
 
     // Load the Intercept IPC Server

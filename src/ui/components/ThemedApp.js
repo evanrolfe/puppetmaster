@@ -30,7 +30,8 @@ export default () => {
   dispatch({ type: 'LOAD_BROWSERS' });
   dispatch({ type: 'LOAD_SETTINGS' });
 
-  global.backendConn.listen('requestCreated', () => {
+  global.proxyConn.listen('requestCreated', () => {
+    console.log(`RECEIVED requestCreated MESSAGE FROM PROXY IPC`);
     dispatch({ type: 'LOAD_REQUESTS' });
   });
   global.backendConn.listen('browsersChanged', () => {
@@ -43,16 +44,13 @@ export default () => {
   };
   const _setWindowSizeThrottled = _.throttle(_setWindowSize, 250);
 
-  useEffect(
-    () => {
-      window.addEventListener('resize', _setWindowSizeThrottled);
+  useEffect(() => {
+    window.addEventListener('resize', _setWindowSizeThrottled);
 
-      return () => {
-        window.removeEventListener('resize', _setWindowSizeThrottled);
-      };
-    },
-    [_setWindowSizeThrottled]
-  );
+    return () => {
+      window.removeEventListener('resize', _setWindowSizeThrottled);
+    };
+  }, [_setWindowSizeThrottled]);
   /*
   // FOR TESTING PURPOSES:
   dispatch({

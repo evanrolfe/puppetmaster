@@ -1,5 +1,5 @@
 import Request from '../models/Request';
-import ipc from '../server-ipc';
+import ipc from '../../shared/ipc-server';
 
 export default class RequestsController {
   // GET /requests

@@ -1,7 +1,8 @@
 import Proxy from 'http-mitm-proxy';
 
+import ipc from '../shared/ipc-server';
 import database from '../shared/database';
-import { DATABASE_FILES } from '../shared/constants';
+import { DATABASE_FILES, PROXY_SOCKET_NAMES } from '../shared/constants';
 
 const startProxy = async () => {
   if (process.env.NODE_ENV === undefined) {
@@ -27,9 +28,8 @@ const startProxy = async () => {
   });
 
   proxy.onRequest((ctx, onRequestCallback) => {
-    const url = `http://${ctx.clientToProxyRequest.headers.host}${
-      ctx.clientToProxyRequest.url
-    }`;
+    // TODO: Fix this:
+    const url = `http://${ctx.clientToProxyRequest.headers.host}${ctx.clientToProxyRequest.url}`;
     console.log(`REQUEST: ${url}`);
     const chunks = [];
 
@@ -42,14 +42,29 @@ const startProxy = async () => {
       const body = Buffer.concat(chunks);
       // console.log(body.toString()+"\n\n\n")
 
+      // Parse the URL:
+      const parsedUrl = new URL(url);
+      const splitPath = parsedUrl.pathname.split('.');
+      let ext;
+
+      if (splitPath.length > 1) {
+        ext = splitPath[splitPath.length - 1];
+      }
+
       await knex('requests').insert({
         url: url,
         host: ctx.clientToProxyRequest.headers.host,
         path: ctx.clientToProxyRequest.url,
         method: ctx.clientToProxyRequest.method,
         response_status: ctx.proxyToClientResponse.statusCode,
-        response_status_message: ctx.proxyToClientResponse.statusMessage
+        response_status_message: ctx.proxyToClientResponse.statusMessage,
+        // TODO:
+        browser_id: 1,
+        ext: ext,
+        created_at: Date.now(),
+        request_headers: JSON.stringify(ctx.clientToProxyRequest.headers)
       });
+      ipc.send('requestCreated', {});
 
       ctx.proxyToClientResponse.write(body);
       return callback();
@@ -62,4 +77,6 @@ const startProxy = async () => {
   console.log(`Proxy server listening on port ${port}`);
 };
 
+const socketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
+ipc.init(socketName, {});
 startProxy();

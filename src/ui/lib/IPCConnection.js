@@ -14,7 +14,7 @@ const getTime = () => {
 };
 */
 
-export default class BackendConnection {
+export default class IPCConnection {
   constructor(socketId) {
     this.replyHandlers = new Map();
     this.listeners = new Map();
@@ -121,7 +121,10 @@ export default class BackendConnection {
 
     return () => {
       const arr = this.listeners.get(name);
-      this.listeners.set(name, arr.filter(cb_ => cb_ !== cb));
+      this.listeners.set(
+        name,
+        arr.filter(cb_ => cb_ !== cb)
+      );
     };
   }
 

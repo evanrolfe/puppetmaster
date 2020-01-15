@@ -1,7 +1,13 @@
-export const MAIN_SOCKET_NAMES = {
-  test: 'pntest-test',
-  production: 'pntest-production',
-  development: 'pntest-development'
+export const BACKEND_SOCKET_NAMES = {
+  test: 'pntest-backend-test',
+  production: 'pntest-backend-production',
+  development: 'pntest-backend-development'
+};
+
+export const PROXY_SOCKET_NAMES = {
+  test: 'pntest-proxy-test',
+  production: 'pntest-proxy-production',
+  development: 'pntest-proxy-development'
 };
 
 export const DATABASE_FILES = {

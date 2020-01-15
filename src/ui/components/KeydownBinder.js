@@ -1,15 +1,14 @@
 // @flow
-import { Component, Node } from 'react';
+import { Component } from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
 
 type Props = {
-  children: Node,
-  onKeydown?: PropTypes.func,
-  onKeyup?: PropTypes.func,
-  disabled?: PropTypes.bool,
-  scoped?: PropTypes.bool,
-  stopMetaPropagation?: PropTypes.bool
+  children: 'object',
+  onKeydown?: 'function',
+  onKeyup?: 'function',
+  disabled?: 'boolean',
+  scoped?: 'boolean',
+  stopMetaPropagation?: 'boolean'
 };
 
 const isMac = () => process.platform === 'darwin';

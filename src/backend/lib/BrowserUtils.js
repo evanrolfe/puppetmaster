@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 
 import Request from '../models/Request';
 import Settings from '../models/Settings';
-import mainIpc from '../server-ipc';
+import mainIpc from '../../shared/ipc-server';
 
 /*
  * NOTE: For each response intercepted, we save the response and its body to requests table.
@@ -54,26 +54,18 @@ const createBrowser = async () => {
   /*
 --ignore-certificate-errors-spki-list=mmf5M/0j6x5DXLVan52Clgxon6Omth3DQ8aadSOTq8M=
 --user-data-dir=/home/evan/.config/httptoolkit/chrome-78.0.3904.108
---proxy-server=https://127.0.0.1:8001
---proxy-bypass-list=<-loopback>;http://localhost:8002
---disable-restore-session-state
---no-default-browser-check
---disable-popup-blocking
---disable-translate
---start-maximized
---disable-default-apps
---disable-sync
---enable-fixed-layout
---no-first-run
---noerrdialogs http://localhost:8002/hide-warning
-*/
+  */
 
+  // https://peter.sh/experiments/chromium-command-line-switches/
   const browserArgs = [
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',
     '--disable-site-isolation-trials',
     '--proxy-server=127.0.0.1:8080',
-    '--proxy-bypass-list=<-loopback>' // Allows you to access localhost
+    '--proxy-bypass-list=<-loopback>', // Allows you to access localhost
+    '--disable-restore-session-state',
+    '--no-default-browser-check',
+    '--disable-sync'
   ];
 
   if (process.env.NODE_ENV === 'test') {
@@ -91,8 +83,7 @@ const createBrowser = async () => {
   browser.id = browserId;
   global.puppeteer_browsers.push(browser);
 
-  // TODO: Add this back in but without saving the requests to the db:
-  // await instrumentBrowser(browser);
+  await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 
@@ -168,12 +159,14 @@ const openBrowser = async browserId => {
   }
 
   // TODO;
-  // await instrumentBrowser(browser);
+  await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 };
 
 const instrumentBrowser = async browser => {
+  // TODO: Add this back in but without saving the requests to the db:
+  /*
   const pages = await browser.pages();
   const page = pages[0];
 
@@ -184,7 +177,7 @@ const instrumentBrowser = async browser => {
     const newPage = await target.page();
     handleNewPage(newPage);
   });
-
+  */
   browser.on('disconnected', () => handleBrowserClosed(browser));
 };
 
@@ -223,9 +216,7 @@ const handleRequest = async (page, request) => {
   request.requestId = dbRequest.id;
 
   console.log(
-    `[BrowserUtils] 1. request intercepted: ${dbRequest.method} ${
-      dbRequest.url
-    }`
+    `[BrowserUtils] 1. request intercepted: ${dbRequest.method} ${dbRequest.url}`
   );
 
   // Check if the intercept is enabled:
@@ -442,6 +433,5 @@ export default {
   openBrowser,
   createBrowser,
   updateBrowser,
-  instrumentBrowser,
   handleBrowserClosed
 };

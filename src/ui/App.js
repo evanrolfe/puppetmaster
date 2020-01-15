@@ -6,19 +6,26 @@ import { showModal } from './components/modals/index';
 import SettingsModal from './components/modals/SettingsModal';
 import ThemedApp from './components/ThemedApp';
 import ThemeSetter from './components/ThemeSetter';
-import BackendConnection from './lib/BackendConnection';
+import IPCConnection from './lib/IPCConnection';
 import { Provider } from './state/state';
 
-import { MAIN_SOCKET_NAMES } from '../shared/constants';
+import { BACKEND_SOCKET_NAMES, PROXY_SOCKET_NAMES } from '../shared/constants';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
 
-    const socketName = MAIN_SOCKET_NAMES[process.env.NODE_ENV];
-    const backendConn = new BackendConnection(socketName);
+    // Connect to the backend via IPC
+    const backendSocketName = BACKEND_SOCKET_NAMES[process.env.NODE_ENV];
+    const backendConn = new IPCConnection(backendSocketName);
     const backendConnected = backendConn.init();
     global.backendConn = backendConn;
+
+    // Connect to the proxy via IPC
+    const proxySocketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
+    const proxyConn = new IPCConnection(proxySocketName);
+    const proxyConnected = proxyConn.init();
+    global.proxyConn = proxyConn;
 
     ipcRenderer.on('toggle-preferences', () => {
       showModal(SettingsModal);
@@ -31,8 +38,13 @@ export default class App extends Component {
     });
 
     // Ensure that the app gets re-rendered once we connect to the backend
-    // eslint-disable-next-line react/no-unused-state
-    this.state = { backendConnected: backendConnected };
+
+    this.state = {
+      // eslint-disable-next-line react/no-unused-state
+      backendConnected: backendConnected,
+      // eslint-disable-next-line react/no-unused-state
+      proxyConnected: proxyConnected
+    };
   }
 
   render() {
