@@ -4,6 +4,8 @@ import ipc from '../shared/ipc-server';
 import database from '../shared/database';
 import { DATABASE_FILES, PROXY_SOCKET_NAMES } from '../shared/constants';
 
+import certUtils from '../shared/cert-utils';
+
 const startProxy = async () => {
   if (process.env.NODE_ENV === undefined) {
     throw new Error(
@@ -73,7 +75,17 @@ const startProxy = async () => {
     onRequestCallback();
   });
 
-  proxy.listen({ port: port, sslCaDir: '/home/evan/Code/proxy' });
+  // 1. Generate testCA.key and testCA.pem:
+  //   openssl req -x509 -new -nodes -keyout testCA.key -sha256 -days 365 -out testCA.pem -subj '/CN=Puppet Master Test CA - DO NOT TRUST'
+  // 2. Generate the SPKI Fingerprint:
+  //   openssl rsa -in testCA.key -outform der -pubout 2>/dev/null | sha256sum | xxd -r -p | base64
+
+  // eslint-disable-next-line func-names
+  proxy.onCertificateRequired = function(hostname, callback) {
+    return callback(null, certUtils.certPaths);
+  };
+
+  proxy.listen({ port: port });
   console.log(`Proxy server listening on port ${port}`);
 };
 

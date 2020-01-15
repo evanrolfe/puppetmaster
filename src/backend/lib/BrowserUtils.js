@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 import Request from '../models/Request';
 import Settings from '../models/Settings';
 import mainIpc from '../../shared/ipc-server';
+import certUtils from '../../shared/cert-utils';
 
 /*
  * NOTE: For each response intercepted, we save the response and its body to requests table.
@@ -57,7 +58,11 @@ const createBrowser = async () => {
   */
 
   // https://peter.sh/experiments/chromium-command-line-switches/
+  const spki = certUtils.getSPKIFingerprint();
+  console.log(`Launching browser with SPKI: ${spki}`);
+
   const browserArgs = [
+    `--ignore-certificate-errors-spki-list=${spki}`,
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',
     '--disable-site-isolation-trials',

@@ -14,6 +14,7 @@ import { app, BrowserWindow, ipcMain, Menu, MenuItem, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
+import certUtils from '../shared/cert-utils';
 import MenuBuilder from './menu';
 import BackendServerStarter from './lib/BackendServerStarter';
 
@@ -58,6 +59,9 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
   log.warn('App ready.');
+
+  // IMPORTANT: This has to be done before the backend or proxy start!!!
+  await certUtils.generateCertsIfNotExists();
 
   if (process.env.NODE_ENV === 'production') {
     log.warn('[MAIN] Starting background server...');
@@ -158,9 +162,7 @@ const deleteMultipleClicked = requestIds => {
   const promise = dialog.showMessageBox(mainWindow, {
     type: 'warning',
     title: 'Delete requests',
-    message: `Are you sure you want to delete ${
-      requestIds.length
-    } selected requests?`,
+    message: `Are you sure you want to delete ${requestIds.length} selected requests?`,
     buttons: ['Cancel', 'Delete']
   });
 
