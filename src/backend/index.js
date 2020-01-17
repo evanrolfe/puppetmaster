@@ -18,7 +18,12 @@ const handleExit = async () => {
   // eslint
   for (let j = 0; j < global.puppeteer_browsers.length; j++) {
     const browser = global.puppeteer_browsers[j];
-    browser.close();
+
+    // NOTE: In test mode we run a headless browser which seems to exit by
+    // itself.
+    if (process.env.NODE_ENV !== 'test') {
+      browser.close();
+    }
 
     // eslint-disable-next-line no-await-in-loop
     await BrowserUtils.handleBrowserClosed(browser);
