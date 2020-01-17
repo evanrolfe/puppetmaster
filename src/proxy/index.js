@@ -29,10 +29,35 @@ const startProxy = async () => {
     console.log(err);
   });
 
-  proxy.onRequest((ctx, onRequestCallback) => {
-    // TODO: Fix this:
-    const url = `http://${ctx.clientToProxyRequest.headers.host}${ctx.clientToProxyRequest.url}`;
-    console.log(`REQUEST: ${url}`);
+  proxy.onRequest(async (ctx, onRequestCallback) => {
+    const request = ctx.clientToProxyRequest;
+
+    // Parse the URL:
+    const splitPath = request.url.split('.');
+    let ext;
+
+    if (splitPath.length > 1) {
+      ext = splitPath[splitPath.length - 1];
+    }
+
+    const protocol = request.socket.encrypted === true ? 'https' : 'http';
+    const url = new URL(request.url, `${protocol}://${request.headers.host}`);
+    console.log(`Request to: ${url.toString()}`);
+
+    // First create the request
+    const dbResult = await knex('requests').insert({
+      url: url.toString(),
+      host: request.headers.host,
+      path: request.url,
+      method: request.method,
+      // TODO:
+      browser_id: 1,
+      ext: ext,
+      created_at: Date.now(),
+      request_headers: JSON.stringify(request.headers)
+    });
+    const dbRequestId = dbResult[0];
+
     const chunks = [];
 
     ctx.onResponseData((_ctx, chunk, callback) => {
@@ -41,33 +66,25 @@ const startProxy = async () => {
     });
 
     ctx.onResponseEnd(async (_ctx, callback) => {
+      console.log(`RESPONSE: ${url.toString()}`);
+
       const body = Buffer.concat(chunks);
-      // console.log(body.toString()+"\n\n\n")
 
-      // Parse the URL:
-      const parsedUrl = new URL(url);
-      const splitPath = parsedUrl.pathname.split('.');
-      let ext;
+      const response = ctx.serverToProxyResponse;
 
-      if (splitPath.length > 1) {
-        ext = splitPath[splitPath.length - 1];
-      }
+      // Update the request in the database
+      await knex('requests')
+        .where({ id: dbRequestId })
+        .update({
+          response_status: response.statusCode,
+          response_status_message: response.statusMessage,
+          response_headers: JSON.stringify(response.headers),
+          response_body: body.toString()
+        });
 
-      await knex('requests').insert({
-        url: url,
-        host: ctx.clientToProxyRequest.headers.host,
-        path: ctx.clientToProxyRequest.url,
-        method: ctx.clientToProxyRequest.method,
-        response_status: ctx.proxyToClientResponse.statusCode,
-        response_status_message: ctx.proxyToClientResponse.statusMessage,
-        // TODO:
-        browser_id: 1,
-        ext: ext,
-        created_at: Date.now(),
-        request_headers: JSON.stringify(ctx.clientToProxyRequest.headers)
-      });
       ipc.send('requestCreated', {});
 
+      // TODO: How did we get the browser to stop caching?
       ctx.proxyToClientResponse.write(body);
       return callback();
     });
@@ -75,6 +92,7 @@ const startProxy = async () => {
     onRequestCallback();
   });
 
+  // To generate your own certs from the command line:
   // 1. Generate testCA.key and testCA.pem:
   //   openssl req -x509 -new -nodes -keyout testCA.key -sha256 -days 365 -out testCA.pem -subj '/CN=Puppet Master Test CA - DO NOT TRUST'
   // 2. Generate the SPKI Fingerprint:

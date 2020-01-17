@@ -2,7 +2,7 @@ export default `CREATE TABLE IF NOT EXISTS requests(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   browser_id INTEGER,
   method TEXT,
-  url TEXT NOT NULL,
+  url TEXT,
   host TEXT,
   path TEXT,
   ext TEXT,

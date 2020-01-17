@@ -45,23 +45,12 @@ const createBrowserDb = async () => {
   return browserId;
 };
 
-const createBrowser = async () => {
-  const browserId = await createBrowserDb();
-
+const getBrowserOptions = browserId => {
   const puppeteerExec = puppeteer
     .executablePath()
     .replace('app.asar', 'app.asar.unpacked');
-
-  /*
---ignore-certificate-errors-spki-list=mmf5M/0j6x5DXLVan52Clgxon6Omth3DQ8aadSOTq8M=
---user-data-dir=/home/evan/.config/httptoolkit/chrome-78.0.3904.108
-  */
-
-  // https://peter.sh/experiments/chromium-command-line-switches/
   const spki = certUtils.getSPKIFingerprint();
-  console.log(`Launching browser with SPKI: ${spki}`);
-
-  const browserArgs = [
+  const args = [
     `--ignore-certificate-errors-spki-list=${spki}`,
     '--disable-web-security',
     '--disable-features=IsolateOrigins,site-per-process',
@@ -70,20 +59,27 @@ const createBrowser = async () => {
     '--proxy-bypass-list=<-loopback>', // Allows you to access localhost
     '--disable-restore-session-state',
     '--no-default-browser-check',
-    '--disable-sync'
+    '--disable-sync',
+    '--incognito'
   ];
 
   if (process.env.NODE_ENV === 'test') {
-    browserArgs.push('--remote-debugging-port=9222');
+    args.push('--remote-debugging-port=9222');
   }
 
-  const browser = await puppeteer.launch({
+  return {
     headless: false,
     defaultViewport: null,
     executablePath: puppeteerExec,
     userDataDir: `./tmp/browser${browserId}`,
-    args: browserArgs
-  });
+    args: args
+  };
+};
+
+const createBrowser = async () => {
+  const browserId = await createBrowserDb();
+  const options = getBrowserOptions(browserId);
+  const browser = await puppeteer.launch(options);
 
   browser.id = browserId;
   global.puppeteer_browsers.push(browser);
@@ -108,17 +104,8 @@ const updateBrowser = async (browserId, title) => {
 // https://github.com/GoogleChrome/puppeteer/issues/1316
 // https://stackoverflow.com/questions/57987585/puppeteer-how-to-store-a-session-including-cookies-page-state-local-storage
 const openBrowser = async browserId => {
-  const puppeteerExec = puppeteer
-    .executablePath()
-    .replace('app.asar', 'app.asar.unpacked');
-
-  const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-    executablePath: puppeteerExec,
-    userDataDir: `./tmp/browser${browserId}`,
-    args: []
-  });
+  const options = getBrowserOptions(browserId);
+  const browser = await puppeteer.launch(options);
 
   // Store in global vars
   browser.id = browserId;
