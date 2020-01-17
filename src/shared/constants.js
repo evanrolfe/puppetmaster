@@ -15,3 +15,28 @@ export const DATABASE_FILES = {
   production: 'pntest-prod.db',
   development: 'pntest-dev.db'
 };
+
+export const DEFAULT_FILTERS = {
+  hostList: [],
+  hostSetting: '',
+  pathList: [],
+  pathSetting: '',
+  extList: [],
+  extSetting: '',
+  resourceTypes: [
+    'document',
+    'eventsource',
+    'fetch',
+    'font',
+    'image',
+    'manifest',
+    'media',
+    'navigation',
+    'other',
+    'stylesheet',
+    'script',
+    'texttrack',
+    'websocket',
+    'xhr'
+  ]
+};

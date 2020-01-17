@@ -3,6 +3,7 @@ import Proxy from 'http-mitm-proxy';
 import ipc from '../shared/ipc-server';
 import database from '../shared/database';
 import { DATABASE_FILES, PROXY_SOCKET_NAMES } from '../shared/constants';
+import CaptureFilters from '../shared/models/CaptureFilters';
 
 import certUtils from '../shared/cert-utils';
 
@@ -17,7 +18,7 @@ const startProxy = async () => {
   const proxy = Proxy();
 
   const dbFile = DATABASE_FILES[process.env.NODE_ENV];
-  const knex = await database.setupDatabaseStore(dbFile);
+  global.knex = await database.setupDatabaseStore(dbFile);
   console.log(`[Proxy] Database loaded`);
 
   proxy.use(Proxy.gunzip);
@@ -45,7 +46,7 @@ const startProxy = async () => {
     console.log(`Request to: ${url.toString()}`);
 
     // First create the request
-    const dbResult = await knex('requests').insert({
+    const requestParams = {
       url: url.toString(),
       host: request.headers.host,
       path: request.url,
@@ -55,8 +56,19 @@ const startProxy = async () => {
       ext: ext,
       created_at: Date.now(),
       request_headers: JSON.stringify(request.headers)
-    });
-    const dbRequestId = dbResult[0];
+    };
+    const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
+      requestParams
+    );
+
+    let dbRequestId;
+    if (shouldRequestBeCaptured === true) {
+      const dbResult = await global.knex('requests').insert(requestParams);
+      dbRequestId = dbResult[0];
+      ctx.proxyToServerRequestOptions.headers[
+        'X-PuppetMaster-Id'
+      ] = dbRequestId;
+    }
 
     const chunks = [];
 
@@ -73,16 +85,19 @@ const startProxy = async () => {
       const response = ctx.serverToProxyResponse;
 
       // Update the request in the database
-      await knex('requests')
-        .where({ id: dbRequestId })
-        .update({
-          response_status: response.statusCode,
-          response_status_message: response.statusMessage,
-          response_headers: JSON.stringify(response.headers),
-          response_body: body.toString()
-        });
+      if (dbRequestId !== undefined) {
+        await global
+          .knex('requests')
+          .where({ id: dbRequestId })
+          .update({
+            response_status: response.statusCode,
+            response_status_message: response.statusMessage,
+            response_headers: JSON.stringify(response.headers),
+            response_body: body.toString()
+          });
 
-      ipc.send('requestCreated', {});
+        ipc.send('requestCreated', {});
+      }
 
       // TODO: How did we get the browser to stop caching?
       ctx.proxyToClientResponse.write(body);

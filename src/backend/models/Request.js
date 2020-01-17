@@ -1,4 +1,4 @@
-import CaptureFilters from './CaptureFilters';
+import CaptureFilters from '../../shared/models/CaptureFilters';
 
 const RESOURCE_TYPES = [
   'document',

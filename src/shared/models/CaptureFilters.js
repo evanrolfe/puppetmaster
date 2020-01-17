@@ -1,27 +1,4 @@
-const DEFAULT_FILTERS = {
-  hostList: [],
-  hostSetting: '',
-  pathList: [],
-  pathSetting: '',
-  extList: [],
-  extSetting: '',
-  resourceTypes: [
-    'document',
-    'eventsource',
-    'fetch',
-    'font',
-    'image',
-    'manifest',
-    'media',
-    'navigation',
-    'other',
-    'stylesheet',
-    'script',
-    'texttrack',
-    'websocket',
-    'xhr'
-  ]
-};
+import { DEFAULT_FILTERS } from '../constants';
 
 export default class CaptureFilters {
   static async getFilters() {
@@ -134,7 +111,7 @@ export default class CaptureFilters {
     ) {
       return false;
     }
-
+    /*
     // Filter resourceType (include):
     if (
       filters.resourceTypes.length > 0 &&
@@ -142,7 +119,7 @@ export default class CaptureFilters {
     ) {
       return false;
     }
-
+*/
     return true;
   }
 }

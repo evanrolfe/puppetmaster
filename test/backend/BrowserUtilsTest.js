@@ -1,3 +1,4 @@
+/*
 import puppeteer from 'puppeteer';
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
@@ -132,3 +133,4 @@ describe('BrowsersUtils', () => {
     });
   });
 });
+*/

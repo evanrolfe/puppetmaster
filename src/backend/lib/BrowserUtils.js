@@ -50,30 +50,32 @@ const getBrowserOptions = browserId => {
     .executablePath()
     .replace('app.asar', 'app.asar.unpacked');
   const spki = certUtils.getSPKIFingerprint();
-  const args = [
-    `--ignore-certificate-errors-spki-list=${spki}`,
-    '--disable-web-security',
-    '--disable-features=IsolateOrigins,site-per-process',
-    '--disable-site-isolation-trials',
-    '--proxy-server=127.0.0.1:8080',
-    '--proxy-bypass-list=<-loopback>', // Allows you to access localhost
-    '--disable-restore-session-state',
-    '--no-default-browser-check',
-    '--disable-sync',
-    '--incognito'
-  ];
 
-  if (process.env.NODE_ENV === 'test') {
-    args.push('--remote-debugging-port=9222');
-  }
-
-  return {
+  const options = {
     headless: false,
     defaultViewport: null,
     executablePath: puppeteerExec,
     userDataDir: `./tmp/browser${browserId}`,
-    args: args
+    args: [
+      `--ignore-certificate-errors-spki-list=${spki}`,
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins,site-per-process',
+      '--disable-site-isolation-trials',
+      '--proxy-server=127.0.0.1:8080',
+      '--proxy-bypass-list=<-loopback>', // Allows you to access localhost
+      '--disable-restore-session-state',
+      '--no-default-browser-check',
+      '--disable-sync',
+      '--incognito'
+    ]
   };
+
+  if (process.env.NODE_ENV === 'test') {
+    options.headless = true;
+    options.args.push('--remote-debugging-port=9222');
+  }
+
+  return options;
 };
 
 const createBrowser = async () => {
