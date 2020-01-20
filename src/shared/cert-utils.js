@@ -99,7 +99,9 @@ const getSPKIFingerprint = () => {
 const certPaths = { keyFile: KEY_PATH, certFile: CERT_PATH };
 
 export default {
+  generateCACertificate,
   generateCertsIfNotExists,
   certPaths,
-  getSPKIFingerprint
+  getSPKIFingerprint,
+  getCertKeyPair
 };

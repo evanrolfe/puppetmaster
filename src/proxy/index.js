@@ -1,127 +1,131 @@
-import Proxy from 'http-mitm-proxy';
+import http from 'http';
+import tls from 'tls';
+
+import httpolyglot from 'httpolyglot';
 
 import ipc from '../shared/ipc-server';
 import database from '../shared/database';
 import { DATABASE_FILES, PROXY_SOCKET_NAMES } from '../shared/constants';
-import CaptureFilters from '../shared/models/CaptureFilters';
-
 import certUtils from '../shared/cert-utils';
 
-const startProxy = async () => {
-  if (process.env.NODE_ENV === undefined) {
-    throw new Error(
-      `You must set the NODE_ENV var!\ni.e. NODE_ENV=development yarn start-proxy`
-    );
-  }
+import proxyRequestListener from './proxy-request-listener';
 
-  const port = 8080;
-  const proxy = Proxy();
+const mightBeTLSHandshake = byte => byte === 22;
 
+const peekFirstByte = socket =>
+  new Promise(resolve => {
+    socket.once('data', data => {
+      socket.pause();
+      socket.unshift(data);
+      resolve(data[0]);
+    });
+  });
+
+const startServer = async () => {
   const dbFile = DATABASE_FILES[process.env.NODE_ENV];
   global.knex = await database.setupDatabaseStore(dbFile);
   console.log(`[Proxy] Database loaded`);
 
-  proxy.use(Proxy.gunzip);
+  const defaultCert = certUtils.getCertKeyPair();
 
-  proxy.onError((ctx, err, errorKind) => {
-    const url =
-      ctx && ctx.clientToProxyRequest ? ctx.clientToProxyRequest.url : '';
-    console.log(`Error: (${errorKind}) on ${url}`);
-    console.log(err);
+  const server = httpolyglot.createServer(
+    {
+      key: defaultCert.key,
+      cert: defaultCert.cert,
+      ca: [defaultCert.cert]
+    },
+    proxyRequestListener
+  );
+
+  server.addListener('connect', (req, socket) => {
+    const [targetHost, port] = req.url.split(':');
+
+    socket.once('error', e => console.log('[Proxy] Error on client socket', e));
+
+    socket.write(
+      `HTTP/${req.httpVersion} 200 OK\r\n\r\n`,
+      'utf-8',
+      async () => {
+        const firstByte = await peekFirstByte(socket);
+
+        // Tell later handlers whether the socket wants an insecure upstream
+        socket.upstreamEncryption = mightBeTLSHandshake(firstByte);
+
+        if (socket.upstreamEncryption) {
+          console.log(`[Proxy] Unwrapping TLS connection to ${targetHost}`);
+          unwrapTLS(targetHost, port, socket);
+        } else {
+          // Non-TLS CONNECT, probably a plain HTTP websocket. Pass it through untouched.
+          console.log(`[Proxy] Passing through connection to ${targetHost}`);
+          server.emit('connection', socket);
+          socket.resume();
+        }
+      }
+    );
   });
 
-  proxy.onRequest(async (ctx, onRequestCallback) => {
-    const request = ctx.clientToProxyRequest;
+  const unwrapTLS = (targetHost, port, socket) => {
+    const tlsSocket = new tls.TLSSocket(socket, {
+      isServer: true,
+      server: server,
+      secureContext: tls.createSecureContext({
+        key: defaultCert.key,
+        cert: defaultCert.cert,
+        ca: defaultCert.cert
+      })
+    });
 
-    // Parse the URL:
-    const splitPath = request.url.split('.');
-    let ext;
+    // Wait for:
+    // * connect, not dropped -> all good
+    // * _tlsError before connect -> cert rejected
+    // * sudden end before connect -> cert rejected
+    new Promise((resolve, reject) => {
+      tlsSocket.on('secure', () => {
+        resolve();
+      });
 
-    if (splitPath.length > 1) {
-      ext = splitPath[splitPath.length - 1];
-    }
+      tlsSocket.on('_tlsError', error => {
+        reject(error);
+      });
 
-    const protocol = request.socket.encrypted === true ? 'https' : 'http';
-    const url = new URL(request.url, `${protocol}://${request.headers.host}`);
-    console.log(`Request to: ${url.toString()}`);
+      tlsSocket.on('end', () => {
+        // Delay, so that simultaneous specific errors reject first
+        // eslint-disable-next-line prefer-promise-reject-errors
+        setTimeout(() => reject('closed'), 1);
+      });
+    }).catch(cause => console.log(`[Proxy] tlsSocket FAILED: ${cause}`));
 
-    // First create the request
-    const requestParams = {
-      url: url.toString(),
-      host: request.headers.host,
-      path: request.url,
-      method: request.method,
-      // TODO:
-      browser_id: 1,
-      ext: ext,
-      created_at: Date.now(),
-      request_headers: JSON.stringify(request.headers)
-    };
-    const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
-      requestParams
+    const innerServer = http.createServer((req, res) => {
+      // Request URIs are usually relative here, but can be * (OPTIONS) or absolute (odd people) in theory
+      if (req.url !== '*' && req.url[0] === '/') {
+        req.url = `https://${targetHost}:${port}${req.url}`;
+      }
+      return proxyRequestListener(req, res);
+    });
+    innerServer.addListener('upgrade', (req, innerSocket, head) => {
+      req.url = `https://${targetHost}:${port}${req.url}`;
+      server.emit('upgrade', req, innerSocket, head);
+    });
+    innerServer.addListener('connect', (req, res) =>
+      server.emit('connect', req, res)
     );
 
-    let dbRequestId;
-    if (shouldRequestBeCaptured === true) {
-      const dbResult = await global.knex('requests').insert(requestParams);
-      dbRequestId = dbResult[0];
-      ctx.proxyToServerRequestOptions.headers[
-        'X-PuppetMaster-Id'
-      ] = dbRequestId;
-    }
-
-    const chunks = [];
-
-    ctx.onResponseData((_ctx, chunk, callback) => {
-      chunks.push(chunk);
-      return callback(null, null); // don't write chunks to client response
-    });
-
-    ctx.onResponseEnd(async (_ctx, callback) => {
-      console.log(`RESPONSE: ${url.toString()}`);
-
-      const body = Buffer.concat(chunks);
-
-      const response = ctx.serverToProxyResponse;
-
-      // Update the request in the database
-      if (dbRequestId !== undefined) {
-        await global
-          .knex('requests')
-          .where({ id: dbRequestId })
-          .update({
-            response_status: response.statusCode,
-            response_status_message: response.statusMessage,
-            response_headers: JSON.stringify(response.headers),
-            response_body: body.toString()
-          });
-
-        ipc.send('requestCreated', {});
-      }
-
-      // TODO: How did we get the browser to stop caching?
-      ctx.proxyToClientResponse.write(body);
-      return callback();
-    });
-
-    onRequestCallback();
-  });
-
-  // To generate your own certs from the command line:
-  // 1. Generate testCA.key and testCA.pem:
-  //   openssl req -x509 -new -nodes -keyout testCA.key -sha256 -days 365 -out testCA.pem -subj '/CN=Puppet Master Test CA - DO NOT TRUST'
-  // 2. Generate the SPKI Fingerprint:
-  //   openssl rsa -in testCA.key -outform der -pubout 2>/dev/null | sha256sum | xxd -r -p | base64
-
-  // eslint-disable-next-line func-names
-  proxy.onCertificateRequired = function(hostname, callback) {
-    return callback(null, certUtils.certPaths);
+    innerServer.emit('connection', tlsSocket);
   };
 
-  proxy.listen({ port: port });
-  console.log(`Proxy server listening on port ${port}`);
+  server.listen(8080);
+  console.log('[Proxy] Server listening on 8080');
 };
+
+// To Test:
+// curl https://linuxmint.com --proxy http://127.0.0.1:8080 --cacert tmp/testCA.pem  --insecure
+if (process.env.NODE_ENV === undefined) {
+  throw new Error(
+    `You must set the NODE_ENV var!\ni.e. NODE_ENV=development yarn start-proxy`
+  );
+}
 
 const socketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
 ipc.init(socketName, {});
-startProxy();
+console.log(`[Proxy] IPC server listening on socket: ${socketName}`);
+startServer();

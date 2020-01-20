@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { DEFAULT_FILTERS } from '../../src/shared/constants';
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
@@ -15,30 +16,8 @@ describe('BrowsersUtils', () => {
     await global.knex.raw('Delete FROM requests;');
     await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="requests";');
 
-    const filters = {
-      hostList: ['localhost'],
-      hostSetting: 'include',
-      pathList: ['/sockjs-node'],
-      pathSetting: 'exclude',
-      extList: ['js', 'css', 'ico'],
-      extSetting: 'exclude',
-      resourceTypes: [
-        'document',
-        'eventsource',
-        'fetch',
-        'font',
-        'image',
-        'manifest',
-        'media',
-        'navigation',
-        'other',
-        'stylesheet',
-        'script',
-        'texttrack',
-        'websocket',
-        'xhr'
-      ]
-    };
+    const filters = Object.assign({}, DEFAULT_FILTERS);
+    filters.hostList = ['localhost'];
 
     await global
       .knex('capture_filters')
@@ -70,6 +49,11 @@ describe('BrowsersUtils', () => {
 
       expect(request.id).to.eql(1);
       expect(request.url).to.eql('http://localhost/api/posts.json');
+      expect(request.host).to.eql('localhost');
+      expect(request.path).to.eql('/api/posts.json');
+      expect(request.ext).to.eql('json');
+
+      expect(request.response_status).to.eql(200);
     });
   });
 });

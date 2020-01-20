@@ -1,13 +1,11 @@
 // import { curly } from 'node-libcurl';
 import puppeteer from 'puppeteer';
 
-import Request from '../models/Request';
-import Settings from '../models/Settings';
 import mainIpc from '../../shared/ipc-server';
 import certUtils from '../../shared/cert-utils';
 
 /*
- * NOTE: For each response intercepted, we save the response and its body to requests table.
+ * NOTE: For each response intercepted
  * If that request is a navigation request (i.e. a page displayed in the browser), then we start
  * the DOMListener, which saves the page's rendered DOM to request.response_body_rendered every
  * 100ms.
@@ -82,7 +80,6 @@ const createBrowser = async () => {
   const browserId = await createBrowserDb();
   const options = getBrowserOptions(browserId);
   const browser = await puppeteer.launch(options);
-
   browser.id = browserId;
   global.puppeteer_browsers.push(browser);
 
@@ -152,15 +149,12 @@ const openBrowser = async browserId => {
     handleNewPage(page);
   }
 
-  // TODO;
   await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 };
 
 const instrumentBrowser = async browser => {
-  // TODO: Add this back in but without saving the requests to the db:
-  /*
   const pages = await browser.pages();
   const page = pages[0];
 
@@ -171,7 +165,7 @@ const instrumentBrowser = async browser => {
     const newPage = await target.page();
     handleNewPage(newPage);
   });
-  */
+
   browser.on('disconnected', () => handleBrowserClosed(browser));
 };
 
@@ -193,87 +187,15 @@ const handleNewPage = async page => {
   if (page === null) return;
 
   await page.setCacheEnabled(false);
-  await page.setRequestInterception(true);
-  page.on('request', async request => {
-    await handleRequest(page, request);
-  });
-  page.on('response', async response => handleResponse(page, response));
+
+  // page.on('response', async response => handleResponse(page, response));
 };
 
-const handleRequest = async (page, request) => {
-  const dbRequest = await Request.createFromBrowserRequest(page, request);
-
-  if (dbRequest === undefined) {
-    return request.continue();
-  }
-
-  request.requestId = dbRequest.id;
-
-  console.log(
-    `[BrowserUtils] 1. request intercepted: ${dbRequest.method} ${dbRequest.url}`
-  );
-
-  // Check if the intercept is enabled:
-  const setting = await Settings.getSetting('interceptEnabled');
-
-  // If its not enabled then we forward every request:
-  if (setting.value === '0') {
-    request.continue();
-    return;
-  }
-
-  global.interceptServer.queueRequest(dbRequest);
-  const result = await global.interceptServer.decisionFromClient(dbRequest);
-
-  console.log(`[BrowserUtils] received decision from client: ${result.action}`);
-
-  if (result.action === 'forward') {
-    request.continue();
-    /*
-    // result.request === undefined if you press the "Disable Intercept" button
-    // when there is still a queue of requests to get through
-    const headersObj =
-      result.request === undefined
-        ? request.headers()
-        : result.request.request_headers;
-    const headersArr = [];
-    Object.keys(headersObj).forEach(key => {
-      headersArr.push(`${key}: ${headersObj[key]}`);
-    });
-
-    const options = {
-      customRequest: request.method().toUpperCase(),
-      HTTPHEADER: headersArr
-    };
-
-    if (result.request.request_payload !== undefined) {
-      console.log(`[BrowserUtils] setting POST body`);
-      console.log(result.request.request_payload);
-
-      options.POSTFIELDS = result.request.request_payload;
-    }
-
-    // const response = await curly(request.url(), options);
-
-    // TODO: How to handle multiple set-cookies?
-    if (response.headers[0]['Set-Cookie'] !== undefined) {
-      response.headers[0]['Set-Cookie'] = response.headers[0][
-        'Set-Cookie'
-      ].toString();
-    }
-
-    request.respond({
-      status: response.statusCode,
-      headers: { 'set-cookie': 'a=b; path=/; HttpOnly' },
-      body: response.data
-    });
-*/
-  } else if (result.action === 'drop') {
-    request.abort();
-  }
-};
-
+/*
 const handleResponse = async (page, response) => {
+  console.log(`[BrowserUtils] handled response:`)
+
+  const headers = response.headers();
   const requestId = response.request().requestId;
   console.log(`handleResponse: requestId: ${requestId}`);
   await Request.updateFromBrowserResponse(page, response);
@@ -328,14 +250,16 @@ const handleResponse = async (page, response) => {
     const origURL = ` ${page.url()}`.slice(1); // Clone the url string
     if (page.listenerCount('framenavigated') === 0) {
       page.on('framenavigated', frame =>
-        handleFramenavigated(page, frame, origURL)
+        //handleFramenavigated(page, frame, origURL)
       );
     }
   }
 
   mainIpc.send('requestCreated', {});
 };
+*/
 
+/*
 const handleFramenavigated = async (page, frame, origURL) => {
   // See: https://stackoverflow.com/questions/49237774/using-devtools-protocol-event-page-framenavigated-to-get-client-side-navigation
   // See: https://github.com/GoogleChrome/puppeteer/issues/1489
@@ -422,7 +346,7 @@ const startDOMListener = async page => {
 
   return domListenerId;
 };
-
+*/
 export default {
   openBrowser,
   createBrowser,
