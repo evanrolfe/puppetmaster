@@ -20,10 +20,13 @@ export default class ResponseTab extends Component<Props> {
       return null;
 
     const headers = JSON.parse(request.response_headers);
+    let content;
 
-    return (
-      <PaneRemaining>
-        <div className="request-tab-panel">
+    if (request.response_status === null) {
+      content = <>No response received.</>;
+    } else {
+      content = (
+        <>
           <span>Response status: {request.response_status}</span>
           <br />
           <br />
@@ -50,7 +53,13 @@ export default class ResponseTab extends Component<Props> {
               ))}
             </tbody>
           </table>
-        </div>
+        </>
+      );
+    }
+
+    return (
+      <PaneRemaining>
+        <div className="request-tab-panel">{content}</div>
       </PaneRemaining>
     );
   }
