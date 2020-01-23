@@ -3,12 +3,17 @@ import tls from 'tls';
 
 import httpolyglot from 'httpolyglot';
 
-import ipc from '../shared/ipc-server';
+import proxyIPC from '../shared/ipc-server';
 import database from '../shared/database';
-import { DATABASE_FILES, PROXY_SOCKET_NAMES } from '../shared/constants';
+import {
+  DATABASE_FILES,
+  PROXY_SOCKET_NAMES,
+  INTERCEPT_SOCKET_NAMES
+} from '../shared/constants';
 import certUtils from '../shared/cert-utils';
 
 import proxyRequestListener from './proxy-request-listener';
+import InterceptServer from './intercept-server';
 
 const mightBeTLSHandshake = byte => byte === 22;
 
@@ -20,6 +25,20 @@ const peekFirstByte = socket =>
       resolve(data[0]);
     });
   });
+
+const startIPCServer = () => {
+  const socketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
+  proxyIPC.init(socketName, {});
+  console.log(`[Proxy] IPC server listening on socket: ${socketName}`);
+};
+
+const startInterceptServer = () => {
+  const socketName = INTERCEPT_SOCKET_NAMES[process.env.NODE_ENV];
+  const interceptServer = new InterceptServer(socketName);
+  interceptServer.init();
+  global.interceptServer = interceptServer;
+  console.log(`[Proxy] Intercept server started`);
+};
 
 const startServer = async () => {
   const dbFile = DATABASE_FILES[process.env.NODE_ENV];
@@ -125,7 +144,6 @@ if (process.env.NODE_ENV === undefined) {
   );
 }
 
-const socketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
-ipc.init(socketName, {});
-console.log(`[Proxy] IPC server listening on socket: ${socketName}`);
+startInterceptServer();
+startIPCServer();
 startServer();

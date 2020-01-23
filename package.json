@@ -240,7 +240,6 @@
     "electron-debug": "^2.0.0",
     "electron-log": "^3.0.7",
     "electron-updater": "^3.2.3",
-    "events": "^3.0.0",
     "history": "^4.7.2",
     "httpolyglot": "^0.1.2",
     "js-beautify": "^1.10.2",

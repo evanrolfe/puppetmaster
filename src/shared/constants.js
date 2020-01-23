@@ -10,6 +10,12 @@ export const PROXY_SOCKET_NAMES = {
   development: 'pntest-proxy-development'
 };
 
+export const INTERCEPT_SOCKET_NAMES = {
+  test: 'pntest-intercept-test',
+  production: 'pntest-intercept-production',
+  development: 'pntest-intercept-development'
+};
+
 export const DATABASE_FILES = {
   test: 'pntest-test.db',
   production: 'pntest-prod.db',

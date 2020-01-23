@@ -3,7 +3,6 @@ import { DATABASE_FILES, BACKEND_SOCKET_NAMES } from '../shared/constants';
 
 import database from './lib/database';
 import BrowserUtils from './lib/BrowserUtils';
-import InterceptServer from './lib/InterceptServer';
 
 // Controllers:
 import BrowsersController from './controllers/BrowsersController';
@@ -59,12 +58,6 @@ if (process.env.NODE_ENV === undefined) {
     };
     await ipc.init(socketName, controllersMap);
     console.log(`[Backend] IPC server started`);
-
-    // Load the Intercept IPC Server
-    const interceptServer = new InterceptServer();
-    interceptServer.init();
-    global.interceptServer = interceptServer;
-    console.log(`[Backend] Intercept server started`);
 
     // IMPORTANT: DO NOT CHANGE THIS LINE!
     // It is use by other processes to know when the backend has finished loading.

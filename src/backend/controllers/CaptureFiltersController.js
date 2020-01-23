@@ -1,4 +1,4 @@
-import CaptureFilters from '../../shared/models/CaptureFilters';
+import CaptureFilters from '../../shared/models/capture-filters';
 
 export default class CaptureFiltersController {
   async show() {

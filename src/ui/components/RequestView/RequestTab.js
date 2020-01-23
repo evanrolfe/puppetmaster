@@ -21,6 +21,21 @@ export default class RequestsTab extends Component<Props> {
 
     const headers = JSON.parse(request.request_headers);
 
+    let payloadContent;
+    if (request.request_payload !== null) {
+      payloadContent = (
+        <>
+          <br />
+          <br />
+          <span>Payload:</span>
+          <br />
+          <span className="selectable force-wrap">
+            {request.request_payload}
+          </span>
+        </>
+      );
+    }
+
     return (
       <PaneRemaining>
         <div className="request-tab-panel">
@@ -55,6 +70,8 @@ export default class RequestsTab extends Component<Props> {
               ))}
             </tbody>
           </table>
+
+          {payloadContent}
         </div>
       </PaneRemaining>
     );

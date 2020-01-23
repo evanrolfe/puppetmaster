@@ -4,6 +4,7 @@ export default `CREATE TABLE IF NOT EXISTS requests(
   method TEXT,
   url TEXT,
   host TEXT,
+  port INTEGER,
   path TEXT,
   ext TEXT,
   created_at INTEGER,

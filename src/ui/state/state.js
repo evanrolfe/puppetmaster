@@ -14,6 +14,8 @@ import {
   DEFAULT_PAGE_LAYOUTS
 } from './constants';
 
+import { INTERCEPT_SOCKET_NAMES } from '../../shared/constants';
+
 const requestsTableColumns = ALL_TABLE_COLUMNS.filter(column =>
   DEFAULT_COLUMNS.includes(column.key)
 );
@@ -203,9 +205,7 @@ const setPaneValue = (key, state, action) => {
   pane[key] = action[key];
 
   console.log(
-    `[STATE] Set ${action.page}.page.panes[${action.paneId}].${key} to: ${
-      action[key]
-    }`
+    `[STATE] Set ${action.page}.page.panes[${action.paneId}].${key} to: ${action[key]}`
   );
 
   return newState;
@@ -228,12 +228,7 @@ const setInterceptRequest = (state, action) => {
 
   // Parse the request headers to text:
   if (action.request !== null) {
-    const headersObj = JSON.parse(action.request.request_headers);
-    const headersStr = Object.keys(headersObj)
-      .map(header => `${header}: ${headersObj[header]}`)
-      .join('\n');
-
-    newState[action.page].requestHeadersText = headersStr;
+    newState[action.page].requestHeadersText = action.request.raw;
     newState[action.page].requestPayloadText = action.request.request_payload;
   } else {
     newState[action.page].requestHeadersText = '';
@@ -532,12 +527,17 @@ function* toggleColumnOrderRequests(action) {
 
 const interceptRequestIPC = async params =>
   new Promise(resolve => {
-    ipc.connectTo('intercept', () => {
-      ipc.of.intercept.on('connect', () => {
+    console.log(`[STATE] starting interceptRequestIPC...`);
+    const socketName = INTERCEPT_SOCKET_NAMES[process.env.NODE_ENV];
+
+    ipc.connectTo(socketName, () => {
+      console.log(`[STATE] connecting to ${socketName} IPC`);
+
+      ipc.of[socketName].on('connect', () => {
         console.log(`[STATE] sending IPC intercept message...`);
 
-        ipc.of.intercept.emit('message', params);
-        ipc.disconnect('intercept');
+        ipc.of[socketName].emit('message', params);
+        ipc.disconnect(socketName);
         resolve();
       });
     });

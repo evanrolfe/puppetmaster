@@ -80,6 +80,7 @@ export default class IPCConnection {
           this.messageQueue = [];
         }
 
+        console.log(`[IPC] connected on socket: ${name}`);
         onOpen();
       });
 

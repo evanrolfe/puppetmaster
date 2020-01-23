@@ -1,15 +1,16 @@
-import { once, EventEmitter } from 'events';
+import { EventEmitter } from 'events';
 import { IPC } from 'node-ipc';
 
-import mainIpc from '../../shared/ipc-server';
+// This refers to the proxy IPC socket
+import proxyIPC from '../shared/ipc-server';
 
-const ipc = new IPC();
+const interceptIPC = new IPC();
 
 /*
  * InterceptServer: communicates with the BrowserInterceptPage on the frontend.
  * It starts an ipc server on the channel "intercept".
  * When a request is intercepted it first sends a "requestIntercepted" message
- * to the client on the mainIpc channel. It then waits until the a decision
+ * to the client on the proxy IPC channel. It then waits until the a decision
  * message is received on the intercept channel and it will then either
  * forward the request or drop it depending on the message. If a new request is
  * queued while the first one is still waiting for the message from the client,
@@ -17,10 +18,11 @@ const ipc = new IPC();
  * "requestIntercepted" message to the client. And the process repeats...
  */
 export default class InterceptServer {
-  constructor() {
+  constructor(socketName) {
     this.events = new EventEmitter();
     this.requestQueue = [];
     this.awaitingReply = false;
+    this.socketName = socketName;
 
     this.events.on('requestQueued', async request => {
       if (
@@ -32,7 +34,7 @@ export default class InterceptServer {
         console.log(
           `[InterceptServer] Processing request ${request.id} from queue...`
         );
-        mainIpc.send('requestIntercepted', { request: request });
+        proxyIPC.send('requestIntercepted', { request: request });
       } else {
         setTimeout(() => {
           this.events.emit('requestQueued', request);
@@ -42,11 +44,11 @@ export default class InterceptServer {
   }
 
   init() {
-    ipc.config.id = 'intercept';
-    ipc.config.silent = true;
+    interceptIPC.config.id = this.socketName;
+    interceptIPC.config.silent = true;
 
-    ipc.serve(() => {
-      ipc.server.on('message', data => {
+    interceptIPC.serve(() => {
+      interceptIPC.server.on('message', data => {
         console.log(
           `[InterceptServer] Received IPC message: ${JSON.stringify(data)}`
         );
@@ -61,7 +63,7 @@ export default class InterceptServer {
         }
       });
     });
-    ipc.server.start();
+    interceptIPC.server.start();
     console.log(
       '[InterceptServer] Started IPC Intercept server, awaiting message from client...'
     );
@@ -90,7 +92,12 @@ export default class InterceptServer {
     );
 
     // NOTE: For some reason once() returns an array of the event arguments
-    const [data] = await once(this.events, `requestDecision-${request.id}`);
+    const data = await new Promise(resolve =>
+      this.events.once(`requestDecision-${request.id}`, dataArr =>
+        resolve(dataArr)
+      )
+    );
+
     this.awaitingReply = false;
     this.requestQueue = this.requestQueue.filter(id => id !== request.id);
 

@@ -43,7 +43,7 @@ export default props => {
     state => state.browserInterceptPage.interceptEnabled
   );
 
-  global.backendConn.listen('requestIntercepted', data => {
+  global.proxyConn.listen('requestIntercepted', data => {
     if (data.request === undefined) return;
 
     dispatch({
