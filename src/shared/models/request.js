@@ -48,12 +48,25 @@ export default class Request {
       'url',
       'host',
       'port',
+      'http_version',
       'path',
       'ext',
-      'created_at',
-      'request_type',
       'request_headers',
       'request_payload',
+
+      'request_modified',
+      'modified_method',
+      'modified_url',
+      'modified_host',
+      'modified_port',
+      'modified_http_version',
+      'modified_path',
+      'modified_ext',
+      'modified_request_headers',
+      'modified_request_payload',
+
+      'created_at',
+      'request_type',
       'response_status',
       'response_status_message',
       'response_headers',
@@ -72,9 +85,15 @@ export default class Request {
     requestParams.request_headers = JSON.stringify(
       requestParams.request_headers
     );
+    requestParams.modified_request_headers = JSON.stringify(
+      requestParams.modified_request_headers
+    );
 
     if (requestParams.request_payload !== undefined)
       requestParams.request_payload = requestParams.request_payload.toString();
+
+    if (requestParams.modified_request_payload !== undefined)
+      requestParams.modified_request_payload = requestParams.modified_request_payload.toString();
 
     // Create the request:
     if (this.id === undefined) {
@@ -98,11 +117,27 @@ export default class Request {
   }
 
   toHttpRequestOptions() {
+    const method =
+      this.modified_method === undefined ? this.method : this.modified_method;
+    const path =
+      this.modified_path === undefined ? this.path : this.modified_path;
+    const host =
+      this.modified_host === undefined ? this.host : this.modified_host;
+    const headers =
+      this.modified_request_headers === undefined
+        ? this.request_headers
+        : this.modified_request_headers;
+    const payload =
+      this.modified_request_payload === undefined
+        ? this.request_payload
+        : this.modified_request_payload;
+
     return {
-      method: this.method,
-      path: this.path,
-      host: this.host,
-      headers: this.request_headers
+      method: method,
+      path: path,
+      host: host,
+      headers: headers,
+      payload: payload
     };
   }
 
@@ -117,6 +152,78 @@ export default class Request {
   setRequestPayload(requestPayload) {
     // NOTE: This is of type Buffer
     this.request_payload = requestPayload;
+  }
+
+  toInterceptParams() {
+    let rawRequest = `${this.method.toUpperCase()} ${this.path} HTTP/${
+      this.http_version
+    }\n`;
+    Object.keys(this.request_headers).forEach(header => {
+      rawRequest += `${header}: ${this.request_headers[header]}\n`;
+    });
+
+    if (this.request_payload !== undefined && this.request_payload.length > 0) {
+      rawRequest += '\n';
+      rawRequest += this.request_payload.toString();
+    }
+
+    return {
+      id: this.id,
+      method: this.method,
+      url: this.url,
+      rawRequest: rawRequest
+    };
+  }
+
+  // Overwrites the existing request based on whats contained in the raw request
+  setRawRequest(rawRequest) {
+    const originalRawRequest = this.toInterceptParams().rawRequest;
+    if (originalRawRequest === rawRequest) return;
+
+    this.request_modified = true;
+
+    const lines = rawRequest.split('\n');
+    const startLineItems = lines[0].split(' ');
+    this.modified_method = startLineItems[0].toUpperCase();
+    this.modified_path = startLineItems[1];
+
+    const headerLines = lines.slice(1, lines.length);
+
+    // If there is a payload in the request, do not process it as a header:
+    if (headerLines[headerLines.length - 2] === '') {
+      const payloadStr = headerLines.pop();
+      this.modified_request_payload = Buffer.from(payloadStr);
+    }
+
+    const headers = {};
+    headerLines.forEach(line => {
+      if (line.length === 0) return;
+
+      const splitLine = line.split(':');
+      headers[splitLine[0]] = splitLine[1].trim();
+    });
+
+    // If the payload has been modified, set the content-length header:
+    if (this.modified_request_payload !== undefined) {
+      headers['content-length'] = this.modified_request_payload.length;
+    }
+
+    this.modified_host = headers.host;
+    this.modified_request_headers = headers;
+
+    // Rebuild the url from the host, path & protocol
+    const protocol = this.modified_port === 443 ? 'https' : 'http';
+    const requestUrl = new URL(
+      this.modified_path,
+      `${protocol}://${this.modified_host}`
+    );
+    this.modified_url = requestUrl.toString();
+
+    // Parse the extension:
+    const splitPath = this.modified_path.split('.');
+    let ext;
+    if (splitPath.length > 1) ext = splitPath[splitPath.length - 1];
+    this.modified_ext = ext;
   }
 
   static fromHttpIncomingMessage(incomingMessage) {
@@ -151,6 +258,7 @@ export default class Request {
       path: path,
       host: hostPort.host,
       port: hostPort.port,
+      http_version: incomingMessage.httpVersion,
       ext: ext,
       request_headers: headers
     });

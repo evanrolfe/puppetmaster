@@ -7,57 +7,46 @@ import zlib from 'zlib';
 import proxyIPC from '../shared/ipc-server';
 import Request from '../shared/models/request';
 
-const INTERCEPT_ENABLED = false;
-/*
-const generateRawRequest = (request) => {
-  let str = `${request.method.toUpperCase()} ${request.url} HTTP/${request.httpVersion}\n`
-  for (let i=0; i<request.rawHeaders.length; i+=2) {
-      str += `${request.rawHeaders[i]}: ${request.rawHeaders[i + 1]}\n`
-  }
+const INTERCEPT_ENABLED = true;
 
-  return str;
-};
-*/
 const makeProxyToServerRequest = parsedRequest =>
   new Promise(resolve => {
     const protocol = parsedRequest.port === 443 ? https : http;
-    console.log(parsedRequest.toHttpRequestOptions());
-    const proxyToServerRequest = protocol.request(
-      parsedRequest.toHttpRequestOptions(),
-      response => {
-        const chunks = [];
-        response.on('data', chunk => chunks.push(chunk));
+    const requestOptions = parsedRequest.toHttpRequestOptions();
 
-        response.on('end', () => {
-          const bodyRaw = Buffer.concat(chunks);
-          let body;
-          const contentEncoding = response.headers['content-encoding'];
+    const proxyToServerRequest = protocol.request(requestOptions, response => {
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
 
-          if (contentEncoding && contentEncoding.toLowerCase() === 'gzip') {
-            delete response.headers['content-encoding'];
-            body = zlib.gunzipSync(bodyRaw);
-          } else {
-            body = bodyRaw;
-          }
+      response.on('end', () => {
+        const bodyRaw = Buffer.concat(chunks);
+        let body;
+        const contentEncoding = response.headers['content-encoding'];
 
-          const remoteAddress = `${response.socket.remoteAddress}:${response.socket.remotePort}`;
+        if (contentEncoding && contentEncoding.toLowerCase() === 'gzip') {
+          delete response.headers['content-encoding'];
+          body = zlib.gunzipSync(bodyRaw);
+        } else {
+          body = bodyRaw;
+        }
 
-          resolve({
-            body: body,
-            headers: response.headers,
-            statusCode: response.statusCode,
-            statusMessage: response.statusMessage,
-            remoteAddress: remoteAddress
-          });
+        const remoteAddress = `${response.socket.remoteAddress}:${response.socket.remotePort}`;
+
+        resolve({
+          body: body,
+          headers: response.headers,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+          remoteAddress: remoteAddress
         });
-      }
-    );
+      });
+    });
 
     if (
-      parsedRequest.request_payload !== undefined &&
-      parsedRequest.request_payload.length > 0
+      requestOptions.payload !== undefined &&
+      requestOptions.payload.length > 0
     ) {
-      proxyToServerRequest.write(parsedRequest.request_payload);
+      proxyToServerRequest.write(requestOptions.payload);
     }
 
     proxyToServerRequest.end();
@@ -73,7 +62,6 @@ const proxyRequestListener = async (
   const requestPayload = await new Promise(resolve => {
     clientToProxyRequest.on('end', () => {
       const data = Buffer.concat(chunks);
-      console.log('Request Data: ', data.toString());
       resolve(data);
     });
   });
@@ -93,13 +81,15 @@ const proxyRequestListener = async (
     await parsedRequest.saveToDatabase();
     proxyIPC.send('requestCreated', {});
 
-    if (INTERCEPT_ENABLED) {
-      // const requestForIntercept = Object.assign({}, requestOptions);
-      // requestForIntercept.id = dbRequestId;
-      // requestForIntercept.raw = generateRawRequest(clientToProxyRequest);
-      // console.log(requestForIntercept.raw)
-      // global.interceptServer.queueRequest(requestForIntercept);
-      // await global.interceptServer.decisionFromClient(requestForIntercept);
+    if (INTERCEPT_ENABLED && parsedRequest.id !== undefined) {
+      const requestForIntercept = parsedRequest.toInterceptParams();
+
+      global.interceptServer.queueRequest(requestForIntercept);
+      const result = await global.interceptServer.decisionFromClient(
+        requestForIntercept
+      );
+
+      parsedRequest.setRawRequest(result.request.rawRequest);
     }
 
     const serverToProxyResponse = await makeProxyToServerRequest(parsedRequest);

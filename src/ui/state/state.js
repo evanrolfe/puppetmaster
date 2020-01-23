@@ -228,11 +228,9 @@ const setInterceptRequest = (state, action) => {
 
   // Parse the request headers to text:
   if (action.request !== null) {
-    newState[action.page].requestHeadersText = action.request.raw;
-    newState[action.page].requestPayloadText = action.request.request_payload;
+    newState[action.page].requestHeadersText = action.request.rawRequest;
   } else {
     newState[action.page].requestHeadersText = '';
-    newState[action.page].requestPayloadText = '';
   }
 
   return newState;
@@ -549,31 +547,16 @@ function* interceptRequest() {
   const requestHeadersText = yield select(
     state => state.browserInterceptPage.requestHeadersText
   );
-  const requestPayloadText = yield select(
-    state => state.browserInterceptPage.requestPayloadText
-  );
-  const requestForBackend = Object.assign({}, request);
+
   let params = {};
 
   if (['forward'].includes(action)) {
-    const headers = {};
-    // TODO: This needs to be done in a saga because it needs to use the current value of requestHeadersText
-    requestHeadersText.split('\n').forEach(headerLine => {
-      const headerSplit = headerLine.split(':');
-      const key = headerSplit[0].trim();
-      const value = headerSplit[1].trim();
-
-      headers[key] = value;
-    });
-    console.log(
-      `[BrowserInterceptPageState] headers: ${JSON.stringify(headers)}`
-    );
-    requestForBackend.request_headers = headers;
-    requestForBackend.request_payload = requestPayloadText;
-
     params = {
       action: action,
-      request: requestForBackend
+      request: {
+        id: request.id,
+        rawRequest: requestHeadersText
+      }
     };
 
     yield console.log(params);
