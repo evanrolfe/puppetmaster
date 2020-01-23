@@ -43,16 +43,6 @@ export default props => {
     state => state.browserInterceptPage.interceptEnabled
   );
 
-  global.proxyConn.listen('requestIntercepted', data => {
-    if (data.request === undefined) return;
-
-    dispatch({
-      type: 'SET_INTERCEPT_REQUEST',
-      page: 'browserInterceptPage',
-      request: data.request
-    });
-  });
-
   const interceptCommand = () => {
     if (request === null) return; // Incase disable is pressed with no request
 

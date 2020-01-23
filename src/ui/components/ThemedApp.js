@@ -38,6 +38,18 @@ export default () => {
     dispatch({ type: 'LOAD_REQUESTS' });
   });
 
+  global.proxyConn.listen('requestIntercepted', data => {
+    if (data.request === undefined) return;
+
+    dispatch({
+      type: 'SET_INTERCEPT_REQUEST',
+      page: 'browserInterceptPage',
+      request: data.request
+    });
+
+    history.push('/browser/intercept');
+  });
+
   const _setWindowSize = () => {
     const size = remote.getCurrentWindow().getSize();
     dispatch({ type: 'SET_WINDOW_SIZE_THROTTLED', windowSize: size });
