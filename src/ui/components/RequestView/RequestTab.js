@@ -1,51 +1,92 @@
 import React, { Component } from 'react';
 import PaneRemaining from '../pane/PaneRemaining';
+import { Dropdown, DropdownButton, DropdownItem } from '../dropdown';
 
 type Props = {
-  request: 'object'
+  showModifiedRequest: 'boolean',
+  setOriginalRequest: 'function',
+  setModifiedRequest: 'function',
+  requestModified: 'boolean',
+  method: 'string',
+  url: 'string',
+  headers: 'object',
+  payload: 'string'
 };
 
 export default class RequestsTab extends Component<Props> {
   props: Props;
 
+  renderIcon(option) {
+    const original =
+      option === 'original' && this.props.showModifiedRequest === false;
+    const modified =
+      option === 'modified' && this.props.showModifiedRequest === true;
+
+    if (original || modified) {
+      return <i className="fa fa-check" />;
+    } else {
+      return <i className="fa fa-empty" />;
+    }
+  }
+
   render() {
-    const request = this.props.request;
-
-    if (
-      request === undefined ||
-      request === null ||
-      request.method === null ||
-      Object.keys(request).length === 0
-    )
-      return null;
-
-    const headers = JSON.parse(request.request_headers);
+    const dropdownTitle =
+      this.props.showModifiedRequest === true ? 'Modified' : 'Original';
 
     let payloadContent;
-    if (request.request_payload !== null) {
+    if (this.props.payload !== null) {
       payloadContent = (
         <>
           <br />
           <br />
           <span>Payload:</span>
           <br />
-          <span className="selectable force-wrap">
-            {request.request_payload}
-          </span>
+          <span className="selectable force-wrap">{this.props.payload}</span>
         </>
+      );
+    }
+
+    let modifiedDropdown;
+    if (this.props.requestModified === 1) {
+      modifiedDropdown = (
+        <div style={{ textAlign: 'right' }}>
+          <Dropdown className="browser-sessions pull-right">
+            <DropdownButton className="pointer btn btn--outlined btn--super-compact">
+              {dropdownTitle}
+              <i className="fa fa-caret-down space-left" />
+            </DropdownButton>
+
+            <DropdownItem
+              onClick={this.props.setOriginalRequest}
+              style={{ minWidth: '120px' }}
+            >
+              {this.renderIcon('original')} Original
+            </DropdownItem>
+            <DropdownItem
+              onClick={this.props.setModifiedRequest}
+              style={{ minWidth: '120px' }}
+            >
+              {this.renderIcon('modified')} Modified
+            </DropdownItem>
+          </Dropdown>
+        </div>
       );
     }
 
     return (
       <PaneRemaining>
         <div className="request-tab-panel">
-          <span className="selectable force-wrap">
-            <span className={`http-method-${request.method}`}>
-              {request.method}
-            </span>{' '}
-            {request.url}
-          </span>
-          <br />
+          <div className="row-fill row-fill--top">
+            <div className="selectable force-wrap">
+              <span className={`http-method-${this.props.method}`}>
+                {this.props.method}
+              </span>{' '}
+              {this.props.url}
+            </div>
+
+            {modifiedDropdown}
+          </div>
+
           <br />
           <span>Headers:</span>
           <br />
@@ -60,12 +101,12 @@ export default class RequestsTab extends Component<Props> {
               </tr>
             </thead>
             <tbody>
-              {Object.keys(headers).map((key, i) => (
+              {Object.keys(this.props.headers).map((key, i) => (
                 <tr className="selectable" key={i}>
                   <td style={{ whiteSpace: 'nowrap' }} className="force-wrap">
                     {key}
                   </td>
-                  <td className="force-wrap">{headers[key]}</td>
+                  <td className="force-wrap">{this.props.headers[key]}</td>
                 </tr>
               ))}
             </tbody>

@@ -32,6 +32,7 @@ const initialState = {
     tabIndex: 0
   },
   browserNetworkPage: {
+    showModifiedRequest: true,
     requestViewTabIndex: 0,
     viewMode: 'pretty', // pretty | raw | preview | parsed
     viewContent: 'render', // source | render
@@ -273,6 +274,8 @@ const reducer = (state, action) => {
       return setPaneValue('length', state, action);
     case 'SET_PANE_TABINDEX':
       return setPaneValue('tabIndex', state, action);
+    case 'SET_SHOW_MODIFIED_REQUEST':
+      return setNestedValue('showModifiedRequest', state, action);
 
     case 'SET_SEARCH':
       return setSearch(state, action);
