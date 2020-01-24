@@ -2,7 +2,12 @@ import React from 'react';
 
 import StatusTag from './StatusTag';
 
-export default ({ request, column }) => {
+type Props = {
+  request: 'object',
+  column: 'object'
+};
+
+export default ({ request, column }: Props) => {
   switch (column.key) {
     case 'id':
       return <td>{request.id}</td>;
@@ -18,6 +23,12 @@ export default ({ request, column }) => {
 
     case 'host':
       return <td>{request.host}</td>;
+
+    case 'request_modified': {
+      const check = <i className="fas fa-check" />;
+      const content = request.request_modified === 1 ? check : '';
+      return <td style={{ textAlign: 'center' }}>{content}</td>;
+    }
 
     case 'response_status':
       if (request.response_status === null) {

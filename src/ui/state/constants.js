@@ -24,12 +24,13 @@ export const STATUS_CODES = {
 
 export const ALL_TABLE_COLUMNS = [
   { key: 'id', title: '#', width: 40 },
-  { key: 'title', title: 'Browser', width: 100 },
+  { key: 'title', title: 'Browser', width: 80 },
   { key: 'method', title: 'Method', width: 70 },
-  { key: 'host', title: 'Host', width: 100 },
-  { key: 'path', title: 'Path', width: 200 },
-  { key: 'request_type', title: 'Type', width: 100 },
+  { key: 'host', title: 'Host', width: 80 },
+  { key: 'path', title: 'Path', width: 175 },
+  { key: 'request_type', title: 'Type', width: 80 },
   { key: 'ext', title: 'Ext', width: 40 },
+  { key: 'request_modified', title: 'Modified?', width: 85 },
   { key: 'response_status', title: 'Status', width: 70 },
   {
     key: 'response_body_length',
@@ -51,7 +52,8 @@ export const DEFAULT_COLUMNS = [
   'host',
   'path',
   'response_status',
-  'request_type'
+  'request_type',
+  'request_modified'
 ];
 
 export const PAGE_LAYOUTS = {

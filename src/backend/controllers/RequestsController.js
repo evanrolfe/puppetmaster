@@ -15,6 +15,7 @@ export default class RequestsController {
       'host',
       'path',
       'ext',
+      'request_modified',
       'requests.created_at',
       'request_type',
       'request_payload',
