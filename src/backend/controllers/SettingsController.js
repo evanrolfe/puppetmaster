@@ -1,4 +1,4 @@
-import Settings from '../models/Settings';
+import Settings from '../../shared/models/settings';
 
 export default class SettingsController {
   async show(args) {

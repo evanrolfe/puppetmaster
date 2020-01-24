@@ -43,10 +43,9 @@ export default props => {
     state => state.browserInterceptPage.interceptEnabled
   );
 
-  const interceptCommand = () => {
-    if (request === null) return; // Incase disable is pressed with no request
-
-    dispatch({ type: 'FORWARD_INTERCEPT_REQUEST' });
+  // Send a command to the intercept server:
+  const interceptCommand = action => {
+    dispatch({ type: 'SEND_INTERCEPT_COMMAND', action: action });
   };
 
   const toggleIntercept = () => {

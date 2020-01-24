@@ -541,8 +541,7 @@ const interceptRequestIPC = async params =>
     });
   });
 
-function* interceptRequest() {
-  const action = 'forward';
+function* sendInterceptCommand(args) {
   const request = yield select(state => state.browserInterceptPage.request);
   const requestHeadersText = yield select(
     state => state.browserInterceptPage.requestHeadersText
@@ -550,9 +549,11 @@ function* interceptRequest() {
 
   let params = {};
 
-  if (['forward'].includes(action)) {
+  if (args.action === 'forward') {
+    if (request === null) return;
+
     params = {
-      action: action,
+      action: 'forward',
       request: {
         id: request.id,
         rawRequest: requestHeadersText
@@ -560,6 +561,8 @@ function* interceptRequest() {
     };
 
     yield console.log(params);
+  } else if (args.action === 'disable') {
+    params = { action: 'disable' };
   }
 
   yield interceptRequestIPC(params);
@@ -586,8 +589,9 @@ function* rootSaga() {
     takeLatest('SELECT_NEXT_REQUEST_LOAD', selectNextRequestLoad),
     takeLatest('SAVE_STATE', saveState),
     takeLatest('LOAD_STATE', loadState),
+
     // Intercept:
-    takeLatest('FORWARD_INTERCEPT_REQUEST', interceptRequest),
+    takeLatest('SEND_INTERCEPT_COMMAND', sendInterceptCommand),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),

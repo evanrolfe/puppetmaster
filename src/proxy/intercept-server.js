@@ -53,7 +53,7 @@ export default class InterceptServer {
           `[InterceptServer] Received IPC message: ${JSON.stringify(data)}`
         );
 
-        if (['forward', 'drop'].includes(data.action)) {
+        if (data.action === 'forward') {
           this.events.emit(`requestDecision-${data.request.id}`, data);
         } else if (data.action === 'forwardAndIntercept') {
           // TODO

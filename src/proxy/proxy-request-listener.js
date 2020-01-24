@@ -6,8 +6,12 @@ import zlib from 'zlib';
 
 import proxyIPC from '../shared/ipc-server';
 import Request from '../shared/models/request';
+import Settings from '../shared/models/settings';
 
-const INTERCEPT_ENABLED = true;
+const interceptEnabled = async () => {
+  const setting = await Settings.getSetting('interceptEnabled');
+  return setting.value === '1';
+};
 
 const makeProxyToServerRequest = parsedRequest =>
   new Promise(resolve => {
@@ -81,7 +85,9 @@ const proxyRequestListener = async (
     await parsedRequest.saveToDatabase();
     proxyIPC.send('requestCreated', {});
 
-    if (INTERCEPT_ENABLED && parsedRequest.id !== undefined) {
+    const isInterceptEnabled = await interceptEnabled();
+
+    if (isInterceptEnabled && parsedRequest.id !== undefined) {
       const requestForIntercept = parsedRequest.toInterceptParams();
 
       global.interceptServer.queueRequest(requestForIntercept);
@@ -89,7 +95,10 @@ const proxyRequestListener = async (
         requestForIntercept
       );
 
-      parsedRequest.setRawRequest(result.request.rawRequest);
+      // If you press "disable intercept", then there will be no result.request
+      if (result.request !== undefined) {
+        parsedRequest.setRawRequest(result.request.rawRequest);
+      }
     }
 
     const serverToProxyResponse = await makeProxyToServerRequest(parsedRequest);

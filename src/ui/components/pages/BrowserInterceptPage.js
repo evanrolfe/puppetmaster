@@ -55,7 +55,7 @@ export default ({
   }
 
   const forwardRequest = () => {
-    interceptCommand('forward', {});
+    interceptCommand('forward');
   };
 
   const changeTab = i => {
