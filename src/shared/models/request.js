@@ -199,8 +199,8 @@ export default class Request {
     headerLines.forEach(line => {
       if (line.length === 0) return;
 
-      const splitLine = line.split(':');
-      headers[splitLine[0]] = splitLine[1].trim();
+      const splitLine = line.split(': ');
+      headers[splitLine[0]] = splitLine[1];
     });
 
     // If the payload has been modified, set the content-length header:
