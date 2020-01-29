@@ -13,6 +13,31 @@ const interceptEnabled = async () => {
   return setting.value === '1';
 };
 
+const decisionFromIntercept = async parsedRequest => {
+  const requestForIntercept = parsedRequest.toInterceptParams();
+
+  global.interceptServer.queueRequest(requestForIntercept);
+  const result = await global.interceptServer.decisionFromClient(
+    requestForIntercept
+  );
+
+  // If you press "disable intercept", then there will be no result.request
+  if (result.request === undefined) return result.action;
+
+  if (result.action === 'forward' && result.request.rawRequest !== undefined) {
+    parsedRequest.setRawRequest(result.request.rawRequest);
+  }
+
+  if (result.action === 'respond' && result.request.rawResponse !== undefined) {
+    parsedRequest.setRawResponse(
+      result.request.rawResponse,
+      result.request.rawResponseBody
+    );
+  }
+
+  return result.action;
+};
+
 const makeProxyToServerRequest = parsedRequest =>
   new Promise(resolve => {
     const protocol = parsedRequest.port === 443 ? https : http;
@@ -86,40 +111,39 @@ const proxyRequestListener = async (
     proxyIPC.send('requestCreated', {});
 
     const isInterceptEnabled = await interceptEnabled();
+    const shouldInterceptRequest =
+      isInterceptEnabled && parsedRequest.id !== undefined;
+    let shouldInterceptResponse = false;
 
-    if (isInterceptEnabled && parsedRequest.id !== undefined) {
-      const requestForIntercept = parsedRequest.toInterceptParams();
-
-      global.interceptServer.queueRequest(requestForIntercept);
-      const result = await global.interceptServer.decisionFromClient(
-        requestForIntercept
-      );
-
-      // If you press "disable intercept", then there will be no result.request
-      if (result.request !== undefined) {
-        parsedRequest.setRawRequest(result.request.rawRequest);
-      }
+    if (shouldInterceptRequest) {
+      const interceptDecision = await decisionFromIntercept(parsedRequest);
+      shouldInterceptResponse = interceptDecision === 'forwardAndIntercept';
     }
 
     const serverToProxyResponse = await makeProxyToServerRequest(parsedRequest);
+    parsedRequest.addHttpServerResponse(serverToProxyResponse);
 
+    if (shouldInterceptResponse) {
+      await decisionFromIntercept(parsedRequest);
+    }
+
+    // If the request is suppoused to be captured, then save the response
     if (parsedRequest.id !== undefined) {
-      parsedRequest.addHttpServerResponse(serverToProxyResponse);
       await parsedRequest.saveToDatabase();
       proxyIPC.send('requestCreated', {});
     }
 
+    // Return the response from the proxy to the client
+    const responseOptions = parsedRequest.toHttpResponseOptions();
     const responseHeaders = Object.assign(serverToProxyResponse.headers);
-    responseHeaders['content-length'] = Buffer.byteLength(
-      serverToProxyResponse.body
-    );
+    responseHeaders['content-length'] = Buffer.byteLength(responseOptions.body);
 
     proxyToClientResponse.writeHead(
       serverToProxyResponse.statusCode,
       responseHeaders
     );
 
-    proxyToClientResponse.end(serverToProxyResponse.body);
+    proxyToClientResponse.end(responseOptions.body);
   }
 };
 

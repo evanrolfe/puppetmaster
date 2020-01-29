@@ -34,6 +34,7 @@ export default class InterceptServer {
         console.log(
           `[InterceptServer] Processing request ${request.id} from queue...`
         );
+
         proxyIPC.send('requestIntercepted', { request: request });
       } else {
         setTimeout(() => {
@@ -56,7 +57,9 @@ export default class InterceptServer {
         if (data.action === 'forward') {
           this.events.emit(`requestDecision-${data.request.id}`, data);
         } else if (data.action === 'forwardAndIntercept') {
-          // TODO
+          this.events.emit(`requestDecision-${data.request.id}`, data);
+        } else if (data.action === 'respond') {
+          this.events.emit(`requestDecision-${data.request.id}`, data);
         } else if (data.action === 'disable') {
           console.log(`[InterceptServer] disabling the request queue...`);
           this.clearQueue();

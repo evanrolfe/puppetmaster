@@ -54,13 +54,48 @@ export default ({
     );
   }
 
-  const forwardRequest = () => {
-    interceptCommand('forward');
-  };
-
   const changeTab = i => {
     setTabIndex(i);
   };
+
+  const isResponse = request !== null && request.rawResponse !== undefined;
+
+  const requestButtons = (
+    <>
+      <button
+        className="pointer btn btn--outlined btn--super-compact"
+        style={{ display: 'inline-block' }}
+        onClick={() => interceptCommand('forward')}
+        disabled={buttonsDisabled}
+      >
+        <i className="fas fa-arrow-right" />
+        &nbsp; Forward
+      </button>
+      <button
+        className="pointer btn btn--outlined btn--super-compact"
+        style={{ marginLeft: '10px', display: 'inline-block' }}
+        onClick={() => interceptCommand('forwardAndIntercept')}
+        disabled={buttonsDisabled}
+      >
+        <i className="fas fa-exchange-alt" />
+        &nbsp; Forward & Intercept Response
+      </button>
+    </>
+  );
+
+  const responseButtons = (
+    <>
+      <button
+        className="pointer btn btn--outlined btn--super-compact"
+        style={{ display: 'inline-block' }}
+        onClick={() => interceptCommand('respond')}
+        disabled={buttonsDisabled}
+      >
+        <i className="fas fa-arrow-right" />
+        &nbsp; Respond
+      </button>
+    </>
+  );
 
   return (
     <PaneContainer orientation="vertical">
@@ -81,33 +116,8 @@ export default ({
           className="form-control form-control--outlined"
           style={{ width: '100%', display: 'inline-block' }}
         >
-          <button
-            className="pointer btn btn--outlined btn--super-compact"
-            style={{ display: 'inline-block' }}
-            onClick={forwardRequest}
-            disabled={buttonsDisabled}
-          >
-            <i className="fas fa-arrow-right" />
-            &nbsp; Forward
-          </button>
-          <button
-            className="pointer btn btn--outlined btn--super-compact"
-            style={{ marginLeft: '10px', display: 'inline-block' }}
-            onClick={() => interceptCommand('forwardAndIntercept')}
-            disabled={buttonsDisabled}
-          >
-            <i className="fas fa-exchange-alt" />
-            &nbsp; Forward & Intercept Response
-          </button>
-          <button
-            className="pointer btn btn--outlined btn--super-compact"
-            style={{ marginLeft: '10px', display: 'inline-block' }}
-            onClick={() => interceptCommand('drop')}
-            disabled={buttonsDisabled}
-          >
-            <i className="fas fa-times" />
-            &nbsp; Drop
-          </button>
+          {!isResponse && requestButtons}
+          {isResponse && responseButtons}
           <button
             className="pointer btn btn--outlined btn--super-compact"
             style={{ marginLeft: '10px', display: 'inline-block' }}

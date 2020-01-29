@@ -228,7 +228,13 @@ const setInterceptRequest = (state, action) => {
   console.log(`[STATE] Set ${action.page}.request to: ${action.request}`);
 
   // Parse the request headers to text:
-  if (action.request !== null) {
+  if (action.request !== null && action.request.rawResponse !== undefined) {
+    newState[action.page].requestHeadersText = action.request.rawResponse;
+    newState[action.page].requestPayloadText = action.request.responseBody;
+  } else if (
+    action.request !== null &&
+    action.request.rawRequest !== undefined
+  ) {
     newState[action.page].requestHeadersText = action.request.rawRequest;
   } else {
     newState[action.page].requestHeadersText = '';
@@ -549,21 +555,33 @@ function* sendInterceptCommand(args) {
   const requestHeadersText = yield select(
     state => state.browserInterceptPage.requestHeadersText
   );
+  const requestPayloadText = yield select(
+    state => state.browserInterceptPage.requestPayloadText
+  );
 
   let params = {};
 
-  if (args.action === 'forward') {
+  if (['forward', 'forwardAndIntercept'].includes(args.action)) {
     if (request === null) return;
 
     params = {
-      action: 'forward',
+      action: args.action,
       request: {
         id: request.id,
         rawRequest: requestHeadersText
       }
     };
+  } else if (args.action === 'respond') {
+    if (request === null) return;
 
-    yield console.log(params);
+    params = {
+      action: args.action,
+      request: {
+        id: request.id,
+        rawResponse: requestHeadersText,
+        rawResponseBody: requestPayloadText
+      }
+    };
   } else if (args.action === 'disable') {
     params = { action: 'disable' };
   }

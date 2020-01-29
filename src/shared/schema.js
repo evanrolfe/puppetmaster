@@ -22,15 +22,23 @@ export default `CREATE TABLE IF NOT EXISTS requests(
 
   created_at INTEGER,
   request_type TEXT,
+  response_body_rendered TEXT,
+  response_remote_address TEXT,
+
   request_headers TEXT,
   request_payload TEXT,
   response_status INTEGER,
   response_status_message TEXT,
   response_headers TEXT,
-  response_remote_address TEXT,
   response_body TEXT,
   response_body_length INTEGER,
-  response_body_rendered TEXT
+
+  response_modified BOOLEAN,
+  modified_response_status INTEGER,
+  modified_response_status_message TEXT,
+  modified_response_headers TEXT,
+  modified_response_body TEXT,
+  modified_response_body_length INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS capture_filters(

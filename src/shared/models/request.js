@@ -67,13 +67,21 @@ export default class Request {
 
       'created_at',
       'request_type',
+      'response_body_rendered',
+      'response_remote_address',
+
       'response_status',
       'response_status_message',
       'response_headers',
-      'response_remote_address',
       'response_body',
       'response_body_length',
-      'response_body_rendered'
+
+      'response_modified',
+      'modified_response_status',
+      'modified_response_status_message',
+      'modified_response_headers',
+      'modified_response_body',
+      'modified_response_body_length'
     ];
     attrs.forEach(attr => {
       this[attr] = params[attr];
@@ -82,11 +90,21 @@ export default class Request {
 
   async saveToDatabase() {
     const requestParams = Object.assign({}, this);
+
+    // Request Headers:
     requestParams.request_headers = JSON.stringify(
       requestParams.request_headers
     );
     requestParams.modified_request_headers = JSON.stringify(
       requestParams.modified_request_headers
+    );
+
+    // Response Headers:
+    requestParams.response_headers = JSON.stringify(
+      requestParams.response_headers
+    );
+    requestParams.modified_response_headers = JSON.stringify(
+      requestParams.modified_response_headers
     );
 
     if (requestParams.request_payload !== undefined)
@@ -141,10 +159,36 @@ export default class Request {
     };
   }
 
+  toHttpResponseOptions() {
+    const body =
+      this.modified_response_body === undefined
+        ? this.response_body
+        : this.modified_response_body;
+    const headers =
+      this.modified_response_headers === undefined
+        ? this.response_headers
+        : this.modified_response_headers;
+    const statusCode =
+      this.modified_response_status === undefined
+        ? this.response_status
+        : this.modified_response_status;
+    const statusMessage =
+      this.modified_response_status_message === undefined
+        ? this.response_status_message
+        : this.modified_response_status_message;
+
+    return {
+      body: body,
+      headers: headers,
+      statusCode: statusCode,
+      statusMessage: statusMessage
+    };
+  }
+
   addHttpServerResponse(httpServerResponse) {
     this.response_status = httpServerResponse.statusCode;
     this.response_status_message = httpServerResponse.statusMessage;
-    this.response_headers = JSON.stringify(httpServerResponse.headers);
+    this.response_headers = httpServerResponse.headers;
     this.response_body = httpServerResponse.body.toString();
     this.response_remote_address = httpServerResponse.remoteAddress;
   }
@@ -154,30 +198,31 @@ export default class Request {
     this.request_payload = requestPayload;
   }
 
+  hasResponse() {
+    return this.response_status !== undefined;
+  }
+
   toInterceptParams() {
-    let rawRequest = `${this.method.toUpperCase()} ${this.path} HTTP/${
-      this.http_version
-    }\n`;
-    Object.keys(this.request_headers).forEach(header => {
-      rawRequest += `${header}: ${this.request_headers[header]}\n`;
-    });
-
-    if (this.request_payload !== undefined && this.request_payload.length > 0) {
-      rawRequest += '\n';
-      rawRequest += this.request_payload.toString();
-    }
-
-    return {
+    const params = {
       id: this.id,
       method: this.method,
       url: this.url,
-      rawRequest: rawRequest
+      rawRequest: this.toRawRequest()
     };
+
+    // TODO: Add the rawResponse here if it exists:
+    if (this.hasResponse()) {
+      params.rawResponse = this.toRawResponse();
+      params.responseBody = this.response_body;
+    }
+
+    return params;
   }
 
   // Overwrites the existing request based on whats contained in the raw request
   setRawRequest(rawRequest) {
     const originalRawRequest = this.toInterceptParams().rawRequest;
+    // Do not bother setting modified_* fields if the request hasn't changed
     if (originalRawRequest === rawRequest) return;
 
     this.request_modified = true;
@@ -226,6 +271,37 @@ export default class Request {
     this.modified_ext = ext;
   }
 
+  setRawResponse(rawResponse, rawResponseBody) {
+    const originalRawResponse = this.toInterceptParams().rawResponse;
+    const originalBody = this.response_body;
+
+    // Do not bother setting modified_* fields if the response hasn't changed
+    if (originalRawResponse === rawResponse && originalBody === rawResponseBody)
+      return;
+
+    this.response_modified = true;
+    this.modified_response_body = rawResponseBody;
+
+    const lines = rawResponse.split('\n');
+    const statusLineArr = lines[0].split(' ');
+
+    this.modified_response_status = statusLineArr[1];
+    this.modified_response_status_message = statusLineArr
+      .slice(2, statusLineArr.length)
+      .join(' ');
+
+    const headerLines = lines.slice(1, lines.length);
+    const headers = {};
+    headerLines.forEach(line => {
+      if (line.length === 0) return;
+
+      const splitLine = line.split(': ');
+      headers[splitLine[0]] = splitLine[1];
+    });
+
+    this.modified_response_headers = headers;
+  }
+
   static fromHttpIncomingMessage(incomingMessage) {
     const isSSL = incomingMessage.socket.encrypted;
     const hostPort = parseHostAndPort(incomingMessage, isSSL ? 443 : 80);
@@ -264,5 +340,31 @@ export default class Request {
     });
 
     return request;
+  }
+
+  toRawRequest() {
+    let rawRequest = `${this.method.toUpperCase()} ${this.path} HTTP/${
+      this.http_version
+    }\n`;
+    Object.keys(this.request_headers).forEach(header => {
+      rawRequest += `${header}: ${this.request_headers[header]}\n`;
+    });
+
+    if (this.request_payload !== undefined && this.request_payload.length > 0) {
+      rawRequest += '\n';
+      rawRequest += this.request_payload.toString();
+    }
+
+    return rawRequest;
+  }
+
+  toRawResponse() {
+    let rawResponse = `HTTP/${this.http_version} ${this.response_status} ${this.response_status_message}\n`;
+
+    Object.keys(this.response_headers).forEach(header => {
+      rawResponse += `${header}: ${this.response_headers[header]}\n`;
+    });
+
+    return rawResponse;
   }
 }
