@@ -135,11 +135,12 @@ const proxyRequestListener = async (
 
     // Return the response from the proxy to the client
     const responseOptions = parsedRequest.toHttpResponseOptions();
-    const responseHeaders = Object.assign(serverToProxyResponse.headers);
+    const responseHeaders = Object.assign({}, responseOptions.headers);
     responseHeaders['content-length'] = Buffer.byteLength(responseOptions.body);
 
     proxyToClientResponse.writeHead(
-      serverToProxyResponse.statusCode,
+      responseOptions.statusCode,
+      responseOptions.statusMessage,
       responseHeaders
     );
 
