@@ -138,11 +138,13 @@ export default ({
         >
           <TabList>
             <Tab>
-              <button type="button">Request</button>
+              <button type="button">Headers</button>
             </Tab>
-            <Tab>
-              <button type="button">Payload</button>
-            </Tab>
+            {isResponse && (
+              <Tab>
+                <button type="button">Body</button>
+              </Tab>
+            )}
           </TabList>
         </Tabs>
       </PaneFixed>
