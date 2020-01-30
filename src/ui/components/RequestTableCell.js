@@ -26,7 +26,9 @@ export default ({ request, column }: Props) => {
 
     case 'request_modified': {
       const check = <i className="fas fa-check" />;
-      const content = request.request_modified === 1 ? check : '';
+      const modified =
+        request.request_modified === 1 || request.response_modified === 1;
+      const content = modified ? check : '';
       return <td style={{ textAlign: 'center' }}>{content}</td>;
     }
 

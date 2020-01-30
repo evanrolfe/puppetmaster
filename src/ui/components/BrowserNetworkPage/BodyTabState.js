@@ -33,6 +33,9 @@ export default () => {
   const { windowSizeThrottel } = trackedState;
 
   const request = useSelector(state => state.browserNetworkPage.request);
+  const showModifiedResponse = useSelector(
+    state => state.browserNetworkPage.showModifiedResponse
+  );
   const prevPanesWidth = useSelector(prevPanesWidthSelector);
 
   const orientation = useSelector(
@@ -58,10 +61,19 @@ export default () => {
     windowSizeThrottel
   );
 
-  console.log(`codeMirrorWidth: ${codeMirrorWidth}`);
+  let responseBody;
+  if (request === null) {
+    responseBody = '';
+  } else if (showModifiedResponse === true && request.response_modified === 1) {
+    responseBody = request.modified_response_body;
+  } else {
+    responseBody = request.response_body;
+  }
+
   return (
     <BodyTab
       request={request}
+      responseBody={responseBody}
       codeMirrorWidth={codeMirrorWidth}
       viewContent={viewContent}
       viewMode={viewMode}

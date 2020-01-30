@@ -12,17 +12,27 @@ import {
   isHTML
 } from '../../lib/CodeEditorUtils';
 
+type Props = {
+  viewMode: 'string',
+  viewContent: 'string',
+  request: 'object',
+  codeMirrorWidth: 'number',
+  selectDropdownItem: 'function',
+  responseBody: 'string'
+};
+
 export default ({
   viewMode,
   viewContent,
   request,
   codeMirrorWidth,
-  selectDropdownItem
-}) => {
+  selectDropdownItem,
+  responseBody
+}: Props) => {
   console.log(`[RENDER] BodyTab`);
 
   const openInBrowser = () => {
-    const content = request.response_body || '';
+    const content = responseBody || '';
     const contentEncoded = Buffer.from(content).toString('base64');
     global.backendConn.send('BrowsersController', 'create', {
       contentEncoded: contentEncoded
@@ -98,7 +108,7 @@ export default ({
   if (normalisedViewContent === 'render') {
     code = request.response_body_rendered || '';
   } else {
-    code = request.response_body || '';
+    code = responseBody || '';
   }
 
   if (normalisedViewMode === 'pretty' && canPrettify(mimeType)) {
