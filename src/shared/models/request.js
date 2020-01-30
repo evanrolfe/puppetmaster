@@ -113,6 +113,10 @@ export default class Request {
     if (requestParams.modified_request_payload !== undefined)
       requestParams.modified_request_payload = requestParams.modified_request_payload.toString();
 
+    // Response Body:
+    if (requestParams.response_body !== undefined)
+      requestParams.response_body = requestParams.response_body.toString();
+
     // Create the request:
     if (this.id === undefined) {
       const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
@@ -189,7 +193,7 @@ export default class Request {
     this.response_status = httpServerResponse.statusCode;
     this.response_status_message = httpServerResponse.statusMessage;
     this.response_headers = httpServerResponse.headers;
-    this.response_body = httpServerResponse.body.toString();
+    this.response_body = httpServerResponse.body;
     this.response_remote_address = httpServerResponse.remoteAddress;
   }
 
@@ -213,7 +217,7 @@ export default class Request {
     // TODO: Add the rawResponse here if it exists:
     if (this.hasResponse()) {
       params.rawResponse = this.toRawResponse();
-      params.responseBody = this.response_body;
+      params.responseBody = this.response_body.toString();
     }
 
     return params;
