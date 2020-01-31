@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 
 import mainIpc from '../../shared/ipc-server';
 import certUtils from '../../shared/cert-utils';
-
+import { handleNewPage } from './BrowserPageUtils';
 /*
  * NOTE: For each response intercepted
  * If that request is a navigation request (i.e. a page displayed in the browser), then we start
@@ -63,8 +63,7 @@ const getBrowserOptions = browserId => {
       '--proxy-bypass-list=<-loopback>', // Allows you to access localhost
       '--disable-restore-session-state',
       '--no-default-browser-check',
-      '--disable-sync',
-      '--incognito'
+      '--disable-sync'
     ]
   };
 
@@ -103,6 +102,7 @@ const updateBrowser = async (browserId, title) => {
 // https://github.com/GoogleChrome/puppeteer/issues/1316
 // https://stackoverflow.com/questions/57987585/puppeteer-how-to-store-a-session-including-cookies-page-state-local-storage
 const openBrowser = async browserId => {
+  console.log(`[BrowserUtils] opening browser ${browserId}`);
   const options = getBrowserOptions(browserId);
   const browser = await puppeteer.launch(options);
 
@@ -122,13 +122,21 @@ const openBrowser = async browserId => {
     .targets()
     .find(targetEnum => targetEnum._targetInfo.type === 'page');
 
-  const cdpSession = await target.createCDPSession();
-  await cdpSession.send('Network.setCookies', {
-    cookies: cookiesObj
-  });
+  if (cookiesObj !== null) {
+    const cdpSession = await target.createCDPSession();
+    await cdpSession.send('Network.setCookies', {
+      cookies: cookiesObj
+    });
+  }
 
   // Load the pages
-  const pageUrls = JSON.parse(browserRecord.pages);
+  let pageUrls;
+  if (browserRecord.pages === null) {
+    pageUrls = [];
+  } else {
+    pageUrls = JSON.parse(browserRecord.pages);
+  }
+
   for (let i = 0; i < pageUrls.length; i++) {
     const pageUrl = pageUrls[i];
 
@@ -149,12 +157,15 @@ const openBrowser = async browserId => {
     handleNewPage(page);
   }
 
+  console.log(`[BrowserUtils] 1 instrumenting browser...`);
   await instrumentBrowser(browser);
 
   mainIpc.send('browsersChanged', {});
 };
 
 const instrumentBrowser = async browser => {
+  console.log(`[BrowserUtils] 2 instrumenting browser...`);
+
   const pages = await browser.pages();
   const page = pages[0];
 
@@ -162,7 +173,9 @@ const instrumentBrowser = async browser => {
 
   // Intercept any new tabs created in the browser:
   browser.on('targetcreated', async target => {
+    console.log(`[BrowserUtils] Target created`);
     const newPage = await target.page();
+    console.log(`[BrowserUtils] taret page: ${newPage.url()}`);
     handleNewPage(newPage);
   });
 
@@ -181,14 +194,6 @@ const handleBrowserClosed = async browser => {
     globalBrowser => globalBrowser !== browser
   );
   mainIpc.send('browsersChanged', {});
-};
-
-const handleNewPage = async page => {
-  if (page === null) return;
-
-  await page.setCacheEnabled(false);
-
-  // page.on('response', async response => handleResponse(page, response));
 };
 
 /*

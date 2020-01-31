@@ -4,8 +4,6 @@ import ipc from '../../shared/ipc-server';
 export default class RequestsController {
   // GET /requests
   async index(args) {
-    console.log(`[Backend] args: ${JSON.stringify(args)}`);
-
     const columns = [
       'requests.id',
       'browser_id',

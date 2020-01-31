@@ -247,7 +247,7 @@
     "lodash": "^4.17.15",
     "node-ipc": "^9.1.1",
     "node-noop": "^1.0.0",
-    "puppeteer": "^2.0.0",
+    "puppeteer": "^2.1.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.18",

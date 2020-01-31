@@ -85,7 +85,8 @@
     "no-else-return": "off",
     "jsx-a11y/label-has-for": "off",
     "jsx-a11y/label-has-associated-control": "off",
-    "jsx-a11y/alt-text": "off"
+    "jsx-a11y/alt-text": "off",
+    "import/prefer-default-export": "off"
   },
   "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {

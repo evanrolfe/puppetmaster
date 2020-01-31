@@ -212,8 +212,6 @@ export default class Request {
       query = query.orderBy('requests.id', 'desc');
     }
 
-    console.log(`[Backend] SQL Query: ${query.toSQL().sql}`);
-
     return query;
   }
 

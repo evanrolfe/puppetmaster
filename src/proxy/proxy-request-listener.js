@@ -135,8 +135,13 @@ const proxyRequestListener = async (
 
     // Return the response from the proxy to the client
     const responseOptions = parsedRequest.toHttpResponseOptions();
+
     const responseHeaders = Object.assign({}, responseOptions.headers);
     responseHeaders['content-length'] = Buffer.byteLength(responseOptions.body);
+
+    if (parsedRequest.id !== undefined) {
+      responseHeaders['X-PnTest-Id'] = parsedRequest.id;
+    }
 
     proxyToClientResponse.writeHead(
       responseOptions.statusCode,
