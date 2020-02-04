@@ -2,6 +2,7 @@ import http from 'http';
 import tls from 'tls';
 import { argv } from 'yargs';
 import httpolyglot from 'httpolyglot';
+import log from 'electron-log';
 
 import proxyIPC from '../shared/ipc-server';
 import database from '../shared/database';
@@ -29,7 +30,7 @@ const peekFirstByte = socket =>
 const startIPCServer = () => {
   const socketName = PROXY_SOCKET_NAMES[process.env.NODE_ENV];
   proxyIPC.init(socketName, {});
-  console.log(`[Proxy] IPC server listening on socket: ${socketName}`);
+  log.info(`[Proxy] IPC server listening on socket: ${socketName}`);
 };
 
 const startInterceptServer = () => {
@@ -37,22 +38,25 @@ const startInterceptServer = () => {
   const interceptServer = new InterceptServer(socketName);
   interceptServer.init();
   global.interceptServer = interceptServer;
-  console.log(`[Proxy] Intercept server started`);
+  log.info(`[Proxy] Intercept server started`);
 };
 
 const startServer = async () => {
-  console.log(`Starting proxy server in mode: ${process.env.NODE_ENV}`);
+  log.info(`[Proxy] Starting proxy server in mode: ${process.env.NODE_ENV}`);
   let dbFile;
 
   if (argv.db === undefined) {
     dbFile = DATABASE_FILES[process.env.NODE_ENV];
-    console.log(`No --db arg given, using default database file: ${dbFile}`);
+    log.info(
+      `[Proxy] No --db arg given, using default database file: ${dbFile}`
+    );
   } else {
     dbFile = argv.db;
   }
 
+  log.info(`[Proxy] Loading database from  ${dbFile}`);
   global.knex = await database.setupDatabaseStore(dbFile);
-  console.log(`[Proxy] Database loaded from  ${dbFile}`);
+  log.info(`[Proxy] Database loaded.`);
 
   const defaultCert = certUtils.getCertKeyPair();
 
@@ -68,7 +72,7 @@ const startServer = async () => {
   server.addListener('connect', (req, socket) => {
     const [targetHost, port] = req.url.split(':');
 
-    socket.once('error', e => console.log('[Proxy] Error on client socket', e));
+    socket.once('error', e => log.error('[Proxy] Error on client socket', e));
 
     socket.write(
       `HTTP/${req.httpVersion} 200 OK\r\n\r\n`,
@@ -80,11 +84,11 @@ const startServer = async () => {
         socket.upstreamEncryption = mightBeTLSHandshake(firstByte);
 
         if (socket.upstreamEncryption) {
-          console.log(`[Proxy] Unwrapping TLS connection to ${targetHost}`);
+          log.debug(`[Proxy] Unwrapping TLS connection to ${targetHost}`);
           unwrapTLS(targetHost, port, socket);
         } else {
           // Non-TLS CONNECT, probably a plain HTTP websocket. Pass it through untouched.
-          console.log(`[Proxy] Passing through connection to ${targetHost}`);
+          log.debug(`[Proxy] Passing through connection to ${targetHost}`);
           server.emit('connection', socket);
           socket.resume();
         }
@@ -121,7 +125,7 @@ const startServer = async () => {
         // eslint-disable-next-line prefer-promise-reject-errors
         setTimeout(() => reject('closed'), 1);
       });
-    }).catch(cause => console.log(`[Proxy] tlsSocket FAILED: ${cause}`));
+    }).catch(cause => log.warn(`[Proxy] tlsSocket FAILED: ${cause}`));
 
     const innerServer = http.createServer((req, res) => {
       // Request URIs are usually relative here, but can be * (OPTIONS) or absolute (odd people) in theory
@@ -142,7 +146,7 @@ const startServer = async () => {
   };
 
   server.listen(8080);
-  console.log('[Proxy] Server listening on 8080');
+  log.info('[Proxy] Server listening on 8080');
 };
 
 // To Test:

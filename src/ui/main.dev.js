@@ -64,32 +64,32 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
-  log.warn('App ready.');
+  log.info('App ready.');
 
   // IMPORTANT: This has to be done before the backend or proxy start!!!
   await certUtils.generateCertsIfNotExists();
 
-  const dbPath = path.join(app.getAppPath(), DEFAULT_DB_FILE);
+  const dbPath = path.join(app.getPath('userData'), DEFAULT_DB_FILE);
 
   // Delete the temp project db file if it already exists:
   if (fs.existsSync(dbPath)) {
-    console.log(`[MAIN] temp project already exists at: ${dbPath}, deleting..`);
+    log.info(`[MAIN] temp project already exists at: ${dbPath}, deleting..`);
     fs.unlinkSync(dbPath);
   }
 
   if (process.env.NODE_ENV === 'production') {
-    log.warn('[MAIN] Starting background server...');
+    log.info('[MAIN] Starting background server...');
     backendProcHandler.setOptions(app, dbPath);
     backendProcHandler.start();
   }
 
   if (process.env.NODE_ENV === 'production') {
-    log.warn('[MAIN] Starting proxy server...');
+    log.info('[MAIN] Starting proxy server...');
     proxyProcHandler.setOptions(app, dbPath);
     proxyProcHandler.start();
   }
 
-  log.warn('Started.');
+  log.info('Started.');
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -126,7 +126,7 @@ app.on('ready', async () => {
     setNewProjectPath(filePath);
   };
 
-  log.warn('MainWindow opened.');
+  log.info('MainWindow opened.');
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
