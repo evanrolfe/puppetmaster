@@ -14,7 +14,11 @@ const DEFAULT_FILTERS = {
   resourceTypes: []
 };
 
-export default class CaptureFiltersModal extends Component {
+type Props = {
+  allResourceTypes: 'array'
+};
+
+export default class CaptureFiltersModal extends Component<Props> {
   constructor(props) {
     super(props);
 
@@ -27,7 +31,7 @@ export default class CaptureFiltersModal extends Component {
     this._handleChangeListInput = this._handleChangeListInput.bind(this);
     this._handleChangeSetting = this._handleChangeSetting.bind(this);
     this._handleApply = this._handleApply.bind(this);
-    this._handleResourceTypeChange = this._handleResourceTypeChange.bind(this);
+    this._handleNavRequestsChange = this._handleNavRequestsChange.bind(this);
     this.onHide = this.onHide.bind(this);
     this.toggleAllResourceTypes = this.toggleAllResourceTypes.bind(this);
   }
@@ -92,23 +96,12 @@ export default class CaptureFiltersModal extends Component {
     });
   }
 
-  _handleResourceTypeChange(event) {
-    const value = event.target.value;
+  _handleNavRequestsChange(event) {
     const checked = event.target.checked;
 
     this.setState(prevState => {
       const newFilters = JSON.parse(JSON.stringify(prevState.filters));
-
-      if (checked) {
-        if (!newFilters.resourceTypes.includes(value)) {
-          newFilters.resourceTypes.push(value);
-        }
-      } else {
-        newFilters.resourceTypes = newFilters.resourceTypes.filter(
-          type => type !== value
-        );
-      }
-
+      newFilters.navigationRequests = checked;
       return { filters: newFilters };
     });
   }
@@ -153,7 +146,7 @@ export default class CaptureFiltersModal extends Component {
           type="checkbox"
           value={type}
           checked={this.state.filters.resourceTypes.includes(type)}
-          onChange={this._handleResourceTypeChange}
+          onChange={this._handleNavRequestsChange}
         />
       </label>
     );
@@ -270,27 +263,15 @@ export default class CaptureFiltersModal extends Component {
                 className="form-control form-control--thin"
                 style={{ width: '50%', paddingRight: '6px' }}
               >
-                <strong>Resource Type: </strong>
-                <span onClick={this.toggleAllResourceTypes}>(toggle all)</span>
-
                 <div className="row-fill">
-                  <div>
-                    {this.props.allResourceTypes
-                      .slice(0, 5)
-                      .map(type => this.displayResourceTypeCheckbox(type))}
-                  </div>
-                  <div>
-                    {this.props.allResourceTypes
-                      .slice(5, 10)
-                      .map(type => this.displayResourceTypeCheckbox(type))}
-                  </div>
-                  <div
-                    style={{ display: 'inline-block', verticalAlign: 'top' }}
-                  >
-                    {this.props.allResourceTypes
-                      .slice(10, this.props.allResourceTypes.length)
-                      .map(type => this.displayResourceTypeCheckbox(type))}
-                  </div>
+                  <label style={{ verticalAlign: 'top' }}>
+                    Capture navigation requests?
+                    <input
+                      type="checkbox"
+                      checked={this.state.filters.navigationRequests}
+                      onChange={this._handleNavRequestsChange}
+                    />
+                  </label>
                 </div>
               </div>
             </div>

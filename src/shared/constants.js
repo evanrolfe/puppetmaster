@@ -29,20 +29,5 @@ export const DEFAULT_FILTERS = {
   pathSetting: '',
   extList: [],
   extSetting: '',
-  resourceTypes: [
-    'document',
-    'eventsource',
-    'fetch',
-    'font',
-    'image',
-    'manifest',
-    'media',
-    'navigation',
-    'other',
-    'stylesheet',
-    'script',
-    'texttrack',
-    'websocket',
-    'xhr'
-  ]
+  navigationRequests: true
 };

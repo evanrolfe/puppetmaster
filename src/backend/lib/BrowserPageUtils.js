@@ -1,4 +1,5 @@
 import mainIpc from '../../shared/ipc-server';
+import CaptureFilters from '../../shared/models/capture-filters';
 
 /*
  * NOTE: For each response intercepted
@@ -40,7 +41,10 @@ const handleResponse = async (page, response) => {
     await global
       .knex('requests')
       .where({ id: requestId })
-      .update({ browser_id: page.browser().id });
+      .update({
+        browser_id: page.browser().id,
+        request_type: response.request().resourceType()
+      });
 
     mainIpc.send('requestCreated', {});
   }
@@ -84,6 +88,10 @@ const handleResponse = async (page, response) => {
 };
 
 const handleFramenavigated = async (page, frame, origURL) => {
+  // Check captureFilters.navigationRequests
+  const captureFilters = await CaptureFilters.getFilters();
+  if (captureFilters.navigationRequests === false) return;
+
   // See: https://stackoverflow.com/questions/49237774/using-devtools-protocol-event-page-framenavigated-to-get-client-side-navigation
   // See: https://github.com/GoogleChrome/puppeteer/issues/1489
   if (frame !== page.mainFrame()) return; //  || origURL === 'about:blank'
@@ -110,6 +118,7 @@ const handleFramenavigated = async (page, frame, origURL) => {
     request_type: 'navigation',
     created_at: Date.now()
   };
+
   const result = await global.knex('requests').insert(requestParams);
   const requestId = result[0];
 

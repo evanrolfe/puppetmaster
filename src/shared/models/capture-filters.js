@@ -111,15 +111,7 @@ export default class CaptureFilters {
     ) {
       return false;
     }
-    /*
-    // Filter resourceType (include):
-    if (
-      filters.resourceTypes.length > 0 &&
-      !filters.resourceTypes.includes(request.request_type)
-    ) {
-      return false;
-    }
-*/
+
     return true;
   }
 }
