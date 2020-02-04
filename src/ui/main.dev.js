@@ -13,10 +13,14 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import path from 'path';
+import fs from 'fs';
 
 import certUtils from '../shared/cert-utils';
 import MenuBuilder from './menu';
-import BackendServerStarter from './lib/BackendServerStarter';
+import BackendProcHandler from './lib/BackendProcHandler';
+import ProxyProcHandler from './lib/ProxyProcHandler';
+import { DEFAULT_DB_FILE } from '../shared/constants';
 
 export default class AppUpdater {
   constructor() {
@@ -26,7 +30,8 @@ export default class AppUpdater {
   }
 }
 
-let backendProcess;
+const backendProcHandler = new BackendProcHandler();
+const proxyProcHandler = new ProxyProcHandler();
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -52,8 +57,9 @@ app.on('window-all-closed', () => {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    console.log(`Killing backend server process...`);
-    backendProcess.kill('SIGHUP');
+    console.log(`Killing backend & proxy server processes...`);
+    backendProcHandler.kill();
+    proxyProcHandler.kill();
   }
 });
 
@@ -63,9 +69,24 @@ app.on('ready', async () => {
   // IMPORTANT: This has to be done before the backend or proxy start!!!
   await certUtils.generateCertsIfNotExists();
 
+  const dbPath = path.join(app.getAppPath(), DEFAULT_DB_FILE);
+
+  // Delete the temp project db file if it already exists:
+  if (fs.existsSync(dbPath)) {
+    console.log(`[MAIN] temp project already exists at: ${dbPath}, deleting..`);
+    fs.unlinkSync(dbPath);
+  }
+
   if (process.env.NODE_ENV === 'production') {
     log.warn('[MAIN] Starting background server...');
-    backendProcess = BackendServerStarter.createBackgroundProcess(app);
+    backendProcHandler.setOptions(app, dbPath);
+    backendProcHandler.start();
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    log.warn('[MAIN] Starting proxy server...');
+    proxyProcHandler.setOptions(app, dbPath);
+    proxyProcHandler.start();
   }
 
   log.warn('Started.');
@@ -79,6 +100,31 @@ app.on('ready', async () => {
       webviewTag: true
     }
   });
+
+  const setNewProjectPath = filePath => {
+    backendProcHandler.setDbPath(filePath);
+    backendProcHandler.restart();
+
+    proxyProcHandler.setDbPath(filePath);
+    proxyProcHandler.restart();
+
+    mainWindow.reload();
+  };
+
+  const openProject = filePath => {
+    console.log(`Opening project! ${filePath}`);
+    setNewProjectPath(filePath);
+  };
+
+  const saveProjectAs = filePath => {
+    console.log(
+      `Saving project as! From: ${backendProcHandler.dbPath} to: ${filePath}`
+    );
+
+    fs.copyFileSync(backendProcHandler.dbPath, filePath);
+
+    setNewProjectPath(filePath);
+  };
 
   log.warn('MainWindow opened.');
 
@@ -103,7 +149,7 @@ app.on('ready', async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
+  const menuBuilder = new MenuBuilder(mainWindow, openProject, saveProjectAs);
   menuBuilder.buildMenu();
 
   // Remove this if your app does not use auto updates

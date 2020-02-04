@@ -32,9 +32,7 @@ export default class App extends Component {
     });
 
     ipcRenderer.on('open-project', (e, args) => {
-      global.backendConn.send('ProjectsController', 'open', {
-        filePath: args.filePath
-      });
+      console.log(args.filePath);
     });
 
     // Ensure that the app gets re-rendered once we connect to the backend

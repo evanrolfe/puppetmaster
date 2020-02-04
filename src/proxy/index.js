@@ -6,7 +6,6 @@ import httpolyglot from 'httpolyglot';
 import proxyIPC from '../shared/ipc-server';
 import database from '../shared/database';
 import {
-  DATABASE_FILES,
   PROXY_SOCKET_NAMES,
   INTERCEPT_SOCKET_NAMES
 } from '../shared/constants';
@@ -41,9 +40,10 @@ const startInterceptServer = () => {
 };
 
 const startServer = async () => {
-  const dbFile = DATABASE_FILES[process.env.NODE_ENV];
+  const dbArgs = process.argv[3].split(' ');
+  const dbFile = dbArgs[1];
   global.knex = await database.setupDatabaseStore(dbFile);
-  console.log(`[Proxy] Database loaded`);
+  console.log(`[Proxy] Database loaded from  ${dbFile}`);
 
   const defaultCert = certUtils.getCertKeyPair();
 

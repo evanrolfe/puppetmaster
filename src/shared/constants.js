@@ -22,6 +22,8 @@ export const DATABASE_FILES = {
   development: 'pntest-dev.db'
 };
 
+export const DEFAULT_DB_FILE = 'temp-project.db';
+
 export const DEFAULT_FILTERS = {
   hostList: [],
   hostSetting: '',

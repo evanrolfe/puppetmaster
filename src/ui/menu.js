@@ -1,11 +1,11 @@
 // @flow
-import { app, Menu, shell, BrowserWindow, dialog } from 'electron';
+import { app, Menu, shell, dialog } from 'electron';
 
 export default class MenuBuilder {
-  mainWindow: BrowserWindow;
-
-  constructor(mainWindow: BrowserWindow) {
+  constructor(mainWindow, openProject, saveProjectAs) {
     this.mainWindow = mainWindow;
+    this.openProject = openProject;
+    this.saveProjectAs = saveProjectAs;
   }
 
   buildMenu() {
@@ -195,7 +195,6 @@ export default class MenuBuilder {
             label: '&Open Project',
             accelerator: 'Ctrl+O',
             click: async () => {
-              console.log('Opening...');
               const openResult = await dialog.showOpenDialog({
                 title: 'Open a Project',
                 filters: [{ name: 'PM Projects', extensions: ['db'] }],
@@ -203,11 +202,24 @@ export default class MenuBuilder {
               });
 
               console.log(openResult.filePaths);
-              this.mainWindow.send('open-project', {
-                filePath: openResult.filePaths[0]
-              });
+              this.openProject(openResult.filePaths);
             }
           },
+          {
+            label: '&Save Project As',
+            accelerator: 'Ctrl+Shift+S',
+            click: async () => {
+              const openResult = await dialog.showSaveDialog({
+                title: 'Save Project As',
+                filters: [{ name: 'PM Projects', extensions: ['db'] }],
+                properties: ['openFile']
+              });
+
+              if (openResult.canceled === false)
+                this.saveProjectAs(openResult.filePath);
+            }
+          },
+
           {
             label: '&Close',
             accelerator: 'Ctrl+W',

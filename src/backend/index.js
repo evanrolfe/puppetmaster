@@ -1,5 +1,5 @@
 import ipc from '../shared/ipc-server';
-import { DATABASE_FILES, BACKEND_SOCKET_NAMES } from '../shared/constants';
+import { BACKEND_SOCKET_NAMES } from '../shared/constants';
 
 import database from './lib/database';
 import BrowserUtils from './lib/BrowserUtils';
@@ -38,13 +38,15 @@ if (process.env.NODE_ENV === undefined) {
 (async () => {
   try {
     console.log(`Starting backend server in mode: ${process.env.NODE_ENV}`);
-    const dbFile = DATABASE_FILES[process.env.NODE_ENV];
+
+    const dbArgs = process.argv[3].split(' ');
+    const dbFile = dbArgs[1];
     const socketName = BACKEND_SOCKET_NAMES[process.env.NODE_ENV];
     global.puppeteer_browsers = [];
 
     // Load the database
     global.knex = await database.setupDatabaseStore(dbFile);
-    console.log(`[Backend] Database loaded`);
+    console.log(`[Backend] Database loaded from ${dbFile}`);
 
     // Load the IPC Server
     const controllersMap = {
