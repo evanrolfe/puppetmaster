@@ -1,5 +1,6 @@
+import { argv } from 'yargs';
 import ipc from '../shared/ipc-server';
-import { BACKEND_SOCKET_NAMES } from '../shared/constants';
+import { DATABASE_FILES, BACKEND_SOCKET_NAMES } from '../shared/constants';
 
 import database from './lib/database';
 import BrowserUtils from './lib/BrowserUtils';
@@ -33,14 +34,19 @@ if (process.env.NODE_ENV === undefined) {
     `You must set the NODE_ENV var!\ni.e. NODE_ENV=development yarn start-backend`
   );
 }
-
 // Start the backend:
 (async () => {
   try {
     console.log(`Starting backend server in mode: ${process.env.NODE_ENV}`);
+    let dbFile;
 
-    const dbArgs = process.argv[3].split(' ');
-    const dbFile = dbArgs[1];
+    if (argv.db === undefined) {
+      dbFile = DATABASE_FILES[process.env.NODE_ENV];
+      console.log(`No --db arg given, using default database file: ${dbFile}`);
+    } else {
+      dbFile = argv.db;
+    }
+
     const socketName = BACKEND_SOCKET_NAMES[process.env.NODE_ENV];
     global.puppeteer_browsers = [];
 

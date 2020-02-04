@@ -18,7 +18,7 @@ export default class BackendProcHandler {
       if (this.app.isPackaged === true) serverPath += '/dist';
       serverPath += '/backend.prod.js';
 
-      const args = ['-r @babel/register', `-db ${this.dbPath}`];
+      const args = ['-r @babel/register', `--db=${this.dbPath}`];
 
       console.log(
         `Starting backend from: ${serverPath} with args: ${args.join(' ')}`

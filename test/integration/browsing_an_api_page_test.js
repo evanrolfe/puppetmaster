@@ -3,7 +3,7 @@ import { DEFAULT_FILTERS } from '../../src/shared/constants';
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
-describe('BrowsersUtils', () => {
+describe('Browsing an Api Page Test', () => {
   let browser;
 
   beforeEach(async () => {

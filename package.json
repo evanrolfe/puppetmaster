@@ -262,7 +262,8 @@
     "source-map-support": "^0.5.9",
     "sqlite3": "^4.1.0",
     "use-saga-reducer": "^1.0.2",
-    "vkbeautify": "^0.99.3"
+    "vkbeautify": "^0.99.3",
+    "yargs": "^15.1.0"
   },
   "devEngines": {
     "node": ">=7.x",

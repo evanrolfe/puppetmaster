@@ -29,6 +29,8 @@ const handleNewPage = async page => {
   if (page === null) return;
   console.log(`[BrowserUtils] handleNewPage`);
 
+  // TODO: Make this a configurable option:
+  page.setCacheEnabled(false);
   page.on('response', async response => handleResponse(page, response));
 };
 

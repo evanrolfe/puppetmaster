@@ -18,7 +18,7 @@ export default class ProxyProcHandler {
       if (this.app.isPackaged === true) serverPath += '/dist';
       serverPath += '/proxy.prod.js';
 
-      const args = ['-r @babel/register', `-db ${this.dbPath}`];
+      const args = ['-r @babel/register', `--db=${this.dbPath}`];
 
       console.log(
         `Starting proxy from: ${serverPath} with args: ${args.join(' ')}`

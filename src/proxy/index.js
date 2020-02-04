@@ -1,11 +1,12 @@
 import http from 'http';
 import tls from 'tls';
-
+import { argv } from 'yargs';
 import httpolyglot from 'httpolyglot';
 
 import proxyIPC from '../shared/ipc-server';
 import database from '../shared/database';
 import {
+  DATABASE_FILES,
   PROXY_SOCKET_NAMES,
   INTERCEPT_SOCKET_NAMES
 } from '../shared/constants';
@@ -40,8 +41,16 @@ const startInterceptServer = () => {
 };
 
 const startServer = async () => {
-  const dbArgs = process.argv[3].split(' ');
-  const dbFile = dbArgs[1];
+  console.log(`Starting proxy server in mode: ${process.env.NODE_ENV}`);
+  let dbFile;
+
+  if (argv.db === undefined) {
+    dbFile = DATABASE_FILES[process.env.NODE_ENV];
+    console.log(`No --db arg given, using default database file: ${dbFile}`);
+  } else {
+    dbFile = argv.db;
+  }
+
   global.knex = await database.setupDatabaseStore(dbFile);
   console.log(`[Proxy] Database loaded from  ${dbFile}`);
 

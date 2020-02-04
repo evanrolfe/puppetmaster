@@ -175,8 +175,10 @@ const instrumentBrowser = async browser => {
   browser.on('targetcreated', async target => {
     console.log(`[BrowserUtils] Target created`);
     const newPage = await target.page();
-    console.log(`[BrowserUtils] taret page: ${newPage.url()}`);
-    handleNewPage(newPage);
+    if (newPage !== null) {
+      console.log(`[BrowserUtils] taret page: ${newPage.url()}`);
+      handleNewPage(newPage);
+    }
   });
 
   browser.on('disconnected', () => handleBrowserClosed(browser));
