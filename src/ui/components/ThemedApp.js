@@ -30,10 +30,10 @@ export default () => {
   dispatch({ type: 'LOAD_BROWSERS' });
   dispatch({ type: 'LOAD_SETTINGS' });
 
-  global.proxyConn.listen('requestCreated', () => {
-    console.log(`RECEIVED requestCreated MESSAGE FROM PROXY IPC`);
-    dispatch({ type: 'LOAD_REQUESTS' });
-  });
+  const dispatchLoadRequests = () => dispatch({ type: 'LOAD_REQUESTS' });
+  global.backendConn.listen('requestCreated', dispatchLoadRequests);
+  global.proxyConn.listen('requestCreated', dispatchLoadRequests);
+
   global.backendConn.listen('browsersChanged', () => {
     dispatch({ type: 'LOAD_REQUESTS' });
   });

@@ -1,3 +1,5 @@
+import mainIpc from '../../shared/ipc-server';
+
 /*
  * NOTE: For each response intercepted
  * If that request is a navigation request (i.e. a page displayed in the browser), then we start
@@ -26,18 +28,22 @@ const handleNewPage = async page => {
   if (page === null) return;
   console.log(`[BrowserUtils] handleNewPage`);
 
-  // await page.setRequestInterception(true);
   page.on('response', async response => handleResponse(page, response));
-  // page.on('framenavigated', frame =>
-  //  handleFramenavigated(page, frame, origURL)
-  // );
 };
 
 const handleResponse = async (page, response) => {
-  if (response.url().includes('/assets/')) return;
-
   const headers = response.headers();
   const requestId = headers['x-pntest-id'];
+
+  // Update the request browser_id in the database
+  if (requestId !== undefined) {
+    await global
+      .knex('requests')
+      .where({ id: requestId })
+      .update({ browser_id: page.browser().id });
+
+    mainIpc.send('requestCreated', {});
+  }
 
   // This does not work when you open a link in a new tab:
   // https://github.com/puppeteer/puppeteer/issues/3667
@@ -55,31 +61,64 @@ const handleResponse = async (page, response) => {
     )
       return;
 
-    // console.log(`*--------------------------------------*`);
-    // console.log(`* Response received on page: ${page.url()}`);
-    // console.log(`* Response URL: ${response.url()}`);
-    // console.log(`* x-pntest-id: ${headers['x-pntest-id']}`)
-    // console.log(`* Is Navigation? ${response.request().isNavigationRequest()}`)
-    // console.log(`*--------------------------------------*\n\n`);
+    console.log(`*--------------------------------------*`);
+    console.log(`* Response received on page: ${page.url()}`);
+    console.log(`* Response URL: ${response.url()}`);
+    console.log(`* x-pntest-id: ${headers['x-pntest-id']}`);
+    console.log(`* Is Navigation? ${response.request().isNavigationRequest()}`);
+    console.log(`* browser_id: ${page.browser().id}`);
+    console.log(`*--------------------------------------*\n\n`);
 
     page.domListenerId = await startDOMListener(page, requestId);
+
+    const origURL = ` ${response.url()}`.slice(1); // Clone the url string
+    if (page.listenerCount('framenavigated') === 0) {
+      console.log(
+        `[BrowserUtils] starting framenavigated for request ${requestId}`
+      );
+      page.on('framenavigated', frame =>
+        handleFramenavigated(page, frame, origURL)
+      );
+    }
   }
 };
-/*
+
 const handleFramenavigated = async (page, frame, origURL) => {
   // See: https://stackoverflow.com/questions/49237774/using-devtools-protocol-event-page-framenavigated-to-get-client-side-navigation
   // See: https://github.com/GoogleChrome/puppeteer/issues/1489
-  if (frame !== page.mainFrame()) return;
+  if (frame !== page.mainFrame()) return; //  || origURL === 'about:blank'
 
   // a framenavigated event gets triggered even if we have already intercepted the requests,
   // so we don't want to create a new request for these ones
   if (frame.url() === origURL) return;
 
+  console.log(`FrameNavigation:`);
+  console.log(`page.url() ${page.url()}`);
+  console.log(`frame.url() ${frame.url()}`);
+  console.log(`origURL ${origURL}`);
+
+  // await clearInterval(page.domListenerId);
+  // console.log(`BrowserUtils: killed DomListener #${page.domListenerId}`);
+
+  // Create a navigation request (not a real HTTP request - just a change in URL)
+  const parsedUrl = new URL(page.url());
+  const requestParams = {
+    browser_id: page.browser().id,
+    url: page.url(),
+    host: parsedUrl.hostname,
+    path: parsedUrl.pathname,
+    request_type: 'navigation',
+    created_at: Date.now()
+  };
+  const result = await global.knex('requests').insert(requestParams);
+  const requestId = result[0];
+
   console.log(
     `[BrowserUtils] frameNavigated to ${frame.url()}, origURL: ${origURL}`
   );
+  console.log(`[BrowserUtils] created navigation request ${requestId}`);
+  page.domListenerId = await startDOMListener(page, requestId);
 };
-*/
 
 const startDOMListener = async (page, requestId) => {
   const domListenerId = await setInterval(async () => {
