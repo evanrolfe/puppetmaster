@@ -18,16 +18,13 @@ const handleExit = async () => {
   for (let j = 0; j < global.puppeteer_browsers.length; j++) {
     const browser = global.puppeteer_browsers[j];
 
-    // NOTE: In test mode we run a headless browser which seems to exit by
-    // itself.
+    // NOTE: In test mode we run a headless browser which exists by itself
     if (process.env.NODE_ENV !== 'test') {
       browser.close();
     }
 
-    // eslint-disable-next-line no-await-in-loop
-    await BrowserUtils.handleBrowserClosed(browser);
+    BrowserUtils.handleBrowserClosed(browser);
   }
-
   return process.exit(0);
 };
 
@@ -69,6 +66,7 @@ if (process.env.NODE_ENV === undefined) {
 
 // Handle exiting:
 // TODO: Maybe use this package? https://www.npmjs.com/package/signal-exit
+
 const events = [
   `SIGINT`,
   `SIGUSR1`,
@@ -80,5 +78,8 @@ const events = [
 
 for (let i = 0; i < events.length; i++) {
   const eventType = events[i];
-  process.on(eventType, handleExit);
+  process.on(eventType, async () => {
+    await handleExit();
+    process.exit(1);
+  });
 }

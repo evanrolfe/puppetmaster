@@ -31,7 +31,7 @@ import { handleNewPage } from './BrowserPageUtils';
 const createBrowserDb = async () => {
   const result = await global
     .knex('browsers')
-    .insert({ open: 1, created_at: Date.now() });
+    .insert({ created_at: Date.now() });
 
   const browserId = result[0];
 
@@ -182,13 +182,8 @@ const instrumentBrowser = async browser => {
   browser.on('disconnected', () => handleBrowserClosed(browser));
 };
 
-const handleBrowserClosed = async browser => {
+const handleBrowserClosed = browser => {
   console.log(`handleBrowserClosed for browser #${browser.id}`);
-
-  await global
-    .knex('browsers')
-    .where({ id: browser.id })
-    .update({ open: 0 });
 
   global.puppeteer_browsers = global.puppeteer_browsers.filter(
     globalBrowser => globalBrowser !== browser
@@ -196,162 +191,6 @@ const handleBrowserClosed = async browser => {
   mainIpc.send('browsersChanged', {});
 };
 
-/*
-const handleResponse = async (page, response) => {
-  console.log(`[BrowserUtils] handled response:`)
-
-  const headers = response.headers();
-  const requestId = response.request().requestId;
-  console.log(`handleResponse: requestId: ${requestId}`);
-  await Request.updateFromBrowserResponse(page, response);
-
-  // Save the cookies & pages:
-  const { cookies } = await page._client.send('Network.getAllCookies');
-  const pages = await page.browser().pages();
-  const pageUrls = pages.map(pageEnum => pageEnum.url());
-  await global
-    .knex('browsers')
-    .where({ id: page.browser().id })
-    .update({
-      cookies: JSON.stringify(cookies),
-      pages: JSON.stringify(pageUrls)
-    });
-
-  if (
-    response.request().isNavigationRequest() &&
-    page.url() !== 'about:blank'
-  ) {
-    // Prevent navigation requests from iframes
-    // if(response.request().frame() !== null && response.request().frame().url() !== page.url()) return;
-
-    console.log(
-      `BrowserUtils: Navigation request for ${page.url()}, requestID: ${requestId}`
-    );
-
-    await global
-      .knex('browsers')
-      .where({ id: page.browser().id })
-      .update({ pages: JSON.stringify(pageUrls) });
-
-    if (response.request().frame() !== null) {
-      console.log(
-        `BrowserUtils: request frame: ${response
-          .request()
-          .frame()
-          .url()}`
-      );
-    } else {
-      console.log(`BrowserUtils: request frame: null`);
-    }
-
-    page.requestId = requestId;
-
-    const domListenerId = await startDOMListener(page);
-    page.domListenerId = domListenerId;
-    console.log(
-      `BrowserUtils: handleResponse() domListenerId = ${domListenerId}`
-    );
-
-    const origURL = ` ${page.url()}`.slice(1); // Clone the url string
-    if (page.listenerCount('framenavigated') === 0) {
-      page.on('framenavigated', frame =>
-        //handleFramenavigated(page, frame, origURL)
-      );
-    }
-  }
-
-  mainIpc.send('requestCreated', {});
-};
-*/
-
-/*
-const handleFramenavigated = async (page, frame, origURL) => {
-  // See: https://stackoverflow.com/questions/49237774/using-devtools-protocol-event-page-framenavigated-to-get-client-side-navigation
-  // See: https://github.com/GoogleChrome/puppeteer/issues/1489
-  if (frame !== page.mainFrame()) return;
-
-  // a framenavigated event gets triggered even if we have already intercepted the requests,
-  // so we don't want to create a new request for these ones
-  if (frame.url() === origURL) return;
-
-  console.log(
-    `BrowserUtils: frameNavigated to ${frame.url()}, origURL: ${origURL}`
-  );
-
-  await clearInterval(page.domListenerId);
-  console.log(`BrowserUtils: killed DomListener #${page.domListenerId}`);
-
-  let pageBody;
-  try {
-    pageBody = await page.content();
-  } catch (error) {
-    // This happens as the result of "navigation request" i.e. typing a url in browser
-    // See: https://github.com/GoogleChrome/puppeteer/issues/2258
-    console.log(`BrowserUtils: ERRROR Saving the body for frame ${page.url()}`);
-  }
-
-  const parsedUrl = new URL(page.url());
-
-  const requestParams = {
-    browser_id: page.browser().id,
-    url: page.url(),
-    host: parsedUrl.hostname,
-    path: parsedUrl.pathname,
-    response_body_rendered: pageBody,
-    request_type: 'navigation',
-    created_at: Date.now()
-  };
-
-  const result = await global.knex('requests').insert(requestParams);
-  //  console.log(
-  //    `BrowserUtils: create new request ${result[0]} and starting DOMListener...`
-  //  );
-  page.requestId = result[0];
-  page.domListenerId = await startDOMListener(page);
-};
-
-// eslint-disable-next-line arrow-body-style
-const startDOMListener = async page => {
-  const domListenerId = await setInterval(async () => {
-    // console.log(`BrowserUtils: DOMListener ${domListenerId} running...`);
-
-    // Fetch the page's current content
-    let body;
-    try {
-      body = await page.content();
-    } catch (e) {
-      clearInterval(domListenerId); // This will run if you close the browser.
-      return;
-    }
-
-    // UGLY WORKAROUND: Prevent the race condition described at the top of page:
-    // Check that the page url has not changed while this callback has been running
-    const result = await global
-      .knex('requests')
-      .select('url')
-      .where({ id: page.requestId });
-    const request = result[0];
-    if (request.url !== page.url()) {
-      clearInterval(domListenerId); // Stop this listener because it is out of date
-      return;
-    }
-
-    // Update the request in the database
-    await global
-      .knex('requests')
-      .where({ id: page.requestId })
-      .update({ response_body_rendered: body });
-
-    //    console.log(
-    //      `BrowserUtils: saved content for page: ${page.url()} to request ${
-    //        page.requestId
-    //      }, (DOMListener ${domListenerId})`
-    //    );
-  }, 200);
-
-  return domListenerId;
-};
-*/
 export default {
   openBrowser,
   createBrowser,

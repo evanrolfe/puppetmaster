@@ -21,23 +21,20 @@ export default class BrowsersController {
   }
 
   async open(args) {
-    // args.browserId
-    const result = await global.knex('browsers').where({ id: args.browserId });
-    const browser = result[0];
+    const browser = global.puppeteer_browsers.find(
+      b => b.id === args.browserId
+    );
 
-    if (browser.open === 1) {
-      await this.bringToForeground(args);
-    } else {
+    if (browser === undefined) {
       await BrowserUtils.openBrowser(args.browserId);
+    } else {
+      await this.bringToForeground(browser);
     }
 
     return { status: 'OK', body: {} };
   }
 
-  async bringToForeground(args) {
-    const browser = global.puppeteer_browsers.find(
-      browserEnum => browserEnum.id === args.browserId
-    );
+  async bringToForeground(browser) {
     const target = browser
       .targets()
       .find(targetEnum => targetEnum._targetInfo.type === 'page');
