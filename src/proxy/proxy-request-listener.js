@@ -88,6 +88,8 @@ const proxyRequestListener = async (
   const chunks = [];
   clientToProxyRequest.on('data', chunk => chunks.push(chunk));
 
+  console.log(`[Proxy] handling request to ${clientToProxyRequest.url}`);
+
   const requestPayload = await new Promise(resolve => {
     clientToProxyRequest.on('end', () => {
       const data = Buffer.concat(chunks);

@@ -15,6 +15,7 @@ import certUtils from '../shared/cert-utils';
 
 import proxyRequestListener from './proxy-request-listener';
 import InterceptServer from './intercept-server';
+import handleUpgrade from './websocket-handler';
 
 const mightBeTLSHandshake = byte => byte === 22;
 
@@ -95,6 +96,8 @@ const startServer = async () => {
       }
     );
   });
+
+  server.on('upgrade', handleUpgrade);
 
   const unwrapTLS = (targetHost, port, socket) => {
     const tlsSocket = new tls.TLSSocket(socket, {
