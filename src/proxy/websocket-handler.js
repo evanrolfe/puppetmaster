@@ -56,24 +56,31 @@ const pipeWebSocket = (
   });
 };
 
+const saveResponseToDB = async (requestId, response) => {
+  const requestParams = {
+    response_headers: JSON.stringify(response.headers),
+    response_status: response.statusCode,
+    response_status_message: response.statusMessage
+  };
+
+  await global
+    .knex('requests')
+    .where({ id: requestId })
+    .update(requestParams);
+};
+
 const connectUpstream = (requestUrl, request, socket, head, requestId) => {
   console.log(`[WebSocket] Connecting to upstream websocket at ${requestUrl}`);
 
   const upstreamSocket = new WebSocket(requestUrl);
 
   // See: https://github.com/websockets/ws/blob/master/doc/ws.md#event-upgrade
-  upstreamSocket.once('upgrade', async response => {
-    // Here we save the response to the database:
-    const requestParams = {
-      response_headers: JSON.stringify(response.headers),
-      response_status: response.statusCode,
-      response_status_message: response.statusMessage
-    };
+  upstreamSocket.once('unexpected-response', async (_request, response) => {
+    saveResponseToDB(requestId, response);
+  });
 
-    await global
-      .knex('requests')
-      .where({ id: requestId })
-      .update(requestParams);
+  upstreamSocket.once('upgrade', async response => {
+    saveResponseToDB(requestId, response);
   });
 
   upstreamSocket.once('open', () => {
