@@ -41,6 +41,14 @@ export default `CREATE TABLE IF NOT EXISTS requests(
   modified_response_body_length INTEGER
 );
 
+CREATE TABLE IF NOT EXISTS websocket_messages(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  request_id INTEGER,
+  direction TEXT,
+  body TEXT,
+  created_at INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS capture_filters(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   filters TEXT NOT NULL

@@ -2,14 +2,20 @@ import url from 'url';
 import WebSocket from 'ws';
 
 const wsServer = new WebSocket.Server({ noServer: true });
-wsServer.on('connection', (ws, requestUrl) => {
+wsServer.on('connection', (ws, requestUrl, requestId) => {
   console.log('[WebSocket] Successfully proxying websocket streams');
 
-  pipeWebSocket(ws, ws.upstreamSocket, 'outgoing', requestUrl);
-  pipeWebSocket(ws.upstreamSocket, ws, 'incoming', requestUrl);
+  pipeWebSocket(ws, ws.upstreamSocket, 'outgoing', requestUrl, requestId);
+  pipeWebSocket(ws.upstreamSocket, ws, 'incoming', requestUrl, requestId);
 });
 
-const pipeWebSocket = (inSocket, outSocket, direction, requestUrl) => {
+const pipeWebSocket = (
+  inSocket,
+  outSocket,
+  direction,
+  requestUrl,
+  requestId
+) => {
   const onPipeFailed = op => err => {
     if (!err) return;
 
@@ -17,11 +23,19 @@ const pipeWebSocket = (inSocket, outSocket, direction, requestUrl) => {
     console.error(`[Proxy] Websocket ${op} failed`, err);
   };
 
-  inSocket.on('message', msg => {
+  inSocket.on('message', async body => {
     console.log(
-      `[WebSocket] Websocket message ${requestUrl} (${direction}): ${msg}`
+      `[WebSocket] Websocket message ${requestUrl} (${direction}): ${body}`
     );
-    outSocket.send(msg, onPipeFailed('message'));
+    const dbParams = {
+      request_id: requestId,
+      direction: direction,
+      body: body,
+      created_at: Date.now()
+    };
+    await global.knex('websocket_messages').insert(dbParams);
+
+    outSocket.send(body, onPipeFailed('message'));
   });
 
   inSocket.on('close', (num, reason) => {
@@ -68,7 +82,7 @@ const connectUpstream = (requestUrl, request, socket, head, requestId) => {
     wsServer.handleUpgrade(request, socket, head, ws => {
       console.log(`[WebSocket] wsServer.handleUpgrade for url: ${requestUrl}`);
       ws.upstreamSocket = upstreamSocket;
-      wsServer.emit('connection', ws, requestUrl);
+      wsServer.emit('connection', ws, requestUrl, requestId);
     });
   });
 
