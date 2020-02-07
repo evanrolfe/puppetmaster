@@ -31,6 +31,30 @@ const handleNewPage = async page => {
 
   // TODO: Make this a configurable option:
   page.setCacheEnabled(false);
+
+  // Capture websocket HTTP requests
+  const cdp = await page.target().createCDPSession();
+  await cdp.send('Network.enable');
+  await cdp.send('Page.enable');
+
+  cdp.on('Network.webSocketWillSendHandshakeRequest', async params => {
+    // Save the websocket HTTP handshake request to the DB
+    const requestParams = {
+      browser_id: page.browser().id,
+      websocket_request_id: params.requestId
+    };
+
+    await global
+      .knex('requests')
+      .where({ websocket_sec_key: params.request.headers['Sec-WebSocket-Key'] })
+      .update(requestParams);
+  });
+
+  // cdp.on('Network.webSocketHandshakeResponseReceived', (params) => {
+  //   console.log(`RequestTo (request headers): ${JSON.stringify(params.response.requestHeaders)}`)
+  //   console.log(`RequestTo (response headers): ${JSON.stringify(params.response.headers)}`)
+  // });
+
   page.on('response', async response => handleResponse(page, response));
 };
 

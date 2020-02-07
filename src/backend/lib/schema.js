@@ -8,6 +8,8 @@ export default `CREATE TABLE IF NOT EXISTS requests(
   http_version TEXT,
   path TEXT,
   ext TEXT,
+  websocket_request_id TEXT,
+  websocket_sec_key TEXT,
 
   request_modified BOOLEAN,
   modified_method TEXT,

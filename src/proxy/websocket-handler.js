@@ -1,6 +1,24 @@
 import url from 'url';
 import WebSocket from 'ws';
+/*
+ * NOTE: How are websocket HTTP handshake requests saved to the database?
 
+ * 1. request DB row is inserted in handleUpgrade in this file, with most of the
+ *    request values.
+ * 2. Network.webSocketWillSendHandshakeRequest callback in BrowserPageUtils.js
+ *    runs and updates the browser_id and websocket_request_id of the request
+ *    which is found by the Sec-WebSocket-Key header that is unique for each
+ *    request.
+ * 3. In this file, upstreamSocket event callback for 'upgrade' and 'unexpected-
+ *    response' updates the request_headers, request_status and
+ *    response_status_message values on the request.
+ *
+ * The reason why the request row is populated in three stages is because the
+ * chromium API does not give you much info about websocket handshake requests,
+ * and they are not included the standard Network request interception API.
+ * So we have to use data from both chromium and the proxy server to populate
+ * the request database table.
+ */
 const wsServer = new WebSocket.Server({ noServer: true });
 wsServer.on('connection', (ws, requestUrl, requestId) => {
   console.log('[WebSocket] Successfully proxying websocket streams');
@@ -75,6 +93,7 @@ const connectUpstream = (requestUrl, request, socket, head, requestId) => {
   const upstreamSocket = new WebSocket(requestUrl);
 
   // See: https://github.com/websockets/ws/blob/master/doc/ws.md#event-upgrade
+  // TODO: Maybe this should use the "downstream socket" instead?
   upstreamSocket.once('unexpected-response', async (_request, response) => {
     saveResponseToDB(requestId, response);
   });
@@ -117,6 +136,7 @@ const handleUpgrade = async (request, socket, head) => {
 
     const realUrl = `${protocol}://${hostname}${port ? `:${port}` : ``}${path}`;
 
+    // 1. Save the websocket HTTP handshake request to DB
     const requestParams = {
       method: request.method,
       url: realUrl,
@@ -125,10 +145,12 @@ const handleUpgrade = async (request, socket, head) => {
       http_version: request.httpVersion,
       path: path,
       request_type: 'websocket',
-      request_headers: JSON.stringify(request.headers)
+      request_headers: JSON.stringify(request.headers),
+      websocket_sec_key: request.headers['sec-websocket-key']
     };
-    const dbResult = await global.knex('requests').insert(requestParams);
-    const requestId = dbResult[0];
+
+    const dbRequest = await global.knex('requests').insert(requestParams);
+    const requestId = dbRequest[0];
 
     connectUpstream(realUrl, request, socket, head, requestId);
   } else {
