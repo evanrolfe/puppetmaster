@@ -27,8 +27,6 @@ describe('Browsing a page with websocket requests', () => {
         .where({ url: 'ws://localhost:3002/' });
       const wsRequest = dbResult[0];
 
-      console.log(wsRequest);
-
       const expectedValues = {
         browser_id: 1,
         method: 'GET',
