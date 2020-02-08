@@ -10,7 +10,7 @@ import { registerModal } from './modals/index';
 import AlertModal from './modals/AlertModal';
 import SettingsModal from './modals/SettingsModal';
 import Sidebar from './Sidebar';
-import BrowserSessionsPage from './pages/BrowserSessionsPage';
+import BrowserWebsocketsPage from './pages/BrowserWebsocketsPage';
 import BrowserNetworkPage from './pages/BrowserNetworkPage';
 import BrowserInterceptPageState from './BrowserInterceptPage/BrowserInterceptPageState';
 import CrawlerPage from './pages/CrawlerPage';
@@ -94,7 +94,11 @@ export default () => {
         path="/browser/intercept"
         component={BrowserInterceptPageState}
       />
-      <Route exact path="/browser/sessions" component={BrowserSessionsPage} />
+      <Route
+        exact
+        path="/browser/websockets"
+        component={BrowserWebsocketsPage}
+      />
 
       <Route exact path="/crawler" component={CrawlerPage} />
       <Route exact path="/requests" component={RequestsPage} />

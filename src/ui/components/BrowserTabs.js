@@ -28,10 +28,10 @@ export default class BrowserTabs extends Component {
       case '/browser/network':
         tabIndex = 0;
         break;
-      case '/browser/intercept':
+      case '/browser/websockets':
         tabIndex = 1;
         break;
-      case '/browser/sessions':
+      case '/browser/intercept':
         tabIndex = 2;
         break;
       default:
@@ -51,10 +51,10 @@ export default class BrowserTabs extends Component {
         path = '/browser/network';
         break;
       case 1:
-        path = '/browser/intercept';
+        path = '/browser/websockets';
         break;
       case 2:
-        path = '/browser/sessions';
+        path = '/browser/intercept';
         break;
       default:
         path = '/browser/network';
@@ -76,11 +76,11 @@ export default class BrowserTabs extends Component {
           </Tab>
 
           <Tab onMouseDown={() => this.goTo(1)}>
-            <button type="button">Intercept</button>
+            <button type="button">Websockets</button>
           </Tab>
 
           <Tab onMouseDown={() => this.goTo(2)}>
-            <button type="button">Sessions</button>
+            <button type="button">Intercept</button>
           </Tab>
         </TabList>
 
