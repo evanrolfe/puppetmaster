@@ -90,11 +90,13 @@ app.on('ready', async () => {
   }
 
   log.info('Started.');
-
+  const iconPath = path.join(__dirname, '../../resources/icons/512x512.png');
+  console.log(iconPath);
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       webviewTag: true
