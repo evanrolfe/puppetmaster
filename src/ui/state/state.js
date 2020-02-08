@@ -32,6 +32,8 @@ const initialState = {
     tabIndex: 0
   },
   browserWebsocketsPage: {
+    websocketMessages: [],
+    websocketMessage: null,
     page: {
       orientation: 'horizontal',
       panes: [
@@ -322,6 +324,10 @@ const reducer = (state, action) => {
     case 'SET_BODYTAB_VIEW':
       return setBodyTabView(state, action);
 
+    // Websockets:
+    case 'WEBSOCKET_MESSAGES_LOADED':
+      return setNestedValue('websocketMessages', state, action);
+
     // SettingsModal:
     case 'SET_THEME':
       return { ...state, activeTheme: action.theme };
@@ -415,6 +421,22 @@ function* setPaneWidthStorage(action) {
     page: 'browserNetworkPage'
   });
   localStorage.setItem('browserNetworkPage.paneWidth', action.width);
+}
+
+function* loadWebsocketMessages() {
+  const response = yield global.backendConn.send(
+    'WebsocketMessagesController',
+    'index',
+    {}
+  );
+
+  const websocketMessages = response.result.body;
+
+  yield put({
+    type: 'WEBSOCKET_MESSAGES_LOADED',
+    websocketMessages: websocketMessages,
+    page: 'browserWebsocketsPage'
+  });
 }
 
 function* loadRequests() {
@@ -633,6 +655,9 @@ function* rootSaga() {
 
     // Intercept:
     takeLatest('SEND_INTERCEPT_COMMAND', sendInterceptCommand),
+
+    // Websockets:
+    takeLatest('LOAD_WEBSOCKET_MESSAGES', loadWebsocketMessages),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),

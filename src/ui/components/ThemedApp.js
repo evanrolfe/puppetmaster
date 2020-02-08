@@ -29,6 +29,7 @@ export default () => {
   dispatch({ type: 'LOAD_REQUESTS' });
   dispatch({ type: 'LOAD_BROWSERS' });
   dispatch({ type: 'LOAD_SETTINGS' });
+  dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
 
   const dispatchLoadRequests = () => dispatch({ type: 'LOAD_REQUESTS' });
   global.backendConn.listen('requestCreated', dispatchLoadRequests);

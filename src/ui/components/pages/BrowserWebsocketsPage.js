@@ -1,12 +1,13 @@
 // @flow
 import React from 'react';
-import { Tab, TabList, Tabs } from 'react-tabs';
 
 import BrowserTabs from '../BrowserTabs';
 import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
 import PaneResizeableState from '../BrowserNetworkPage/PaneResizeableState';
+import MessagesTableState from '../BrowserWebsocketsPage/MessagesTableState';
+import MessageViewPaneState from '../BrowserWebsocketsPage/MessageViewPaneState';
 
 type Props = {
   history: 'array',
@@ -41,23 +42,14 @@ export default ({ history, location }: Props) => (
           </div>
         </PaneFixed>
 
-        <PaneRemaining>The remaining pane!</PaneRemaining>
+        <PaneRemaining>
+          <MessagesTableState />
+        </PaneRemaining>
       </PaneContainer>
     </PaneResizeableState>
 
     <PaneRemaining>
-      <PaneContainer orientation="vertical">
-        <PaneFixed>
-          <Tabs className="theme--pane__body react-tabs" selectedIndex={0}>
-            <TabList>
-              <Tab>
-                <button type="button">Message</button>
-              </Tab>
-            </TabList>
-          </Tabs>
-        </PaneFixed>
-        Hello world
-      </PaneContainer>
+      <MessageViewPaneState />
     </PaneRemaining>
   </PaneContainer>
 );
