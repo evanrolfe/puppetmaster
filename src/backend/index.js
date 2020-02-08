@@ -6,10 +6,11 @@ import database from './lib/database';
 import BrowserUtils from './lib/BrowserUtils';
 
 // Controllers:
-import BrowsersController from './controllers/BrowsersController';
 import CaptureFiltersController from './controllers/CaptureFiltersController';
+import BrowsersController from './controllers/BrowsersController';
 import RequestsController from './controllers/RequestsController';
 import SettingsController from './controllers/SettingsController';
+import WebsocketMessagesController from './controllers/WebsocketMessagesController';
 
 const handleExit = async () => {
   console.log('Exiting the backend server...');
@@ -59,7 +60,8 @@ if (process.env.NODE_ENV === undefined) {
       BrowsersController: BrowsersController,
       CaptureFiltersController: CaptureFiltersController,
       RequestsController: RequestsController,
-      SettingsController: SettingsController
+      SettingsController: SettingsController,
+      WebsocketMessagesController: WebsocketMessagesController
     };
     await ipc.init(socketName, controllersMap);
     console.log(`[Backend] IPC server started`);
