@@ -13,30 +13,6 @@ import RequestTabState from '../BrowserNetworkPage/RequestTabState';
 import ResponseTabState from '../BrowserNetworkPage/ResponseTabState';
 import BodyTabState from '../BrowserNetworkPage/BodyTabState';
 
-export const RESOURCE_TYPES = [
-  'document',
-  'eventsource',
-  'fetch',
-  'font',
-  'image',
-  'manifest',
-  'media',
-  'navigation',
-  'other',
-  'stylesheet',
-  'script',
-  'texttrack',
-  'websocket',
-  'xhr'
-];
-
-export const STATUS_CODES = {
-  2: '2xx [Success]',
-  3: '3xx [Redirect]',
-  4: '4xx [Request Error]',
-  5: '5xx [Server Error]'
-};
-
 type Props = {
   history: 'object',
   location: 'object'
@@ -79,7 +55,11 @@ export default ({ history, location }: Props) => {
   // This is a pane which has no sub-panes and is also not the first pane
   const renderNormalPane = (parentPane, pane, i) => {
     const paneContent = (
-      <PaneWithTabsState paneId={pane.id} tabs={pane.tabs}>
+      <PaneWithTabsState
+        paneId={pane.id}
+        pageName="browserNetworkPage"
+        tabs={pane.tabs}
+      >
         {pane.tabs.map(tab => renderPaneContent(tab))}
       </PaneWithTabsState>
     );
@@ -87,7 +67,11 @@ export default ({ history, location }: Props) => {
     const PaneComponent =
       i < parentPane.panes.length - 1 ? PaneResizeableState : PaneRemaining;
 
-    return <PaneComponent paneId={pane.id}>{paneContent}</PaneComponent>;
+    return (
+      <PaneComponent paneId={pane.id} pageName="browserNetworkPage">
+        {paneContent}
+      </PaneComponent>
+    );
   };
 
   const renderPane = (parentPane, pane, i) => {
@@ -95,7 +79,7 @@ export default ({ history, location }: Props) => {
     if (pane.id === 1) {
       console.log(`Rendering first pane ${pane.id}`);
       return (
-        <PaneResizeableState paneId={pane.id}>
+        <PaneResizeableState paneId={pane.id} pageName="browserNetworkPage">
           {renderPaneContent(pane.tab)}
         </PaneResizeableState>
       );

@@ -7,20 +7,23 @@ import PaneWithTabs from '../pane/PaneWithTabs';
 type Props = {
   tabs: 'array',
   children: 'object',
-  paneId: 'number'
+  paneId: 'number',
+  pageName: 'string'
 };
 
-export default ({ paneId, tabs, children }: Props) => {
+export default ({ paneId, pageName, tabs, children }: Props) => {
   const dispatch = useDispatch();
 
-  const tabIndex = useSelector(state => getPane(state, paneId).tabIndex);
+  const tabIndex = useSelector(
+    state => getPane(state, paneId, pageName).tabIndex
+  );
 
   const setTabIndex = i => {
     console.log(`Setting tab index: ${i}`);
     dispatch({
       type: 'SET_PANE_TABINDEX',
       tabIndex: i,
-      page: 'browserNetworkPage',
+      page: pageName,
       paneId: paneId
     });
   };

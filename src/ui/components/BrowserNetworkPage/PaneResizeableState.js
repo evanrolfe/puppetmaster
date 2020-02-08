@@ -6,26 +6,29 @@ import PaneResizeable from '../pane/PaneResizeable';
 
 type Props = {
   paneId: 'number',
+  pageName: 'string',
   children: 'object'
 };
 
-export default ({ paneId, children }: Props) => {
+export default ({ paneId, pageName, children }: Props) => {
   const dispatch = useDispatch();
 
   const orientation = useSelector(
-    state => getParentPane(state, paneId).orientation
+    state => getParentPane(state, paneId, pageName).orientation
   );
   const draggingPane = useSelector(
-    state => getPane(state, paneId).draggingPane
+    state => getPane(state, paneId, pageName).draggingPane
   );
-  const paneLength = useSelector(state => getPane(state, paneId).length);
+  const paneLength = useSelector(
+    state => getPane(state, paneId, pageName).length
+  );
 
   console.log(`Rendering resizeable pane ${paneId} with length: ${paneLength}`);
 
   const setDraggingPane = draggingPane1 => {
     dispatch({
       type: 'SET_DRAGGING_PANE',
-      page: 'browserNetworkPage',
+      page: pageName,
       paneId: paneId,
       draggingPane: draggingPane1
     });
@@ -34,7 +37,7 @@ export default ({ paneId, children }: Props) => {
   const setPaneLength = length => {
     dispatch({
       type: 'SET_PANE_LENGTH',
-      page: 'browserNetworkPage',
+      page: pageName,
       paneId: paneId,
       length: length
     });

@@ -2,7 +2,30 @@ import React from 'react';
 
 import { useDispatch, useSelector } from '../../state/state';
 import RequestsFilterForm from '../RequestsFilterForm';
-import { RESOURCE_TYPES, STATUS_CODES } from '../pages/BrowserNetworkPage';
+
+const RESOURCE_TYPES = [
+  'document',
+  'eventsource',
+  'fetch',
+  'font',
+  'image',
+  'manifest',
+  'media',
+  'navigation',
+  'other',
+  'stylesheet',
+  'script',
+  'texttrack',
+  'websocket',
+  'xhr'
+];
+
+const STATUS_CODES = {
+  2: '2xx [Success]',
+  3: '3xx [Redirect]',
+  4: '4xx [Request Error]',
+  5: '5xx [Server Error]'
+};
 
 export default () => {
   const dispatch = useDispatch();

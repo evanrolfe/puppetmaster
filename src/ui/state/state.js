@@ -203,7 +203,7 @@ const setOrientation = (state, action) => {
 const setPaneValue = (key, state, action) => {
   const newState = { ...state };
 
-  const pane = getPane(state, action.paneId);
+  const pane = getPane(state, action.paneId, action.page);
   pane[key] = action[key];
 
   console.log(

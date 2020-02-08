@@ -32,8 +32,8 @@ const getPane = (state, paneId) => {
 };
 */
 
-const getPane = (state, paneId) => {
-  const panes = state.browserNetworkPage.page.panes;
+const getPane = (state, paneId, pageName) => {
+  const panes = state[pageName].page.panes;
   let paneFound;
 
   panes.forEach(pane => {
@@ -51,13 +51,13 @@ const getPane = (state, paneId) => {
   return paneFound;
 };
 
-const getParentPane = (state, paneId) => {
-  const panes = state.browserNetworkPage.page.panes;
+const getParentPane = (state, paneId, pageName) => {
+  const panes = state[pageName].page.panes;
   let paneFound;
 
   panes.forEach(pane => {
     if (pane.id === paneId) {
-      paneFound = state.browserNetworkPage.page;
+      paneFound = state[pageName].page;
     } else if (
       pane.panes !== undefined &&
       pane.panes.map(p => p.id).includes(paneId)
