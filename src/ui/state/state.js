@@ -31,6 +31,23 @@ const initialState = {
     interceptEnabled: false,
     tabIndex: 0
   },
+  browserWebsocketsPage: {
+    page: {
+      orientation: 'horizontal',
+      panes: [
+        {
+          id: 1,
+          tab: 'Websockets',
+          length: 700,
+          draggingPane: false
+        },
+        {
+          id: 2,
+          draggingPane: false
+        }
+      ]
+    }
+  },
   browserNetworkPage: {
     showModifiedRequest: true,
     showModifiedResponse: true,
