@@ -385,6 +385,8 @@ const reducer = (state, action) => {
       return selectPrevWebsocketMessage(state, action);
     case 'SELECT_NEXT_WEBSOCKET_MESSAGE':
       return selectNextWebsocketMessage(state, action);
+    case 'WEBSOCKET_MESSAGE_LOADED':
+      return setNestedValue('websocketMessage', state, action);
 
     // SettingsModal:
     case 'SET_THEME':
@@ -565,6 +567,28 @@ function* loadRequest() {
     type: 'REQUEST_LOADED',
     request: request,
     page: 'browserNetworkPage'
+  });
+}
+
+function* loadWebsocketMessage() {
+  const messageId = yield select(
+    state => state.browserWebsocketsPage.selectedMessageId
+  );
+
+  const response = yield global.backendConn.send(
+    'WebsocketMessagesController',
+    `show`,
+    {
+      id: messageId
+    }
+  );
+  const websocketMessage = response.result.body;
+  console.log(`Loaded websocket message ${websocketMessage.id}`);
+
+  yield put({
+    type: 'WEBSOCKET_MESSAGE_LOADED',
+    websocketMessage: websocketMessage,
+    page: 'browserWebsocketsPage'
   });
 }
 
@@ -763,6 +787,7 @@ function* rootSaga() {
 
     // Websockets:
     takeLatest('LOAD_WEBSOCKET_MESSAGES', loadWebsocketMessages),
+    takeLatest('LOAD_WEBSOCKET_MESSAGE', loadWebsocketMessage),
     takeLatest('TOGGLE_COLUMN_ORDER_MESSAGES', toggleColumnOrderMessages),
     takeLatest('SEARCH_WEBSOCKET_MESSAGES', searchWebsocketMessages),
     takeLatest('SELECT_WEBSOCKET_MESSAGE_LOAD', selectWebsocketMessageLoad),

@@ -5,7 +5,7 @@ import MessageViewPane from './MessageViewPane';
 
 export default () => {
   const websocketMessage = useSelector(
-    state => state.browserNetworkPage.websocketMessage
+    state => state.browserWebsocketsPage.websocketMessage
   );
 
   return <MessageViewPane websocketMessage={websocketMessage} />;

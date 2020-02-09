@@ -9,7 +9,6 @@ export default class WebsocketMessagesController {
       .select(
         'websocket_messages.id AS id',
         'websocket_messages.direction AS direction',
-        'websocket_messages.body AS body',
         'websocket_messages.created_at AS created_at',
         'websocket_messages.request_id AS request_id',
         'requests.url AS url'
@@ -41,5 +40,13 @@ export default class WebsocketMessagesController {
     const messages = await query;
 
     return { status: 'OK', body: messages };
+  }
+
+  async show(args) {
+    const result = await global
+      .knex('websocket_messages')
+      .where({ id: args.id });
+
+    return { status: 'OK', body: result[0] };
   }
 }
