@@ -4,13 +4,22 @@ import { Tab, TabList, Tabs } from 'react-tabs';
 import PaneContainer from '../pane/PaneContainer';
 import PaneFixed from '../pane/PaneFixed';
 import PaneRemaining from '../pane/PaneRemaining';
+import CodeEditor from '../RequestView/CodeEditor';
 
 type Props = {
-  websocketMessage: 'object'
+  websocketMessage: 'object',
+  codeMirrorWidth: 'number'
 };
 
-export default ({ websocketMessage }: Props) => {
+export default ({ websocketMessage, codeMirrorWidth }: Props) => {
   console.log(websocketMessage);
+
+  let body;
+  if (websocketMessage === null) {
+    body = '';
+  } else {
+    body = websocketMessage.body;
+  }
 
   return (
     <PaneContainer orientation="vertical">
@@ -24,8 +33,8 @@ export default ({ websocketMessage }: Props) => {
         </Tabs>
       </PaneFixed>
 
-      <PaneRemaining>
-        {websocketMessage !== null && websocketMessage.body}
+      <PaneRemaining style={{ width: `${codeMirrorWidth}px` }}>
+        <CodeEditor value={body} />
       </PaneRemaining>
     </PaneContainer>
   );
