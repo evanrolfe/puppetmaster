@@ -45,6 +45,13 @@ export const ALL_TABLE_COLUMNS = [
   { key: 'created_at', title: 'Time', width: 200 }
 ];
 
+export const WEBSOCKET_MESSAGE_TABLE_COLUMNS = [
+  { key: 'id', title: '#', width: 40 },
+  { key: 'url', title: 'URL', width: 300 },
+  { key: 'direction', title: 'Direction', width: 90 },
+  { key: 'created_at', title: 'Time', width: 200 }
+];
+
 export const DEFAULT_COLUMNS = [
   'id',
   'title',

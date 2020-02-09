@@ -34,6 +34,8 @@ const initialState = {
   browserWebsocketsPage: {
     websocketMessages: [],
     websocketMessage: null,
+    orderBy: 'id',
+    dir: 'desc',
     page: {
       orientation: 'horizontal',
       panes: [
@@ -424,10 +426,13 @@ function* setPaneWidthStorage(action) {
 }
 
 function* loadWebsocketMessages() {
+  const orderBy = yield select(state => state.browserWebsocketsPage.orderBy);
+  const dir = yield select(state => state.browserWebsocketsPage.dir);
+
   const response = yield global.backendConn.send(
     'WebsocketMessagesController',
     'index',
-    {}
+    { order_by: orderBy, dir: dir }
   );
 
   const websocketMessages = response.result.body;
@@ -574,6 +579,15 @@ function* toggleColumnOrderRequests(action) {
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
+function* toggleColumnOrderMessages(action) {
+  yield put({
+    type: 'TOGGLE_COLUMN_ORDER',
+    columnKey: action.columnKey,
+    page: action.page
+  });
+  yield put({ type: 'LOAD_WEBSOCKET_MESSAGES' });
+}
+
 const interceptRequestIPC = async params =>
   new Promise(resolve => {
     console.log(`[STATE] starting interceptRequestIPC...`);
@@ -658,6 +672,7 @@ function* rootSaga() {
 
     // Websockets:
     takeLatest('LOAD_WEBSOCKET_MESSAGES', loadWebsocketMessages),
+    takeLatest('TOGGLE_COLUMN_ORDER_MESSAGES', toggleColumnOrderMessages),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),

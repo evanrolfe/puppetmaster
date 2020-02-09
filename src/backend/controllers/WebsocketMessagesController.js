@@ -1,7 +1,9 @@
 export default class WebsocketMessagesController {
   // GET /requests
-  async index() {
-    const messages = await global.knex
+  async index(args) {
+    console.log('WebsocketMessagesController');
+    console.log(args);
+    let query = global.knex
       .select(
         'websocket_messages.id AS id',
         'websocket_messages.direction AS direction',
@@ -12,6 +14,16 @@ export default class WebsocketMessagesController {
       )
       .from('websocket_messages')
       .leftJoin('requests', 'requests.id', 'websocket_messages.request_id');
+
+    // Order
+    if (args.order_by !== undefined && args.dir !== undefined) {
+      if (args.order_by === 'id') args.order_by = 'websocket_messages.id';
+      query = query.orderBy(args.order_by, args.dir);
+    } else {
+      query = query.orderBy('websocket_messages.id', 'desc');
+    }
+
+    const messages = await query;
 
     return { status: 'OK', body: messages };
   }
