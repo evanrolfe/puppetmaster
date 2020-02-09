@@ -34,6 +34,8 @@ const initialState = {
   browserWebsocketsPage: {
     websocketMessages: [],
     websocketMessage: null,
+    selectedMessageId: null,
+    selectedMessageId2: null,
     orderBy: 'id',
     dir: 'desc',
     filters: {
@@ -144,6 +146,51 @@ const selectRequest = (state, action) => {
   newState[action.page].selectedRequestId = action.requestId;
   newState[action.page].selectedRequestId2 = selectedRequestId2;
   return newState;
+};
+
+const selectWebsocketMessage = (state, action) => {
+  let selectedMessageId2 = null;
+
+  if (state.shiftPressed === true) {
+    if (state.browserWebsocketsPage.selectedMessageId2 === null) {
+      selectedMessageId2 = state.browserWebsocketsPage.selectedMessageId;
+    } else {
+      selectedMessageId2 = state.browserWebsocketsPage.selectedMessageId2;
+    }
+  }
+
+  const newState = { ...state };
+  newState[action.page].selectedMessageId = action.websocketMessageId;
+  newState[action.page].selectedMessageId2 = selectedMessageId2;
+  return newState;
+};
+
+const selectPrevWebsocketMessage = (state, action) => {
+  const index = state[action.page].websocketMessages.findIndex(
+    websocketMessage =>
+      websocketMessage.id === state[action.page].selectedMessageId
+  );
+  const prevMessage = state[action.page].websocketMessages[index - 1];
+  if (prevMessage === undefined) return state;
+
+  return selectWebsocketMessage(state, {
+    websocketMessageId: prevMessage.id,
+    page: action.page
+  });
+};
+
+const selectNextWebsocketMessage = (state, action) => {
+  const index = state[action.page].websocketMessages.findIndex(
+    websocketMessage =>
+      websocketMessage.id === state[action.page].selectedMessageId
+  );
+  const nextMessage = state[action.page].websocketMessages[index + 1];
+  if (nextMessage === undefined) return state;
+
+  return selectWebsocketMessage(state, {
+    websocketMessageId: nextMessage.id,
+    page: action.page
+  });
 };
 
 const toggleColumnOrder = (state, action) => {
@@ -332,6 +379,12 @@ const reducer = (state, action) => {
     // Websockets:
     case 'WEBSOCKET_MESSAGES_LOADED':
       return setNestedValue('websocketMessages', state, action);
+    case 'SELECT_WEBSOCKET_MESSAGE':
+      return selectWebsocketMessage(state, action);
+    case 'SELECT_PREV_WEBSOCKET_MESSAGE':
+      return selectPrevWebsocketMessage(state, action);
+    case 'SELECT_NEXT_WEBSOCKET_MESSAGE':
+      return selectNextWebsocketMessage(state, action);
 
     // SettingsModal:
     case 'SET_THEME':
@@ -546,6 +599,15 @@ function* selectRequestLoad(action) {
   yield put({ type: 'LOAD_REQUEST' });
 }
 
+function* selectWebsocketMessageLoad(action) {
+  yield put({
+    type: 'SELECT_WEBSOCKET_MESSAGE',
+    websocketMessageId: action.websocketMessage.id,
+    page: 'browserWebsocketsPage'
+  });
+  yield put({ type: 'LOAD_WEBSOCKET_MESSAGE' });
+}
+
 function* selectPrevRequestLoad() {
   yield put({ type: 'SELECT_PREV_REQUEST', page: 'browserNetworkPage' });
   yield put({ type: 'LOAD_REQUEST' });
@@ -554,6 +616,22 @@ function* selectPrevRequestLoad() {
 function* selectNextRequestLoad() {
   yield put({ type: 'SELECT_NEXT_REQUEST', page: 'browserNetworkPage' });
   yield put({ type: 'LOAD_REQUEST' });
+}
+
+function* selectPrevWebsocketMessageLoad() {
+  yield put({
+    type: 'SELECT_PREV_WEBSOCKET_MESSAGE',
+    page: 'browserWebsocketsPage'
+  });
+  yield put({ type: 'LOAD_WEBSOCKET_MESSAGE' });
+}
+
+function* selectNextWebsocketMessageLoad() {
+  yield put({
+    type: 'SELECT_NEXT_WEBSOCKET_MESSAGE',
+    page: 'browserWebsocketsPage'
+  });
+  yield put({ type: 'LOAD_WEBSOCKET_MESSAGE' });
 }
 
 function* searchRequests(action) {
@@ -687,6 +765,15 @@ function* rootSaga() {
     takeLatest('LOAD_WEBSOCKET_MESSAGES', loadWebsocketMessages),
     takeLatest('TOGGLE_COLUMN_ORDER_MESSAGES', toggleColumnOrderMessages),
     takeLatest('SEARCH_WEBSOCKET_MESSAGES', searchWebsocketMessages),
+    takeLatest('SELECT_WEBSOCKET_MESSAGE_LOAD', selectWebsocketMessageLoad),
+    takeLatest(
+      'SELECT_PREV_WEBSOCKET_MESSAGE_LOAD',
+      selectPrevWebsocketMessageLoad
+    ),
+    takeLatest(
+      'SELECT_NEXT_WEBSOCKET_MESSAGE_LOAD',
+      selectNextWebsocketMessageLoad
+    ),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),
