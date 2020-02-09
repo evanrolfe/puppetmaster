@@ -8,6 +8,7 @@ import PaneFixed from '../pane/PaneFixed';
 import PaneResizeableState from '../BrowserNetworkPage/PaneResizeableState';
 import MessagesTableState from '../BrowserWebsocketsPage/MessagesTableState';
 import MessageViewPaneState from '../BrowserWebsocketsPage/MessageViewPaneState';
+import MessagesSearchFormState from '../BrowserWebsocketsPage/MessagesSearchFormState';
 
 type Props = {
   history: 'array',
@@ -23,23 +24,7 @@ export default ({ history, location }: Props) => (
         </PaneFixed>
 
         <PaneFixed style={{ marginLeft: '10px', padding: '6px' }}>
-          <div className="pane-control">
-            <div
-              className="form-control form-control--outlined"
-              style={{
-                width: '60%',
-                maxWidth: '800px',
-                display: 'inline-block'
-              }}
-            >
-              <label>Search:</label>
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                placeholder="Enter search term"
-              />
-            </div>
-          </div>
+          <MessagesSearchFormState />
         </PaneFixed>
 
         <PaneRemaining>

@@ -1,3 +1,5 @@
+const SEARCHABLE_COLUMNS = ['id', 'url', 'direction'];
+
 export default class WebsocketMessagesController {
   // GET /requests
   async index(args) {
@@ -21,6 +23,19 @@ export default class WebsocketMessagesController {
       query = query.orderBy(args.order_by, args.dir);
     } else {
       query = query.orderBy('websocket_messages.id', 'desc');
+    }
+
+    // Search filter:
+    if (args.search !== undefined) {
+      // eslint-disable-next-line func-names
+      query = query.where(function() {
+        SEARCHABLE_COLUMNS.forEach(column => {
+          if (column === 'id') column = 'websocket_messages.id';
+          if (column === 'url') column = 'requests.url';
+
+          this.orWhere(column, 'like', `%${args.search}%`);
+        });
+      });
     }
 
     const messages = await query;

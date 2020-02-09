@@ -36,6 +36,9 @@ const initialState = {
     websocketMessage: null,
     orderBy: 'id',
     dir: 'desc',
+    filters: {
+      search: ''
+    },
     page: {
       orientation: 'horizontal',
       panes: [
@@ -426,13 +429,14 @@ function* setPaneWidthStorage(action) {
 }
 
 function* loadWebsocketMessages() {
+  const filters = yield select(state => state.browserWebsocketsPage.filters);
   const orderBy = yield select(state => state.browserWebsocketsPage.orderBy);
   const dir = yield select(state => state.browserWebsocketsPage.dir);
 
   const response = yield global.backendConn.send(
     'WebsocketMessagesController',
     'index',
-    { order_by: orderBy, dir: dir }
+    { order_by: orderBy, dir: dir, ...filters }
   );
 
   const websocketMessages = response.result.body;
@@ -561,6 +565,15 @@ function* searchRequests(action) {
   yield put({ type: 'LOAD_REQUESTS' });
 }
 
+function* searchWebsocketMessages(action) {
+  yield put({
+    type: 'SET_SEARCH',
+    value: action.value,
+    page: 'browserWebsocketsPage'
+  });
+  yield put({ type: 'LOAD_WEBSOCKET_MESSAGES' });
+}
+
 function* filterRequests(action) {
   yield put({
     type: 'SET_FILTERS',
@@ -673,6 +686,7 @@ function* rootSaga() {
     // Websockets:
     takeLatest('LOAD_WEBSOCKET_MESSAGES', loadWebsocketMessages),
     takeLatest('TOGGLE_COLUMN_ORDER_MESSAGES', toggleColumnOrderMessages),
+    takeLatest('SEARCH_WEBSOCKET_MESSAGES', searchWebsocketMessages),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),
