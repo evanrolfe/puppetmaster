@@ -103,6 +103,16 @@ export default ({
     }
   };
 
+  // This will create the context menus for the multiple requests selection
+  if (selectedMessageIds.length > 1) {
+    console.log(
+      `[Frontend] Create context menu for multiple websocket messages`
+    );
+    ipcRenderer.send('websocketMessagesSelected', {
+      websocketMessageIds: selectedMessageIds
+    });
+  }
+
   return (
     <KeydownBinder
       stopMetaPropagation
