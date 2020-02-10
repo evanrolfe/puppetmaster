@@ -1,5 +1,7 @@
 import url from 'url';
 import WebSocket from 'ws';
+import proxyIPC from '../shared/ipc-server';
+
 /*
  * NOTE: How are websocket HTTP handshake requests saved to the database?
 
@@ -52,6 +54,7 @@ const pipeWebSocket = (
       created_at: Date.now()
     };
     await global.knex('websocket_messages').insert(dbParams);
+    proxyIPC.send('websocketMessageCreated', {});
 
     outSocket.send(body, onPipeFailed('message'));
   });
@@ -85,6 +88,8 @@ const saveResponseToDB = async (requestId, response) => {
     .knex('requests')
     .where({ id: requestId })
     .update(requestParams);
+
+  proxyIPC.send('websocketMessageCreated', {});
 };
 
 const connectUpstream = (requestUrl, request, socket, head, requestId) => {

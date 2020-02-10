@@ -31,14 +31,23 @@ export default () => {
   dispatch({ type: 'LOAD_SETTINGS' });
   dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
 
+  // Listen for new requests
   const dispatchLoadRequests = () => dispatch({ type: 'LOAD_REQUESTS' });
   global.backendConn.listen('requestCreated', dispatchLoadRequests);
   global.proxyConn.listen('requestCreated', dispatchLoadRequests);
 
+  // Listen for new websocket messages
+  const loadMessages = () => dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
+
+  global.proxyConn.listen('websocketMessageCreated', loadMessages);
+  global.backendConn.listen('websocketMessageCreated', loadMessages);
+
+  // Listen for a change in browsers
   global.backendConn.listen('browsersChanged', () => {
     dispatch({ type: 'LOAD_REQUESTS' });
   });
 
+  // Listen for a request intercepted
   global.proxyConn.listen('requestIntercepted', data => {
     if (data.request === undefined) return;
 
