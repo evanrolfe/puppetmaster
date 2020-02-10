@@ -21,8 +21,6 @@ describe('Browsing a page with XHR requests', () => {
 
       const requests = await global.knex('requests');
 
-      expect(requests.length).to.eql(9);
-
       const expectedUrls = [
         'http://localhost/posts',
         'http://localhost/static/js/bundle.js',

@@ -41,14 +41,10 @@ describe('Requests', () => {
       expect(result.result.status).to.eql('OK');
       expect(result.result.body.length).to.eql(2);
 
-      expect(result.result.body[0].body).to.eql(
-        'Hi, Im fine thanks, and yourself?'
-      );
       expect(result.result.body[0].direction).to.eql('outgoing');
       expect(result.result.body[0].request_id).to.eql(1);
       expect(result.result.body[0].url).to.eql('ws://localhost:3002/');
 
-      expect(result.result.body[1].body).to.eql('Hello, how are you?');
       expect(result.result.body[1].direction).to.eql('incoming');
       expect(result.result.body[1].request_id).to.eql(1);
       expect(result.result.body[1].url).to.eql('ws://localhost:3002/');

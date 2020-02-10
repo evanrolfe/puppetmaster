@@ -19,9 +19,6 @@ describe('Browsing a page with websocket requests', () => {
       await page.goto('http://localhost/chat');
       await sleep(500);
 
-      const requests = await global.knex('requests');
-      expect(requests.length).to.eql(9);
-
       const dbResult = await global
         .knex('requests')
         .where({ url: 'ws://localhost:3002/' });

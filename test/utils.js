@@ -2,13 +2,13 @@ import puppeteer from 'puppeteer';
 import { DEFAULT_FILTERS } from '../src/shared/constants';
 
 const clearDatabase = async () => {
-  await global.knex.raw('Delete FROM browsers;');
+  await global.knex.raw('DELETE FROM browsers;');
   await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="browsers";');
-  await global.knex.raw('Delete FROM capture_filters;');
+  await global.knex.raw('DELETE FROM capture_filters;');
   await global.knex.raw(
     'DELETE FROM SQLITE_SEQUENCE WHERE name="capture_filters";'
   );
-  await global.knex.raw('Delete FROM requests;');
+  await global.knex.raw('DELETE FROM requests;');
   await global.knex.raw('DELETE FROM SQLITE_SEQUENCE WHERE name="requests";');
 
   const filters = Object.assign({}, DEFAULT_FILTERS);
