@@ -1,4 +1,6 @@
 import React from 'react';
+import { ipcRenderer } from 'electron';
+
 import RequestsTableHeader from '../RequestsTableHeader';
 import KeydownBinder from '../KeydownBinder';
 
@@ -87,6 +89,20 @@ export default ({
     if (e.key === 'Shift') shiftPressed();
   };
 
+  const _handleRightClick = (messageId, event) => {
+    event.preventDefault();
+
+    if (selectedMessageId2 !== null) {
+      ipcRenderer.send('showMultipleWebsocketMessageContextMenu', {
+        messageId: messageId
+      });
+    } else {
+      ipcRenderer.send('showWebsocketMessageContextMenu', {
+        messageId: messageId
+      });
+    }
+  };
+
   return (
     <KeydownBinder
       stopMetaPropagation
@@ -118,6 +134,10 @@ export default ({
                 id={`websocketMessageRow${websocketMessage.id}`}
                 onMouseDown={e => selectMessage(websocketMessage, e)}
                 className={_getRowClassName(websocketMessage.id)}
+                onContextMenu={_handleRightClick.bind(
+                  this,
+                  websocketMessage.id
+                )}
               >
                 <td>{websocketMessage.id}</td>
                 <td>{websocketMessage.url}</td>

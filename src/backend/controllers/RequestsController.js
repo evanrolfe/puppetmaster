@@ -37,9 +37,6 @@ export default class RequestsController {
   }
 
   async delete(args) {
-    console.log(`RequestsController.delete()`);
-    console.log(args);
-
     if (Array.isArray(args.id)) {
       await global
         .knex('requests')

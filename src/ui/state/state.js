@@ -92,25 +92,6 @@ const initialState = {
 /* ----------------------------------------------------------------------------*
  * Reducers:
  * ----------------------------------------------------------------------------*/
-const handleRequestDelete = (state, action) => {
-  let deletedIds;
-  // If multiple requests were deleted:
-  if (Array.isArray(action.requestId) === true) {
-    deletedIds = action.requestId;
-
-    // If a single request was deleted:
-  } else {
-    deletedIds = [action.requestId];
-  }
-
-  return {
-    ...state,
-    requests: state.browserNetworkPage.requests.filter(
-      req => !deletedIds.includes(req.id)
-    )
-  };
-};
-
 const selectPrevRequest = (state, action) => {
   const index = state[action.page].requests.findIndex(
     request => request.id === state[action.page].selectedRequestId
@@ -326,8 +307,6 @@ const reducer = (state, action) => {
 
     case 'REQUEST_LOADED':
       return setNestedValue('request', state, action);
-    case 'REQUEST_DELETED':
-      return handleRequestDelete(state, action);
 
     // RequestsTable:
     case 'SELECT_REQUEST':
@@ -378,6 +357,9 @@ const reducer = (state, action) => {
 
     // Websockets:
     case 'WEBSOCKET_MESSAGES_LOADED':
+      ipcRenderer.send('websocketMessagesTabledChanged', {
+        websocketMessages: action.websocketMessages
+      });
       return setNestedValue('websocketMessages', state, action);
     case 'SELECT_WEBSOCKET_MESSAGE':
       return selectWebsocketMessage(state, action);
@@ -611,7 +593,12 @@ function* deleteRequest(action) {
   yield global.backendConn.send('RequestsController', 'delete', {
     id: action.requestId
   });
-  yield put({ type: 'REQUEST_DELETED', requestId: action.requestId });
+}
+
+function* deleteWebsocketMessage(action) {
+  yield global.backendConn.send('WebsocketMessagesController', 'delete', {
+    id: action.websocketMesageId
+  });
 }
 
 function* selectRequestLoad(action) {
@@ -799,6 +786,7 @@ function* rootSaga() {
       'SELECT_NEXT_WEBSOCKET_MESSAGE_LOAD',
       selectNextWebsocketMessageLoad
     ),
+    takeEvery('DELETE_WEBSOCKET_MESSAGE', deleteWebsocketMessage),
 
     // Settings:
     takeLatest('SET_THEME_STORAGE', setThemeStorage),

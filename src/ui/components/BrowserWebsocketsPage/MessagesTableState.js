@@ -1,4 +1,5 @@
 import React from 'react';
+import { ipcRenderer } from 'electron';
 
 import { useDispatch, useSelector } from '../../state/state';
 import MessagesTable from './MessagesTable';
@@ -43,6 +44,15 @@ export default () => {
     dispatch({ type: 'SELECT_PREV_WEBSOCKET_MESSAGE_LOAD' });
   const selectNextMessage = () =>
     dispatch({ type: 'SELECT_NEXT_WEBSOCKET_MESSAGE_LOAD' });
+
+  // NOTE: This fires twice when the event is received for some reason
+  ipcRenderer.on('deleteWebsocketMessage', (event, args) => {
+    console.log(`DELETING WEBSOCKET: ${args.websocketMesageId}`);
+    dispatch({
+      type: 'DELETE_WEBSOCKET_MESSAGE',
+      websocketMesageId: args.websocketMesageId
+    });
+  });
 
   return (
     <MessagesTable

@@ -1,3 +1,5 @@
+import ipc from '../../shared/ipc-server';
+
 const SEARCHABLE_COLUMNS = ['id', 'url', 'direction'];
 
 export default class WebsocketMessagesController {
@@ -48,5 +50,23 @@ export default class WebsocketMessagesController {
       .where({ id: args.id });
 
     return { status: 'OK', body: result[0] };
+  }
+
+  async delete(args) {
+    if (Array.isArray(args.id)) {
+      await global
+        .knex('websocket_messages')
+        .whereIn('id', args.id)
+        .del();
+    } else {
+      await global
+        .knex('websocket_messages')
+        .where({ id: args.id })
+        .del();
+    }
+
+    ipc.send('websocketMessageCreated', {});
+
+    return { status: 'OK', body: {} };
   }
 }
