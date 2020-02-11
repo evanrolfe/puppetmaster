@@ -75,6 +75,18 @@ const handleResponse = async (page, response) => {
     mainIpc.send('requestCreated', {});
   }
 
+  // Save the cookies & pages:
+  const { cookies } = await page._client.send('Network.getAllCookies');
+  const pages = await page.browser().pages();
+  const pageUrls = pages.map(pageEnum => pageEnum.url());
+  await global
+    .knex('browsers')
+    .where({ id: page.browser().id })
+    .update({
+      cookies: JSON.stringify(cookies),
+      pages: JSON.stringify(pageUrls)
+    });
+
   // This does not work when you open a link in a new tab:
   // https://github.com/puppeteer/puppeteer/issues/3667
   const isNavigation =

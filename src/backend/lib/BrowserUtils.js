@@ -4,29 +4,6 @@ import puppeteer from 'puppeteer';
 import mainIpc from '../../shared/ipc-server';
 import certUtils from '../../shared/cert-utils';
 import { handleNewPage } from './BrowserPageUtils';
-/*
- * NOTE: For each response intercepted
- * If that request is a navigation request (i.e. a page displayed in the browser), then we start
- * the DOMListener, which saves the page's rendered DOM to request.response_body_rendered every
- * 100ms.
- *
- * For every page, we also listen for the framenavigated event, which creates a navigation request
- * and saves the rendered DOM to that request in the database, cancels the DOMListener and starts
- * a new one.
- *
- * Race Condition - this happens if you don't check the database inside the DOMListener callback:
- *
- * BrowserUtils: DOMListener 16 running...
- * BrowserUtils: saved content for page: http://localhost/ to request 1, (DOMListener 16)
- * BrowserUtils: DOMListener 16 running...
- * BrowserUtils: frameNavigated to http://localhost/posts
- * BrowserUtils: killed DomListener #16
- * BrowserUtils: saved content for page: http://localhost/posts to request 1, (DOMListener 16)
- * BrowserUtils: create new request 9 and starting DOMListener...
- * BrowserUtils: started domListener id 64
- * BrowserUtils: DOMListener 64 running...
- * BrowserUtils: saved content for page: http://localhost/posts to request 9, (DOMListener 64)
- */
 
 const createBrowserDb = async () => {
   const result = await global
