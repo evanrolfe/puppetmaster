@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from '../state/state';
+import { useSelector } from '../../state/state';
 import BrowserSessionsDropdown from './BrowserSessionsDropdown';
 import LayoutDropdown from './LayoutDropdown';
 

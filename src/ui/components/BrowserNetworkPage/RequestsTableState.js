@@ -1,7 +1,7 @@
 import React from 'react';
 import { getUntrackedObject } from 'react-tracked';
 import { useSelector, useTrackedState } from '../../state/state';
-import RequestsTable from '../RequestsTable';
+import RequestsTable from './RequestsTable';
 
 export default () => {
   const trackedState = useTrackedState();

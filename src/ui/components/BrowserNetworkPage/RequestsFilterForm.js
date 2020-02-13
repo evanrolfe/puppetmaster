@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react';
 
-import { registerModal, showModal } from './modals/index';
-import DisplayFiltersModal from './modals/DisplayFiltersModal';
-import CaptureFiltersModal from './modals/CaptureFiltersModal';
+import { registerModal, showModal } from '../modals/index';
+import DisplayFiltersModal from '../modals/DisplayFiltersModal';
+import CaptureFiltersModal from '../modals/CaptureFiltersModal';
 
 type Props = {
   allStatusCodes: 'array',

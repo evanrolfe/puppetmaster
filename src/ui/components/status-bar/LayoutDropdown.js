@@ -1,12 +1,12 @@
 import React from 'react';
-import { useDispatch, useSelector } from '../state/state';
-import { PAGE_LAYOUTS } from '../state/constants';
+import { useDispatch, useSelector } from '../../state/state';
+import { PAGE_LAYOUTS } from '../../state/constants';
 import {
   Dropdown,
   DropdownButton,
   DropdownItem,
   DropdownDivider
-} from './dropdown';
+} from '../dropdown';
 
 export default () => {
   console.log(`[RENDER] LayoutDropdown`);

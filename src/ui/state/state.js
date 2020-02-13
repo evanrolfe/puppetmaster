@@ -229,7 +229,7 @@ const setNestedValue = (key, state, action) => {
   const newState = { ...state };
 
   newState[action.page][key] = action[key];
-  console.log(`[STATE] Set ${action.page}.${key} to: ${action[key]}`);
+
   return newState;
 };
 
@@ -258,10 +258,6 @@ const setPaneValue = (key, state, action) => {
   const pane = getPane(state, action.paneId, action.page);
   pane[key] = action[key];
 
-  console.log(
-    `[STATE] Set ${action.page}.page.panes[${action.paneId}].${key} to: ${action[key]}`
-  );
-
   return newState;
 };
 
@@ -278,7 +274,6 @@ const setInterceptRequest = (state, action) => {
   const newState = { ...state };
 
   newState[action.page].request = action.request;
-  console.log(`[STATE] Set ${action.page}.request to: ${action.request}`);
 
   // Parse the request headers to text:
   if (action.request !== null && action.request.rawResponse !== undefined) {
@@ -341,11 +336,6 @@ const reducer = (state, action) => {
     case 'SET_FILTERS':
       return setFilters(state, action);
     case 'SET_WINDOW_SIZE_THROTTLED':
-      console.log(
-        `[State] setting windowSizeThrottel to ${JSON.stringify(
-          action.windowSize
-        )}`
-      );
       return { ...state, windowSizeThrottel: action.windowSize };
 
     case 'SET_LAYOUT':
@@ -543,7 +533,6 @@ function* loadRequest() {
     id: requestId
   });
   const request = response.result.body;
-  console.log(`Loaded request ${request.id}`);
 
   yield put({
     type: 'REQUEST_LOADED',
@@ -565,7 +554,6 @@ function* loadWebsocketMessage() {
     }
   );
   const websocketMessage = response.result.body;
-  console.log(`Loaded websocket message ${websocketMessage.id}`);
 
   yield put({
     type: 'WEBSOCKET_MESSAGE_LOADED',

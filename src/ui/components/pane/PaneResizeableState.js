@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useDispatch, useSelector } from '../../state/state';
 import { getPane, getParentPane } from '../../state/selectors';
-import PaneResizeable from '../pane/PaneResizeable';
+import PaneResizeable from './PaneResizeable';
 
 type Props = {
   paneId: 'number',

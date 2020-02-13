@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useDispatch, useSelector } from '../../state/state';
 import { getPane } from '../../state/selectors';
-import PaneWithTabs from '../pane/PaneWithTabs';
+import PaneWithTabs from './PaneWithTabs';
 
 type Props = {
   tabs: 'array',

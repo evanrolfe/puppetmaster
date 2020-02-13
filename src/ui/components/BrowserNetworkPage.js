@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { useSelector } from '../../state/state';
-import PaneContainer from '../pane/PaneContainer';
-import PaneRemaining from '../pane/PaneRemaining';
-import PaneFixed from '../pane/PaneFixed';
-import PaneWithTabsState from '../BrowserNetworkPage/PaneWithTabsState';
-import PaneResizeableState from '../BrowserNetworkPage/PaneResizeableState';
-import BrowserTabs from '../BrowserTabs';
-import RequestsTableState from '../BrowserNetworkPage/RequestsTableState';
-import RequestsFilterFormState from '../BrowserNetworkPage/RequestsFilterFormState';
-import RequestTabState from '../BrowserNetworkPage/RequestTabState';
-import ResponseTabState from '../BrowserNetworkPage/ResponseTabState';
-import BodyTabState from '../BrowserNetworkPage/BodyTabState';
+import { useSelector } from '../state/state';
+import PaneContainer from './pane/PaneContainer';
+import PaneRemaining from './pane/PaneRemaining';
+import PaneFixed from './pane/PaneFixed';
+import PaneWithTabsState from './pane/PaneWithTabsState';
+import PaneResizeableState from './pane/PaneResizeableState';
+import BrowserTabs from './BrowserNetworkPage/BrowserTabs';
+import RequestsTableState from './BrowserNetworkPage/RequestsTableState';
+import RequestsFilterFormState from './BrowserNetworkPage/RequestsFilterFormState';
+import RequestTabState from './BrowserNetworkPage/RequestTabState';
+import ResponseTabState from './BrowserNetworkPage/ResponseTabState';
+import BodyTabState from './BrowserNetworkPage/BodyTabState';
 
 type Props = {
   history: 'object',

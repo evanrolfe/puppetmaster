@@ -10,14 +10,12 @@ import { registerModal } from './modals/index';
 import AlertModal from './modals/AlertModal';
 import SettingsModal from './modals/SettingsModal';
 import Sidebar from './Sidebar';
-import BrowserWebsocketsPage from './pages/BrowserWebsocketsPage';
-import BrowserNetworkPage from './pages/BrowserNetworkPage';
-import BrowserInterceptPageState from './BrowserInterceptPage/BrowserInterceptPageState';
-import CrawlerPage from './pages/CrawlerPage';
-import RequestsPage from './pages/RequestsPage';
-import ScansPage from './pages/ScansPage';
+import BrowserWebsocketsPage from './BrowserWebsocketsPage';
+import BrowserNetworkPage from './BrowserNetworkPage';
+import BrowserInterceptPageState from './BrowserInterceptPageState';
+import RequestsPage from './RequestsPage';
 
-import BrowserNetworkConfig from './BrowserNetworkConfig';
+import BrowserNetworkConfig from './status-bar/BrowserNetworkConfig';
 import { useDispatch } from '../state/state';
 
 export default () => {
@@ -71,26 +69,6 @@ export default () => {
       window.removeEventListener('resize', _setWindowSizeThrottled);
     };
   }, [_setWindowSizeThrottled]);
-  /*
-  // FOR TESTING PURPOSES:
-  dispatch({
-    type: 'SET_INTERCEPT_REQUEST',
-    page: 'browserInterceptPage',
-    request: {
-      browser_id: 1,
-      created_at: 1576059737887,
-      ext: "json",
-      host: "localhost",
-      id: 11,
-      method: "POST",
-      path: "/api/users/sign_in.json",
-      request_headers: `{"referer":"http://localhost/login","origin":"http://localhost","user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.0 Safari/537.36","content-type":"application/json","cookie":""}`,
-      request_payload: `{"user":{"email":"alice@authcov.io","password":"password"}}`,
-      request_type: "fetch",
-      url: "http://localhost/api/users/sign_in.json"
-    }
-  });
-*/
 
   const content = (
     <>
@@ -108,9 +86,7 @@ export default () => {
         component={BrowserWebsocketsPage}
       />
 
-      <Route exact path="/crawler" component={CrawlerPage} />
       <Route exact path="/requests" component={RequestsPage} />
-      <Route exact path="/scans" component={ScansPage} />
     </>
   );
 

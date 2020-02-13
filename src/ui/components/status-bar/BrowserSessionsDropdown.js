@@ -1,12 +1,12 @@
 import React from 'react';
-import { useDispatch, useSelector } from '../state/state';
+import { useDispatch, useSelector } from '../../state/state';
 import {
   Dropdown,
   DropdownButton,
   DropdownItem,
   DropdownDivider
-} from './dropdown';
-import EditBrowserModal from './modals/EditBrowserModal';
+} from '../dropdown';
+import EditBrowserModal from '../modals/EditBrowserModal';
 
 export default () => {
   console.log(`[RENDER] BrowserSessionsDropdown`);
