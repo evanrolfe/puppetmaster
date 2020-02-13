@@ -1,5 +1,5 @@
 import * as React from 'react';
-import RequestTableRow from './RequestTableRow';
+import RequestTableRowState from './RequestTableRowState';
 
 /*
  * NOTE: We have monkey-patched the rowRenderer function from react-virtualized
@@ -12,7 +12,6 @@ type Props = {
   className: 'string',
   columns: 'array',
   index: 'number',
-  key: 'string',
   onRowClick: 'function',
   onRowDoubleClick: 'function',
   onRowMouseOut: 'function',
@@ -26,7 +25,6 @@ export default function rowRenderer({
   className,
   columns,
   index,
-  key,
   onRowClick,
   onRowDoubleClick,
   onRowMouseOut,
@@ -48,7 +46,7 @@ export default function rowRenderer({
     a11yProps.tabIndex = 0;
 
     if (onRowClick) {
-      a11yProps.onClick = event => onRowClick({ event, index, rowData });
+      a11yProps.onMouseDown = event => onRowClick({ event, index, rowData });
     }
     if (onRowDoubleClick) {
       a11yProps.onDoubleClick = event =>
@@ -68,16 +66,15 @@ export default function rowRenderer({
   }
 
   return (
-    <div
-      {...a11yProps}
+    <RequestTableRowState
+      key={rowData.id}
+      request={rowData}
       className={className}
-      key={key}
       role="row"
       style={style}
+      a11yProps={a11yProps}
     >
-      <RequestTableRow key={rowData.id} request={rowData}>
-        {columns}
-      </RequestTableRow>
-    </div>
+      {columns}
+    </RequestTableRowState>
   );
 }

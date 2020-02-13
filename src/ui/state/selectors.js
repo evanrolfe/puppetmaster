@@ -1,36 +1,33 @@
-/*
-// TODO: This is an attempt to make getPane recursive:
-const checkPane = (pane, paneId) => {
-  console.log(`checkPane: checking ${pane.id}`)
+const getSelectedRequestIds = state => {
+  const selectedId1 = state.browserNetworkPage.selectedRequestId;
+  const selectedId2 = state.browserNetworkPage.selectedRequestId2;
+  const requestIds = state.browserNetworkPage.requests.map(r => r.id);
 
-  if(pane.id === paneId) {
-    console.log(`checkPane: yes! found ${paneId}`)
-    return pane;
+  const i1 = requestIds.indexOf(selectedId1);
+  const i2 = requestIds.indexOf(selectedId2);
+  let selectedRequestIds;
+
+  if (i2 > i1) {
+    selectedRequestIds = requestIds.slice(i1, i2 + 1);
+  } else {
+    selectedRequestIds = requestIds.slice(i2, i1 + 1);
   }
 
-  if(pane.panes !== undefined && pane.panes.length > 0) {
-    pane.panes.forEach((subPane) => {
-      checkPane(subPane, paneId);
-    })
+  return selectedRequestIds;
+};
+
+const isRequestSelected = (state, requestId) => {
+  const selectedId1 = state.browserNetworkPage.selectedRequestId;
+  const selectedId2 = state.browserNetworkPage.selectedRequestId2;
+
+  if (selectedId2 !== null) {
+    const selectedIds = getSelectedRequestIds(state);
+
+    return selectedIds.includes(requestId);
+  } else {
+    return selectedId1 === requestId;
   }
 };
-
-const getPane = (state, paneId) => {
-  const panes = state.browserNetworkPage.page.panes;
-  let result;
-
-  panes.forEach((pane) => {
-    console.log(`getPane: checking ${pane.id}`)
-    const paneFound = checkPane(pane, paneId);
-
-    if(paneFound !== undefined) {
-      result = paneFound;
-    }
-  })
-
-  return result;
-};
-*/
 
 const getPane = (state, paneId, pageName) => {
   const panes = state[pageName].page.panes;
@@ -69,4 +66,4 @@ const getParentPane = (state, paneId, pageName) => {
   return paneFound;
 };
 
-export { getPane, getParentPane };
+export { isRequestSelected, getSelectedRequestIds, getPane, getParentPane };

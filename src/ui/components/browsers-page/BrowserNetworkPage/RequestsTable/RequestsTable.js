@@ -3,31 +3,14 @@ import { ipcRenderer } from 'electron';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 
 import { useDispatch } from '../../../../state/state';
+
 import KeydownBinder from '../../../KeydownBinder';
 import requestsTableCellRenderer from './RequestsTableCellRenderer';
 import rowRenderer from './rowRenderer';
 
-const getSelectedRequestIds = (selectedId1, selectedId2, requests) => {
-  const requestIds = requests.map(request => request.id);
-
-  const i1 = requestIds.indexOf(selectedId1);
-  const i2 = requestIds.indexOf(selectedId2);
-  let selectedRequestIds;
-
-  if (i2 > i1) {
-    selectedRequestIds = requestIds.slice(i1, i2 + 1);
-  } else {
-    selectedRequestIds = requestIds.slice(i2, i1 + 1);
-  }
-
-  return selectedRequestIds;
-};
-
 type Props = {
   requests: 'array',
   requestsTableColumns: 'array',
-  selectedRequestId: 'number',
-  selectedRequestId2: 'number',
   orderBy: 'string',
   dir: 'string'
 };
@@ -35,8 +18,6 @@ type Props = {
 export default ({
   requests,
   requestsTableColumns,
-  selectedRequestId,
-  selectedRequestId2,
   // eslint-disable-next-line no-unused-vars
   orderBy,
   // eslint-disable-next-line no-unused-vars
@@ -45,26 +26,7 @@ export default ({
   const dispatch = useDispatch();
   console.log(`[RENDER] RequestsTable with ${requests.length} requests`);
 
-  const selectedRequestIds = getSelectedRequestIds(
-    selectedRequestId,
-    selectedRequestId2,
-    requests
-  );
   /*
-  const _getRowClassName = requestId => {
-    let isSelected = false;
-
-    if (selectedRequestId2 === null) {
-      isSelected = parseInt(requestId) === selectedRequestId;
-    } else {
-      isSelected = selectedRequestIds.includes(requestId);
-    }
-
-    if (isSelected) {
-      return 'selected';
-    }
-  };
-
   const _handleRightClick = (requestId, event) => {
     event.preventDefault();
 
@@ -103,13 +65,6 @@ export default ({
     dispatch({ type: 'DELETE_REQUEST', requestId: args.requestId });
   });
 
-  // This will create the context menus for the multiple requests selection
-  if (selectedRequestIds.length > 1) {
-    console.log(`[Frontend] Create context menu for multiple requests`);
-    ipcRenderer.send('requestsSelected', {
-      requestIds: selectedRequestIds
-    });
-  }
   /*
   const classNameForTableHeader = columnName => {
     if (columnName === orderBy) return 'ordered';

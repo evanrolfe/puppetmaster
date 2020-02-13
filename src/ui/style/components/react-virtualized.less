@@ -35,11 +35,15 @@
 .ReactVirtualized__Table__row {
   //border-bottom: 1px solid @hl-md;
   outline: none !important;
+
+  &:not(.selected):hover {
+    cursor: pointer;
+    background-color: @hl-xs;
+  }
 }
 
-.ReactVirtualized__Table__row:hover {
-  cursor: pointer;
-  background-color: @hl-xs;
+.selected {
+  background-color: @hl-lg;
 }
 
 .ReactVirtualized__Table__rowColumn {
