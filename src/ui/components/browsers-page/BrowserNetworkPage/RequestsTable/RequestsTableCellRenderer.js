@@ -1,5 +1,5 @@
 import React from 'react';
-import StatusTag from '../../StatusTag';
+import StatusTag from '../../../StatusTag';
 
 type Props = {
   cellData: 'any',

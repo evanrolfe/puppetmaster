@@ -2,8 +2,8 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 
-import { useDispatch } from '../../../state/state';
-import KeydownBinder from '../../KeydownBinder';
+import { useDispatch } from '../../../../state/state';
+import KeydownBinder from '../../../KeydownBinder';
 import requestsTableCellRenderer from './RequestsTableCellRenderer';
 import rowRenderer from './rowRenderer';
 
