@@ -1,7 +1,7 @@
 import React from 'react';
 import { getUntrackedObject } from 'react-tracked';
 
-import { useSelector, useDispatch, useTrackedState } from '../state/state';
+import { useSelector, useDispatch, useTrackedState } from '../../state/state';
 import BrowserInterceptPage from './BrowserInterceptPage';
 
 const getCodeMirrorWidth = windowSizeThrottel => {

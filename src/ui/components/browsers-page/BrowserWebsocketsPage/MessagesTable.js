@@ -2,7 +2,7 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 
 import RequestsTableHeader from '../BrowserNetworkPage/RequestsTableHeader';
-import KeydownBinder from '../KeydownBinder';
+import KeydownBinder from '../../KeydownBinder';
 
 const getSelectedMessageIds = (selectedId1, selectedId2, messages) => {
   const messageIds = messages.map(message => message.id);

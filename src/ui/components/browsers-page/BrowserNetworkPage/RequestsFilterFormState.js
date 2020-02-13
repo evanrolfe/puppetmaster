@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useDispatch, useSelector } from '../../state/state';
+import { useSelector, useDispatch } from '../../../state/state';
 import RequestsFilterForm from './RequestsFilterForm';
 
 const RESOURCE_TYPES = [

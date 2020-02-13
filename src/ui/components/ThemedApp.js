@@ -10,12 +10,12 @@ import { registerModal } from './modals/index';
 import AlertModal from './modals/AlertModal';
 import SettingsModal from './modals/SettingsModal';
 import Sidebar from './Sidebar';
-import BrowserWebsocketsPage from './BrowserWebsocketsPage';
-import BrowserNetworkPage from './BrowserNetworkPage';
-import BrowserInterceptPageState from './BrowserInterceptPageState';
+import BrowserWebsocketsPage from './browsers-page/BrowserWebsocketsPage';
+import BrowserNetworkPage from './browsers-page/BrowserNetworkPage';
+import BrowserInterceptPageState from './browsers-page/BrowserInterceptPageState';
 import RequestsPage from './RequestsPage';
 
-import BrowserNetworkConfig from './status-bar/BrowserNetworkConfig';
+import BrowserNetworkConfig from './browsers-page/status-bar/BrowserNetworkConfig';
 import { useDispatch } from '../state/state';
 
 export default () => {

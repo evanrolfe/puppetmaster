@@ -1,6 +1,10 @@
 import React from 'react';
 
-import { useTrackedState, useSelector, useDispatch } from '../../state/state';
+import {
+  useTrackedState,
+  useSelector,
+  useDispatch
+} from '../../../state/state';
 import BodyTab from '../RequestView/BodyTab';
 
 const getCodeMirrorWidth = (orientation, paneWidth, windowSizeThrottel) => {

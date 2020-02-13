@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useSelector, useTrackedState } from '../../state/state';
+import { useSelector, useTrackedState } from '../../../state/state';
 import MessageViewPane from './MessageViewPane';
 
 const getCodeMirrorWidth = (paneWidth, windowSizeThrottel) => {

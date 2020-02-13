@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useSelector, useDispatch } from '../../state/state';
+import { useSelector, useDispatch } from '../../../state/state';
 import RequestTab from '../RequestView/RequestTab';
 
 export default () => {

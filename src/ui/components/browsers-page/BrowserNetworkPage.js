@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { useSelector } from '../state/state';
-import PaneContainer from './pane/PaneContainer';
-import PaneRemaining from './pane/PaneRemaining';
-import PaneFixed from './pane/PaneFixed';
-import PaneWithTabsState from './pane/PaneWithTabsState';
-import PaneResizeableState from './pane/PaneResizeableState';
+import { useSelector } from '../../state/state';
+import PaneContainer from '../pane/PaneContainer';
+import PaneRemaining from '../pane/PaneRemaining';
+import PaneFixed from '../pane/PaneFixed';
+import PaneWithTabsState from '../pane/PaneWithTabsState';
+import PaneResizeableState from '../pane/PaneResizeableState';
 import BrowserTabs from './BrowserNetworkPage/BrowserTabs';
 import RequestsTableState from './BrowserNetworkPage/RequestsTableState';
 import RequestsFilterFormState from './BrowserNetworkPage/RequestsFilterFormState';

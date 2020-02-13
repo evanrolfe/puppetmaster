@@ -1,10 +1,10 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
 
-import { useDispatch, useSelector } from '../../state/state';
+import { useDispatch, useSelector } from '../../../state/state';
 import MessagesTable from './MessagesTable';
 
-import { WEBSOCKET_MESSAGE_TABLE_COLUMNS } from '../../state/constants';
+import { WEBSOCKET_MESSAGE_TABLE_COLUMNS } from '../../../state/constants';
 
 export default () => {
   const dispatch = useDispatch();

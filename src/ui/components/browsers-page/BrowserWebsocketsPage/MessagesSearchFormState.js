@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useDispatch, useSelector } from '../../state/state';
+import { useDispatch, useSelector } from '../../../state/state';
 import MessagesSearchForm from './MessagesSearchForm';
 
 export default () => {

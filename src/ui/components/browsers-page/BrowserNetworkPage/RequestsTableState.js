@@ -1,6 +1,6 @@
 import React from 'react';
 import { getUntrackedObject } from 'react-tracked';
-import { useSelector, useTrackedState } from '../../state/state';
+import { useSelector, useTrackedState } from '../../../state/state';
 import RequestsTable from './RequestsTable';
 
 export default () => {

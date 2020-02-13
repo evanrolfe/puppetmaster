@@ -1,9 +1,9 @@
 import React from 'react';
 import { Tab, TabList, Tabs } from 'react-tabs';
 
-import PaneContainer from '../pane/PaneContainer';
-import PaneFixed from '../pane/PaneFixed';
-import PaneRemaining from '../pane/PaneRemaining';
+import PaneContainer from '../../pane/PaneContainer';
+import PaneFixed from '../../pane/PaneFixed';
+import PaneRemaining from '../../pane/PaneRemaining';
 import CodeEditor from '../RequestView/CodeEditor';
 
 type Props = {
