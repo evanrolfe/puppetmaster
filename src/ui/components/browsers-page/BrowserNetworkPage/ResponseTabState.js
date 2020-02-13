@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useSelector, useDispatch } from '../../../state/state';
-import ResponseTab from '../RequestView/ResponseTab';
+import ResponseTab from './RequestView/ResponseTab';
 
 export default () => {
   const request = useSelector(state => state.browserNetworkPage.request);

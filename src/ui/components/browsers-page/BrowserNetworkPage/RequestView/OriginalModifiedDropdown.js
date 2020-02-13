@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, DropdownButton, DropdownItem } from '../../dropdown';
+import { Dropdown, DropdownButton, DropdownItem } from '../../../dropdown';
 
 type Props = {
   setOriginal: 'function',

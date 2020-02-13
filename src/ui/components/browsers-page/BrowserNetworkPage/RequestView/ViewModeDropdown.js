@@ -4,7 +4,7 @@ import {
   DropdownButton,
   DropdownItem,
   DropdownDivider
-} from '../../dropdown';
+} from '../../../dropdown';
 
 type Props = {
   viewMode: 'string',

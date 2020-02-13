@@ -1,7 +1,7 @@
 import React from 'react';
 
-import PaneRemaining from '../../pane/PaneRemaining';
-import PaneFixed from '../../pane/PaneFixed';
+import PaneRemaining from '../../../pane/PaneRemaining';
+import PaneFixed from '../../../pane/PaneFixed';
 import CodeEditor from './CodeEditor';
 import Preview from './Preview';
 import ViewModeDropdown from './ViewModeDropdown';
@@ -10,7 +10,7 @@ import {
   canPrettify,
   prettifyCode,
   isHTML
-} from '../../../lib/CodeEditorUtils';
+} from '../../../../lib/CodeEditorUtils';
 
 type Props = {
   viewMode: 'string',

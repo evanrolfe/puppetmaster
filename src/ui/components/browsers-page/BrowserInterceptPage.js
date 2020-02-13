@@ -6,7 +6,7 @@ import BrowserTabs from './BrowserNetworkPage/BrowserTabs';
 import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
-import CodeEditor from './RequestView/CodeEditor';
+import CodeEditor from './BrowserNetworkPage/RequestView/CodeEditor';
 
 type Props = {
   request: 'object',

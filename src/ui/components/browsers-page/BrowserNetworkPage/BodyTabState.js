@@ -5,7 +5,7 @@ import {
   useSelector,
   useDispatch
 } from '../../../state/state';
-import BodyTab from '../RequestView/BodyTab';
+import BodyTab from './RequestView/BodyTab';
 
 const getCodeMirrorWidth = (orientation, paneWidth, windowSizeThrottel) => {
   let codeMirrorWidth;

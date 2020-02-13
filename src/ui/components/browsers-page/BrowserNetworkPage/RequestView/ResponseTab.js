@@ -1,5 +1,5 @@
 import React from 'react';
-import PaneRemaining from '../../pane/PaneRemaining';
+import PaneRemaining from '../../../pane/PaneRemaining';
 import OriginalModifiedDropdown from './OriginalModifiedDropdown';
 
 type Props = {
