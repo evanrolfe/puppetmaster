@@ -1,21 +1,28 @@
 import React from 'react';
-
-import { useSelector } from '../../state/state';
+import { getUntrackedObject } from 'react-tracked';
+import { useSelector, useTrackedState } from '../../state/state';
 import RequestsTable from '../RequestsTable';
 
 export default () => {
+  const trackedState = useTrackedState();
+  const untrackedState = getUntrackedObject(trackedState);
+
+  // Tracked state vars:
   const selectedRequestId = useSelector(
     state => state.browserNetworkPage.selectedRequestId
   );
   const selectedRequestId2 = useSelector(
     state => state.browserNetworkPage.selectedRequestId2
   );
+  useSelector(state => state.browserNetworkPage.requests.length);
   const requests = useSelector(state => state.browserNetworkPage.requests);
-  const orderBy = useSelector(state => state.browserNetworkPage.orderBy);
-  const dir = useSelector(state => state.browserNetworkPage.dir);
   const requestsTableColumns = useSelector(
     state => state.browserNetworkPage.requestsTableColumns
   );
+
+  // Untracked state vars:
+  const orderBy = untrackedState.browserNetworkPage.orderBy;
+  const dir = untrackedState.browserNetworkPage.dir;
 
   return (
     <RequestsTable

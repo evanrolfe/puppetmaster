@@ -212,6 +212,12 @@ export default class Request {
       query = query.orderBy('requests.id', 'desc');
     }
 
+    // Limit
+    if (params.limit !== undefined) {
+      const limit = parseInt(params.limit);
+      query = query.limit(limit);
+    }
+
     return query;
   }
 

@@ -43,9 +43,7 @@ export default () => {
   global.backendConn.listen('websocketMessageCreated', loadMessages);
 
   // Listen for a change in browsers
-  global.backendConn.listen('browsersChanged', () => {
-    dispatch({ type: 'LOAD_REQUESTS' });
-  });
+  global.backendConn.listen('browsersChanged', dispatchLoadRequests);
 
   // Listen for a request intercepted
   global.proxyConn.listen('requestIntercepted', data => {

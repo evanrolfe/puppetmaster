@@ -1,10 +1,11 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
+import { AutoSizer, Column, Table } from 'react-virtualized';
 
 import { useDispatch } from '../state/state';
 import KeydownBinder from './KeydownBinder';
-import RequestsTableHeader from './RequestsTableHeader';
-import RequestTableCell from './RequestTableCell';
+import requestsTableCellRenderer from './RequestsTableCellRenderer';
+import rowRenderer from './rowRenderer';
 
 const getSelectedRequestIds = (selectedId1, selectedId2, requests) => {
   const requestIds = requests.map(request => request.id);
@@ -36,20 +37,20 @@ export default ({
   requestsTableColumns,
   selectedRequestId,
   selectedRequestId2,
+  // eslint-disable-next-line no-unused-vars
   orderBy,
+  // eslint-disable-next-line no-unused-vars
   dir
 }: Props) => {
   const dispatch = useDispatch();
-  console.log(`[RENDER] RequestsTable`);
-
-  const requestDivRef = React.createRef();
+  console.log(`[RENDER] RequestsTable with ${requests.length} requests`);
 
   const selectedRequestIds = getSelectedRequestIds(
     selectedRequestId,
     selectedRequestId2,
     requests
   );
-
+  /*
   const _getRowClassName = requestId => {
     let isSelected = false;
 
@@ -75,7 +76,7 @@ export default ({
       ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
     }
   };
-
+*/
   const _handleKeyUp = e => {
     if (e.key === 'Shift') dispatch({ type: 'SHIFT_RELEASED' });
   };
@@ -109,13 +110,12 @@ export default ({
       requestIds: selectedRequestIds
     });
   }
-
+  /*
   const classNameForTableHeader = columnName => {
     if (columnName === orderBy) return 'ordered';
 
     return '';
   };
-
   const setTableColumnWidth = (columnIndex, width) => {
     dispatch({
       type: 'SET_COLUMN_WIDTH',
@@ -124,78 +124,47 @@ export default ({
       page: 'browserNetworkPage'
     });
   };
+*/
 
-  const selectRequest = (request, event) => {
+  const selectRequest = ({ event, rowData }) => {
     // Do not proceed if this is a right-click
     if (event.nativeEvent.which === 3) return;
-    // const requestDiv = requestDivRef.current;
-    // dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
+
+    const request = rowData;
     dispatch({ type: 'SELECT_REQUEST_LOAD', request: request });
   };
-  /*
-  useEffect(() => {
-    console.log(`Setting scrollTop to: ${requestsTableScrollTop}`)
-    const requestDiv = requestDivRef.current;
-    requestDiv.scrollTop = requestsTableScrollTop;
 
-    return () => {
-      console.log(`Leaving RequestsTable - saving scrollTop to: ${requestDiv.scrollTop}`)
-      dispatch({type: 'SET_SCROLLTOP', requestsTableScrollTop: requestDiv.scrollTop, page: 'browserNetworkPage'});
-    };
-  }, [requestDivRef, requestsTableScrollTop]);
-*/
   return (
     <KeydownBinder
       stopMetaPropagation
       onKeydown={_handleKeyDown}
       onKeyup={_handleKeyUp}
     >
-      <div
-        className="pane-remaining"
-        style={{ overflowX: 'auto' }}
-        ref={requestDivRef}
-      >
-        <table className="requests-table">
-          <thead>
-            <tr>
-              {requestsTableColumns.map((column, i) => (
-                <RequestsTableHeader
-                  key={`RequestsTableHeader${i}`}
-                  onClick={() =>
-                    dispatch({
-                      type: 'TOGGLE_COLUMN_ORDER_REQUESTS',
-                      columnKey: column.key,
-                      page: 'browserNetworkPage'
-                    })
-                  }
-                  className={classNameForTableHeader(column.key)}
-                  orderDir={dir}
+      <div className="pane-remaining" style={{ overflowX: 'hidden' }}>
+        <AutoSizer className="no-highlight">
+          {({ height, width }) => (
+            <Table
+              className="no-highlight"
+              width={width}
+              height={height}
+              headerHeight={21}
+              rowCount={requests.length}
+              rowGetter={({ index }) => requests[index]}
+              onRowClick={selectRequest}
+              rowHeight={21}
+              rowRenderer={rowRenderer}
+            >
+              {requestsTableColumns.map(column => (
+                <Column
                   width={column.width}
-                  setTableColumnWidth={setTableColumnWidth}
-                  columnIndex={i}
-                  minWidth={column.minWidth}
-                >
-                  {column.title}
-                </RequestsTableHeader>
+                  label={column.title}
+                  dataKey={column.key}
+                  cellRenderer={requestsTableCellRenderer}
+                />
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map(request => (
-              <tr
-                key={request.id}
-                id={`requestRow${request.id}`}
-                onMouseDown={e => selectRequest(request, e)}
-                onContextMenu={_handleRightClick.bind(this, request.id)}
-                className={_getRowClassName(request.id)}
-              >
-                {requestsTableColumns.map(column => (
-                  <RequestTableCell request={request} column={column} />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </Table>
+          )}
+        </AutoSizer>
       </div>
     </KeydownBinder>
   );
