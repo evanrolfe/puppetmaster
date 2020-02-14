@@ -26,19 +26,6 @@ export default ({
   const dispatch = useDispatch();
   console.log(`[RENDER] RequestsTable with ${requests.length} requests`);
 
-  /*
-  const _handleRightClick = (requestId, event) => {
-    event.preventDefault();
-
-    if (selectedRequestId2 !== null) {
-      ipcRenderer.send('showMultipleRequestContextMenu', {
-        requestId: requestId
-      });
-    } else {
-      ipcRenderer.send('showRequestContextMenu', { requestId: requestId });
-    }
-  };
-*/
   const _handleKeyUp = e => {
     if (e.key === 'Shift') dispatch({ type: 'SHIFT_RELEASED' });
   };

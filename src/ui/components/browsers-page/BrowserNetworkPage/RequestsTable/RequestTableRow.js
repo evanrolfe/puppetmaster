@@ -6,12 +6,15 @@ type Props = {
   a11yProps: 'object',
   style: 'string',
   isSelected: 'boolean',
-  className: 'string'
+  className: 'string',
+  handleRightClick: 'function'
 };
 
 export default class RequestTableRow extends Component<Props> {
   shouldComponentUpdate(nextProps) {
     if (this.props.isSelected !== nextProps.isSelected) return true;
+    if (this.props.request.browser_id === nextProps.request.browser_id)
+      return true;
 
     if (this.props.request.id === nextProps.request.id) return false;
 
@@ -23,7 +26,13 @@ export default class RequestTableRow extends Component<Props> {
   }
 
   render() {
-    const { a11yProps, style, isSelected, children } = this.props;
+    const {
+      a11yProps,
+      style,
+      isSelected,
+      children,
+      handleRightClick
+    } = this.props;
 
     let { className } = this.props;
 
@@ -32,7 +41,13 @@ export default class RequestTableRow extends Component<Props> {
     if (isSelected) className += ' selected';
 
     return (
-      <div {...a11yProps} className={className} role="row" style={style}>
+      <div
+        {...a11yProps}
+        className={className}
+        role="row"
+        style={style}
+        onContextMenu={handleRightClick}
+      >
         {children}
       </div>
     );
