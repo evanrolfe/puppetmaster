@@ -50,7 +50,7 @@ export default class RequestsController {
     }
 
     // TODO: Change this to requestsChanged
-    ipc.send('requestCreated', {});
+    ipc.send('requestDeleted', { requestId: args.id });
 
     return { status: 'OK', body: {} };
   }

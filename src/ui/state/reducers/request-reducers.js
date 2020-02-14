@@ -11,6 +11,31 @@ const requestsLoaded = (state, action) => {
 const requestLoaded = (state, action) =>
   setNestedValue('request', state, action);
 
+const requestDeleted = (state, action) => {
+  console.log(`[STATE] Request deleted, removing it from the state`);
+  console.log(action.requestId);
+
+  let deletedIds;
+
+  if (Array.isArray(action.requestId)) {
+    deletedIds = action.requestId;
+  } else {
+    deletedIds = [action.requestId];
+  }
+
+  const newState = { ...state };
+
+  newState.browserNetworkPage.requests = newState.browserNetworkPage.requests.filter(
+    request => !deletedIds.includes(request.id)
+  );
+
+  // Clear the selected requests:
+  newState.browserNetworkPage.selectedRequestId = null;
+  newState.browserNetworkPage.selectedRequestId2 = null;
+
+  return newState;
+};
+
 const selectRequest = (state, action) => {
   console.log(`[REQUESTREDUCERS] selecting request ${action.requestId}...`);
   let selectedRequestId2 = null;
@@ -63,6 +88,7 @@ const selectNextRequest = (state, action) => {
 const requestReducers = {
   REQUESTS_LOADED: requestsLoaded,
   REQUEST_LOADED: requestLoaded,
+  REQUEST_DELETED: requestDeleted,
   SELECT_REQUEST: selectRequest,
   SELECT_PREV_REQUEST: selectPrevRequest,
   SELECT_NEXT_REQUEST: selectNextRequest
