@@ -11,6 +11,15 @@ const requestsLoaded = (state, action) => {
 const requestLoaded = (state, action) =>
   setNestedValue('request', state, action);
 
+const requestCreated = (state, action) => {
+  const newState = { ...state };
+
+  // TODO: Insert it in the right place depending on the order_by and dir state
+  newState.browserNetworkPage.requests.unshift(action.request);
+
+  return newState;
+};
+
 const requestDeleted = (state, action) => {
   console.log(`[STATE] Request deleted, removing it from the state`);
   console.log(action.requestId);
@@ -88,6 +97,7 @@ const selectNextRequest = (state, action) => {
 const requestReducers = {
   REQUESTS_LOADED: requestsLoaded,
   REQUEST_LOADED: requestLoaded,
+  REQUEST_CREATED: requestCreated,
   REQUEST_DELETED: requestDeleted,
   SELECT_REQUEST: selectRequest,
   SELECT_PREV_REQUEST: selectPrevRequest,

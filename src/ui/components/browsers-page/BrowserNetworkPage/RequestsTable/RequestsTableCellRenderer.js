@@ -9,7 +9,8 @@ type Props = {
 
 export default ({ cellData, dataKey, rowData }: Props) => {
   const request = rowData;
-  // console.log(`Render request ${request.id}, col: ${dataKey}`)
+
+  if (cellData === null || cellData === undefined) return '';
 
   switch (dataKey) {
     case 'method':
@@ -25,11 +26,7 @@ export default ({ cellData, dataKey, rowData }: Props) => {
     }
 
     case 'response_status':
-      if (cellData === null) {
-        return '';
-      } else {
-        return <StatusTag statusCode={cellData} small />;
-      }
+      return <StatusTag statusCode={cellData} small />;
 
     case 'created_at': {
       const time = new Date(cellData);

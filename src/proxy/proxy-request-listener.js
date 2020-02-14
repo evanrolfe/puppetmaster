@@ -110,7 +110,9 @@ const proxyRequestListener = async (
     proxyToClientResponse.end('Bad request: Host missing...', 'UTF-8');
   } else {
     await parsedRequest.saveToDatabase();
-    proxyIPC.send('requestCreated', {});
+    proxyIPC.send('requestCreated', {
+      request: parsedRequest.toDatabaseParams()
+    });
 
     const isInterceptEnabled = await interceptEnabled();
     const shouldInterceptRequest =
@@ -132,7 +134,7 @@ const proxyRequestListener = async (
     // If the request is suppoused to be captured, then save the response
     if (parsedRequest.id !== undefined) {
       await parsedRequest.saveToDatabase();
-      proxyIPC.send('requestCreated', {});
+      proxyIPC.send('requestUpdated', {});
     }
 
     // Return the response from the proxy to the client

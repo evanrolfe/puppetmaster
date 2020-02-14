@@ -89,6 +89,30 @@ export default class Request {
   }
 
   async saveToDatabase() {
+    const requestParams = this.toDatabaseParams();
+
+    // Create the request:
+    if (this.id === undefined) {
+      const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
+        this
+      );
+
+      if (shouldRequestBeCaptured === false) return;
+
+      const dbResult = await global.knex('requests').insert(requestParams);
+      this.id = dbResult[0];
+
+      // Update the request:
+    } else {
+      await global
+        .knex('requests')
+        .where({ id: this.id })
+        .update(requestParams);
+      console.log(`Saved response to db request: ${this.id}`);
+    }
+  }
+
+  toDatabaseParams() {
     const requestParams = Object.assign({}, this);
 
     // Request Headers:
@@ -117,25 +141,7 @@ export default class Request {
     if (requestParams.response_body !== undefined)
       requestParams.response_body = requestParams.response_body.toString();
 
-    // Create the request:
-    if (this.id === undefined) {
-      const shouldRequestBeCaptured = await CaptureFilters.shouldRequestBeCaptured(
-        this
-      );
-
-      if (shouldRequestBeCaptured === false) return;
-
-      const dbResult = await global.knex('requests').insert(requestParams);
-      this.id = dbResult[0];
-
-      // Update the request:
-    } else {
-      await global
-        .knex('requests')
-        .where({ id: this.id })
-        .update(requestParams);
-      console.log(`Saved response to db request: ${this.id}`);
-    }
+    return requestParams;
   }
 
   toHttpRequestOptions() {

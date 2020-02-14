@@ -72,7 +72,7 @@ const handleResponse = async (page, response) => {
         request_type: response.request().resourceType()
       });
 
-    mainIpc.send('requestCreated', {});
+    mainIpc.send('requestUpdated', {});
   }
 
   // Save the cookies & pages:
