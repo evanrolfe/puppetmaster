@@ -7,7 +7,7 @@ import PaneFixed from '../pane/PaneFixed';
 import PaneWithTabsState from '../pane/PaneWithTabsState';
 import PaneResizeableState from '../pane/PaneResizeableState';
 import BrowserTabs from './BrowserNetworkPage/BrowserTabs';
-import RequestsTableState from './BrowserNetworkPage/RequestsTableState';
+import RequestsTableState from './BrowserNetworkPage/RequestsTable/RequestsTableState';
 import RequestsFilterFormState from './BrowserNetworkPage/RequestsFilterFormState';
 import RequestTabState from './BrowserNetworkPage/RequestTabState';
 import ResponseTabState from './BrowserNetworkPage/ResponseTabState';
