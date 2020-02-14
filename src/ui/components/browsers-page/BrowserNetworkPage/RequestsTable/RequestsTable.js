@@ -1,5 +1,4 @@
 import React from 'react';
-import { ipcRenderer } from 'electron';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 
 import { useDispatch } from '../../../../state/state';
@@ -46,11 +45,6 @@ export default ({
     }
     if (e.key === 'Shift') dispatch({ type: 'SHIFT_PRESSED' });
   };
-
-  // NOTE: This fires twice when the event is received for some reason
-  ipcRenderer.on('deleteRequest', (event, args) => {
-    dispatch({ type: 'DELETE_REQUEST', requestId: args.requestId });
-  });
 
   /*
   const classNameForTableHeader = columnName => {

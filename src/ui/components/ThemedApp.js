@@ -18,6 +18,8 @@ import RequestsPage from './RequestsPage';
 import BrowserNetworkConfig from './browsers-page/status-bar/BrowserNetworkConfig';
 import { useDispatch } from '../state/state';
 
+import { listenForRequests } from '../state/listeners/listen-for-requests';
+
 export default () => {
   console.log('[RENDER] ThemedApp');
   const history = createHashHistory();
@@ -28,6 +30,8 @@ export default () => {
   dispatch({ type: 'LOAD_BROWSERS' });
   dispatch({ type: 'LOAD_SETTINGS' });
   dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
+
+  listenForRequests(dispatch);
 
   // Listen for new requests
   const dispatchLoadRequests = () => dispatch({ type: 'LOAD_REQUESTS' });

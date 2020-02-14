@@ -1,9 +1,7 @@
 import React from 'react';
-import { ipcRenderer } from 'electron';
 import { getUntrackedObject } from 'react-tracked';
 
 import { useSelector, useTrackedState } from '../../../../state/state';
-import { getSelectedRequestIds } from '../../../../state/selectors';
 import RequestsTable from './RequestsTable';
 
 export default () => {
@@ -23,18 +21,6 @@ export default () => {
   const selectedRequestId = untrackedState.browserNetworkPage.selectedRequestId;
   const selectedRequestId2 =
     untrackedState.browserNetworkPage.selectedRequestId2;
-
-  // This will create the context menus for the multiple requests selection
-  const selectedRequestIds = getSelectedRequestIds(untrackedState);
-
-  if (selectedRequestIds.length > 1) {
-    console.log(
-      `[Frontend] Create context menu for multiple requests (${selectedRequestIds.length})`
-    );
-    ipcRenderer.send('requestsSelected', {
-      requestIds: selectedRequestIds
-    });
-  }
 
   return (
     <RequestsTable

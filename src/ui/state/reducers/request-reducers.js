@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron';
 
+import { getSelectedRequestIds } from '../selectors';
 import { setNestedValue } from './utils';
 
 const requestsLoaded = (state, action) => {
@@ -25,6 +26,15 @@ const selectRequest = (state, action) => {
   const newState = { ...state };
   newState[action.page].selectedRequestId = action.requestId;
   newState[action.page].selectedRequestId2 = selectedRequestId2;
+
+  // Create the multiple requests context menu if necessary:
+  if (selectedRequestId2 !== null) {
+    const selectedRequestIds = getSelectedRequestIds(newState);
+    console.log(
+      `[STATE] Create contenxt menu for(${selectedRequestIds.length}) requests`
+    );
+    ipcRenderer.send('requestsSelected', { requestIds: selectedRequestIds });
+  }
 
   console.log(`[REQUESTREDUCERS] selected request ${action.requestId}`);
   return newState;
