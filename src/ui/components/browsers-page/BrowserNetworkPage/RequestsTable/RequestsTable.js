@@ -4,7 +4,6 @@ import { AutoSizer, Column, Table } from 'react-virtualized';
 import { useDispatch } from '../../../../state/state';
 
 import KeydownBinder from '../../../KeydownBinder';
-import requestsTableCellRenderer from './RequestsTableCellRenderer';
 import rowRenderer from './rowRenderer';
 
 type Props = {
@@ -95,7 +94,6 @@ export default ({
                   width={column.width}
                   label={column.title}
                   dataKey={column.key}
-                  cellRenderer={requestsTableCellRenderer}
                 />
               ))}
             </Table>

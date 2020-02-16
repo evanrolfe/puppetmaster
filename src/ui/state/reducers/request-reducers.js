@@ -20,10 +20,20 @@ const requestCreated = (state, action) => {
   return newState;
 };
 
-const requestDeleted = (state, action) => {
-  console.log(`[STATE] Request deleted, removing it from the state`);
-  console.log(action.requestId);
+const requestUpdated = (state, action) => {
+  console.log(`[STATE] Request updated, updating the state...`);
+  console.log(action.request);
 
+  const newState = { ...state };
+
+  const requestIds = newState.browserNetworkPage.requests.map(r => r.id);
+  const index = requestIds.indexOf(action.request.id);
+  newState.browserNetworkPage.requests[index] = action.request;
+
+  return newState;
+};
+
+const requestDeleted = (state, action) => {
   let deletedIds;
 
   if (Array.isArray(action.requestId)) {
@@ -99,6 +109,7 @@ const requestReducers = {
   REQUEST_LOADED: requestLoaded,
   REQUEST_CREATED: requestCreated,
   REQUEST_DELETED: requestDeleted,
+  REQUEST_UPDATED: requestUpdated,
   SELECT_REQUEST: selectRequest,
   SELECT_PREV_REQUEST: selectPrevRequest,
   SELECT_NEXT_REQUEST: selectNextRequest

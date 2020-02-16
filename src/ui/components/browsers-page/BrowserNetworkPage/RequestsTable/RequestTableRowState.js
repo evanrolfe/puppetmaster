@@ -3,17 +3,15 @@ import { ipcRenderer } from 'electron';
 
 import RequestTableRow from './RequestTableRow';
 import { useSelector } from '../../../../state/state';
-import { isRequestSelected } from '../../../../state/selectors';
+import { isRequestSelected, getRequest } from '../../../../state/selectors';
 /*
  * NOTE: This state component is a bit of a hack. We only use it in order to
  *       "inject" the isSelected state into the RequestTableRow because
  *       react-virtualized does not let us pass any more data through to the
  *       rows apart from the request object itsself.
- * TODO: Have a "selected" attribute set on the request object.
  */
-
 type Props = {
-  request: 'object'
+  requestId: 'number'
 };
 
 export default (props: Props) => {
@@ -21,10 +19,10 @@ export default (props: Props) => {
     state => state.browserNetworkPage.selectedRequestId2
   );
   const isSelected = useSelector(state =>
-    isRequestSelected(state, props.request.id)
+    isRequestSelected(state, props.requestId)
   );
 
-  const { request } = props;
+  const request = useSelector(state => getRequest(state, props.requestId));
 
   const handleRightClick = event => {
     event.preventDefault();
@@ -42,6 +40,7 @@ export default (props: Props) => {
   return (
     <RequestTableRow
       {...props}
+      request={request}
       isSelected={isSelected}
       handleRightClick={handleRightClick}
     />

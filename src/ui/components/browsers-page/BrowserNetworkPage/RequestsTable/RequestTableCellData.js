@@ -2,13 +2,12 @@ import React from 'react';
 import StatusTag from '../../../StatusTag';
 
 type Props = {
-  cellData: 'any',
   dataKey: 'string',
   rowData: 'any'
 };
 
-export default ({ cellData, dataKey, rowData }: Props) => {
-  const request = rowData;
+export default ({ dataKey, request }: Props) => {
+  const cellData = request[dataKey];
 
   if (cellData === null || cellData === undefined) return '';
 

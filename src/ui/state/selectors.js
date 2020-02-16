@@ -29,6 +29,13 @@ const isRequestSelected = (state, requestId) => {
   }
 };
 
+const getRequest = (state, requestId) => {
+  const requestIds = state.browserNetworkPage.requests.map(r => r.id);
+  const index = requestIds.indexOf(requestId);
+
+  return state.browserNetworkPage.requests[index];
+};
+
 const getPane = (state, paneId, pageName) => {
   const panes = state[pageName].page.panes;
   let paneFound;
@@ -66,4 +73,10 @@ const getParentPane = (state, paneId, pageName) => {
   return paneFound;
 };
 
-export { isRequestSelected, getSelectedRequestIds, getPane, getParentPane };
+export {
+  isRequestSelected,
+  getSelectedRequestIds,
+  getRequest,
+  getPane,
+  getParentPane
+};

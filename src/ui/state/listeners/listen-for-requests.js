@@ -19,6 +19,9 @@ const listenForRequests = dispatch => {
   global.proxyConn.listen('requestCreated', args => {
     dispatch({ type: 'REQUEST_CREATED', request: args.request });
   });
+  global.proxyConn.listen('requestUpdated', args => {
+    dispatch({ type: 'REQUEST_UPDATED', request: args.request });
+  });
 
   // Listen for a change in browsers
   global.backendConn.listen('browsersChanged', dispatchLoadRequests);

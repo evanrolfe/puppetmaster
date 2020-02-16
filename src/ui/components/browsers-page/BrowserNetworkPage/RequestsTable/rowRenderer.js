@@ -68,13 +68,12 @@ export default function rowRenderer({
   return (
     <RequestTableRowState
       key={rowData.id}
-      request={rowData}
+      requestId={rowData.id}
       className={className}
       role="row"
       style={style}
       a11yProps={a11yProps}
-    >
-      {columns}
-    </RequestTableRowState>
+      columns={columns}
+    />
   );
 }

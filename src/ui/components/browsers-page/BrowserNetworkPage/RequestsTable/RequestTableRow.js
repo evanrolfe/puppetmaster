@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import RequestTableCellData from './RequestTableCellData';
+import RequestTableCell from './RequestTableCell';
 
 type Props = {
   request: 'object',
-  children: 'array',
+  columns: 'array',
   a11yProps: 'object',
   style: 'string',
   isSelected: 'boolean',
@@ -13,7 +15,18 @@ type Props = {
 export default class RequestTableRow extends Component<Props> {
   shouldComponentUpdate(nextProps) {
     if (this.props.isSelected !== nextProps.isSelected) return true;
+
+    // If the request has had its browser saved
     if (this.props.request.browser_id === nextProps.request.browser_id)
+      return true;
+
+    // If the request has had its response saved
+    console.log(
+      `Request: ${this.props.request.id}, response_status: ${this.props.request.response_status}, next: ${nextProps.request.response_status}`
+    );
+    if (
+      this.props.request.response_status !== nextProps.request.response_status
+    )
       return true;
 
     if (this.props.request.id === nextProps.request.id) return false;
@@ -30,8 +43,9 @@ export default class RequestTableRow extends Component<Props> {
       a11yProps,
       style,
       isSelected,
-      children,
-      handleRightClick
+      handleRightClick,
+      columns,
+      request
     } = this.props;
 
     let { className } = this.props;
@@ -39,6 +53,19 @@ export default class RequestTableRow extends Component<Props> {
     console.log(`[RENDER] RequestTableRow`);
 
     if (isSelected) className += ' selected';
+
+    /*
+     * NOTE: Here we have to override react-virtualized's columns because they
+     *       are using the state which does not come from our hooks.
+     */
+    const cells = columns.map(column => {
+      const cellContent = (
+        <RequestTableCellData {...column.columnProps} request={request} />
+      );
+      return (
+        <RequestTableCell {...column.cellProps}>{cellContent}</RequestTableCell>
+      );
+    });
 
     return (
       <div
@@ -48,7 +75,7 @@ export default class RequestTableRow extends Component<Props> {
         style={style}
         onContextMenu={handleRightClick}
       >
-        {children}
+        {cells}
       </div>
     );
   }

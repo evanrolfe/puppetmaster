@@ -134,7 +134,9 @@ const proxyRequestListener = async (
     // If the request is suppoused to be captured, then save the response
     if (parsedRequest.id !== undefined) {
       await parsedRequest.saveToDatabase();
-      proxyIPC.send('requestUpdated', {});
+      proxyIPC.send('requestUpdated', {
+        request: parsedRequest.toDatabaseParams()
+      });
     }
 
     // Return the response from the proxy to the client
