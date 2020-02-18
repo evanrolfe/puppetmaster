@@ -259,7 +259,7 @@
     "react-router-dom": "^5.0.1",
     "react-tabs": "^3.0.0",
     "react-tracked": "^1.0.1",
-    "react-virtualized": "^9.21.2",
+    "react-virtualized": "https://github.com/evanrolfe/react-virtualized",
     "redux-saga": "^1.1.3",
     "source-map-support": "^0.5.9",
     "sqlite3": "^4.1.0",

@@ -1,4 +1,3 @@
-import mainIpc from '../../shared/ipc-server';
 import CaptureFilters from '../../shared/models/capture-filters';
 
 /*
@@ -61,19 +60,6 @@ const handleNewPage = async page => {
 const handleResponse = async (page, response) => {
   const headers = response.headers();
   const requestId = headers['x-pntest-id'];
-
-  // Update the request browser_id in the database
-  if (requestId !== undefined) {
-    await global
-      .knex('requests')
-      .where({ id: requestId })
-      .update({
-        browser_id: page.browser().id,
-        request_type: response.request().resourceType()
-      });
-
-    mainIpc.send('requestUpdated', {});
-  }
 
   // Save the cookies & pages:
   const { cookies } = await page._client.send('Network.getAllCookies');
