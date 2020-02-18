@@ -1,12 +1,12 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
 
-import RequestTableRow from './RequestTableRow';
+import RequestsTableRow from './RequestsTableRow';
 import { useSelector } from '../../../../state/state';
 import { isRequestSelected, getRequest } from '../../../../state/selectors';
 /*
  * NOTE: This state component is a bit of a hack. We only use it in order to
- *       "inject" the isSelected state into the RequestTableRow because
+ *       "inject" the isSelected state into the RequestsTableRow because
  *       react-virtualized does not let us pass any more data through to the
  *       rows apart from the request object itsself.
  */
@@ -38,7 +38,7 @@ export default (props: Props) => {
   };
 
   return (
-    <RequestTableRow
+    <RequestsTableRow
       {...props}
       request={request}
       isSelected={isSelected}

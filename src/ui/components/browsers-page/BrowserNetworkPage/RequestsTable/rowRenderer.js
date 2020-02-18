@@ -1,5 +1,5 @@
 import * as React from 'react';
-import RequestTableRowState from './RequestTableRowState';
+import RequestsTableRowState from './RequestsTableRowState';
 
 /*
  * NOTE: We have monkey-patched the rowRenderer function from react-virtualized
@@ -66,7 +66,7 @@ export default function rowRenderer({
   }
 
   return (
-    <RequestTableRowState
+    <RequestsTableRowState
       key={rowData.id}
       requestId={rowData.id}
       className={className}

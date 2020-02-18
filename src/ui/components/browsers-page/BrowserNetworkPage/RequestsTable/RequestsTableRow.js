@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import RequestTableCellData from './RequestTableCellData';
-import RequestTableCell from './RequestTableCell';
+import RequestsTableCellData from './RequestsTableCellData';
+import RequestsTableCell from './RequestsTableCell';
 
 type Props = {
   request: 'object',
@@ -60,10 +60,12 @@ export default class RequestTableRow extends Component<Props> {
      */
     const cells = columns.map(column => {
       const cellContent = (
-        <RequestTableCellData {...column.columnProps} request={request} />
+        <RequestsTableCellData {...column.columnProps} request={request} />
       );
       return (
-        <RequestTableCell {...column.cellProps}>{cellContent}</RequestTableCell>
+        <RequestsTableCell {...column.cellProps}>
+          {cellContent}
+        </RequestsTableCell>
       );
     });
 
