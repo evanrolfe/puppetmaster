@@ -6,7 +6,7 @@ import PaneContainer from '../pane/PaneContainer';
 import PaneRemaining from '../pane/PaneRemaining';
 import PaneFixed from '../pane/PaneFixed';
 import PaneResizeableState from '../pane/PaneResizeableState';
-import MessagesTableState from './BrowserWebsocketsPage/MessagesTableState';
+import MessagesTableState from './BrowserWebsocketsPage/MessagesTable/MessagesTableState';
 import MessageViewPaneState from './BrowserWebsocketsPage/MessageViewPaneState';
 import MessagesSearchFormState from './BrowserWebsocketsPage/MessagesSearchFormState';
 

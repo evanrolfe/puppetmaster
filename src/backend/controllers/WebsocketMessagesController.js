@@ -65,7 +65,7 @@ export default class WebsocketMessagesController {
         .del();
     }
 
-    ipc.send('websocketMessageCreated', {});
+    ipc.send('websocketMessageDeleted', { websocketMessageId: args.id });
 
     return { status: 'OK', body: {} };
   }

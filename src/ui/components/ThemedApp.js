@@ -19,6 +19,7 @@ import BrowserNetworkConfig from './browsers-page/status-bar/BrowserNetworkConfi
 import { useDispatch } from '../state/state';
 
 import { listenForRequests } from '../state/listeners/listen-for-requests';
+import { listenForWebsocketMessages } from '../state/listeners/listen-for-websocket-messages';
 
 export default () => {
   console.log('[RENDER] ThemedApp');
@@ -32,6 +33,7 @@ export default () => {
   dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
 
   listenForRequests(dispatch);
+  listenForWebsocketMessages(dispatch);
 
   // Listen for new websocket messages
   const loadMessages = () => dispatch({ type: 'LOAD_WEBSOCKET_MESSAGES' });
