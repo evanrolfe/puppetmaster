@@ -24,11 +24,11 @@ export const STATUS_CODES = {
 
 export const ALL_TABLE_COLUMNS = [
   { key: 'id', title: '#', width: 40 },
-  { key: 'title', title: 'Browser', width: 80 },
+  // { key: 'title', title: 'Browser', width: 80 },
   { key: 'method', title: 'Method', width: 70 },
-  { key: 'host', title: 'Host', width: 80 },
+  { key: 'host', title: 'Host', width: 200 },
   { key: 'path', title: 'Path', width: 175 },
-  { key: 'request_type', title: 'Type', width: 80 },
+  // { key: 'request_type', title: 'Type', width: 80 },
   { key: 'ext', title: 'Ext', width: 40 },
   { key: 'request_modified', title: 'Modified?', width: 85 },
   { key: 'response_status', title: 'Status', width: 70 },
@@ -54,13 +54,12 @@ export const WEBSOCKET_MESSAGE_TABLE_COLUMNS = [
 
 export const DEFAULT_COLUMNS = [
   'id',
-  'title',
   'method',
   'host',
   'path',
   'response_status',
-  'request_type',
-  'request_modified'
+  'request_modified',
+  'response_body_length'
 ];
 
 export const PAGE_LAYOUTS = {
