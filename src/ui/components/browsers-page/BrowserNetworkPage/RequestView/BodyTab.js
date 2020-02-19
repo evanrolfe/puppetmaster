@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PaneRemaining from '../../../pane/PaneRemaining';
 import PaneFixed from '../../../pane/PaneFixed';
@@ -29,8 +29,6 @@ export default ({
   selectDropdownItem,
   responseBody
 }: Props) => {
-  console.log(`[RENDER] BodyTab`);
-
   const openInBrowser = () => {
     const content = responseBody || '';
     const contentEncoded = Buffer.from(content).toString('base64');
@@ -40,6 +38,9 @@ export default ({
   };
 
   if (request === null || Object.entries(request).length === 0) return <></>;
+
+  console.log(`[RENDER] BodyTab for request ${request.id}`);
+  const startTime = Date.now();
 
   let mimeType;
   if (request.request_type === 'navigation') {
@@ -114,6 +115,14 @@ export default ({
   if (normalisedViewMode === 'pretty' && canPrettify(mimeType)) {
     code = prettifyCode(code, mimeType);
   }
+
+  useEffect(() => {
+    const endTime = Date.now();
+    const diff = endTime - startTime;
+    console.log(
+      `[Performance] BodyTab render DONE for ${request.id} in ${diff} ms`
+    );
+  }, [request.id]);
 
   return (
     <>
