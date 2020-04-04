@@ -1,6 +1,6 @@
-# Puppet Master
+# OneProxy
 
-An HTTP proxy application for performing penetration tests against web applications, with advanced capabilities for handling single-page-applications.
+An HTTP proxy application for performing penetration tests against web applications, with advanced capabilities for handling single-page-applications. This project is no longer in development. Instead it is now being developed as a native gui application using Qt and C++.
 
 ![](./screenshot.png)
 
