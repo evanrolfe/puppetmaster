@@ -42,7 +42,7 @@ $ NODE_ENV=development yarn start-proxy
 ```
 
 ## Test
-
+The integration tests require that you are running the [example app](https://github.com/evanrolfe/example_app), follow those instructions to download and run it using docker. Then you can run the tests with: 
 ```bash
 $ yarn test
 ```
