@@ -248,7 +248,7 @@
     "httpolyglot": "^0.1.2",
     "js-beautify": "^1.10.2",
     "knex": "^0.20.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "node-ipc": "^9.1.1",
     "node-noop": "^1.0.0",
     "puppeteer": "^2.1.0",
